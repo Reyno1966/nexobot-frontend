@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import LogoutButton from "@/components/LogoutButton";
 
 export default function DashboardPage() {
   const [user, setUser] = useState<any>(null);
@@ -9,22 +10,33 @@ export default function DashboardPage() {
   const router = useRouter();
 
   useEffect(() => {
-    const session = localStorage.getItem("sb-session");
+    async function loadUser() {
+      try {
+        const res = await fetch("/api/auth/me", {
+          method: "GET",
+          credentials: "include",
+        });
 
-    if (!session) {
-      router.push("/auth/login");
-      return;
+        if (!res.ok) {
+          router.push("/auth/login");
+          return;
+        }
+
+        const data = await res.json();
+
+        if (!data?.user) {
+          router.push("/auth/login");
+          return;
+        }
+
+        setUser(data.user);
+        setLoading(false);
+      } catch (error) {
+        router.push("/auth/login");
+      }
     }
 
-    const parsed = JSON.parse(session);
-
-    if (!parsed?.user) {
-      router.push("/auth/login");
-      return;
-    }
-
-    setUser(parsed.user);
-    setLoading(false);
+    loadUser();
   }, [router]);
 
   if (loading) {
@@ -46,15 +58,7 @@ export default function DashboardPage() {
           <span className="font-semibold">{user.email}</span>
         </p>
 
-        <button
-          onClick={() => {
-            localStorage.removeItem("sb-session");
-            router.push("/auth/login");
-          }}
-          className="w-full bg-black text-white py-2 rounded-lg font-semibold hover:bg-gray-800 transition"
-        >
-          Cerrar sesión
-        </button>
+        <LogoutButton />
       </div>
     </div>
   );

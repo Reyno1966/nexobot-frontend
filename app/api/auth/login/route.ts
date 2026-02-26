@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
+import { createClient } from "@supabase/supabase-js";
 
 export async function POST(req: Request) {
   try {
@@ -15,7 +15,7 @@ export async function POST(req: Request) {
       );
     }
 
-    // Cliente Supabase normal (sin helpers)
+    // Cliente Supabase
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -34,17 +34,20 @@ export async function POST(req: Request) {
       );
     }
 
-    // Guardar la sesión manualmente en cookies
+    // Guardar tokens en cookies
     const cookieStore = cookies();
+
     cookieStore.set("sb-access-token", data.session.access_token, {
       httpOnly: true,
       secure: true,
+      sameSite: "lax",
       path: "/",
     });
 
     cookieStore.set("sb-refresh-token", data.session.refresh_token, {
       httpOnly: true,
       secure: true,
+      sameSite: "lax",
       path: "/",
     });
 
