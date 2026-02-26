@@ -1,47 +1,46 @@
-import Link from "next/link";
+import { cookies } from "next/headers";
+import { NextResponse } from "next/server";
 
-export default function LoginPage() {
-  return (
-    <div className="min-h-screen flex items-center justify-center p-6">
-      <div className="w-full max-w-md bg-white shadow-lg rounded-xl p-8">
-        <h1 className="text-3xl font-bold mb-6 text-center">Iniciar sesión</h1>
+export async function POST(req: Request) {
+  const body = await req.json();
 
-        <form action="/api/auth/login" method="post" className="space-y-4">
-          <div>
-            <label className="block mb-1 font-medium">Email</label>
-            <input
-              type="email"
-              name="email"
-              required
-              className="w-full border px-3 py-2 rounded-lg"
-            />
-          </div>
-
-          <div>
-            <label className="block mb-1 font-medium">Contraseña</label>
-            <input
-              type="password"
-              name="password"
-              required
-              className="w-full border px-3 py-2 rounded-lg"
-            />
-          </div>
-
-          <button
-            type="submit"
-            className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold"
-          >
-            Entrar
-          </button>
-        </form>
-
-        <p className="text-center mt-4">
-          ¿No tienes cuenta?{" "}
-          <Link href="/signup" className="text-blue-600 font-semibold">
-            Regístrate
-          </Link>
-        </p>
-      </div>
-    </div>
+  // Aquí va tu lógica de login con Supabase
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_SUPABASE_URL}/auth/v1/token?grant_type=password`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      },
+      body: JSON.stringify({
+        email: body.email,
+        password: body.password,
+      }),
+    }
   );
+
+  const data = await response.json();
+
+  if (data.error) {
+    return NextResponse.json({ error: data.error.message }, { status: 400 });
+  }
+
+  const cookieStore = await cookies();
+
+  cookieStore.set("sb-access-token", data.session.access_token, {
+    httpOnly: true,
+    secure: true,
+    sameSite: "lax",
+    path: "/",
+  });
+
+  cookieStore.set("sb-refresh-token", data.session.refresh_token, {
+    httpOnly: true,
+    secure: true,
+    sameSite: "lax",
+    path: "/",
+  });
+
+  return NextResponse.json({ user: data.user });
 }
