@@ -4,7 +4,6 @@ import { NextResponse } from "next/server";
 export async function POST(req: Request) {
   const body = await req.json();
 
-  // Aquí va tu lógica de login con Supabase
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_SUPABASE_URL}/auth/v1/token?grant_type=password`,
     {
@@ -44,4 +43,3 @@ export async function POST(req: Request) {
 
   return NextResponse.json({ user: data.user });
 }
-
