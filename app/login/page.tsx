@@ -1,46 +1,45 @@
-import { cookies } from "next/headers";
-import { NextResponse } from "next/server";
+"use client";
 
-export async function POST(req: Request) {
-  const body = await req.json();
+import { useState } from "react";
 
-  // Aquí va tu lógica de login con Supabase
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_SUPABASE_URL}/auth/v1/token?grant_type=password`,
-    {
+export default function Page() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  async function handleLogin(e: React.FormEvent) {
+    e.preventDefault();
+
+    const res = await fetch("/api/auth/login", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      },
-      body: JSON.stringify({
-        email: body.email,
-        password: body.password,
-      }),
-    }
-  );
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
 
-  const data = await response.json();
-
-  if (data.error) {
-    return NextResponse.json({ error: data.error.message }, { status: 400 });
+    const data = await res.json();
+    console.log(data);
   }
 
-  const cookieStore = await cookies();
+  return (
+    <div style={{ padding: 40 }}>
+      <h1>Login</h1>
 
-  cookieStore.set("sb-access-token", data.session.access_token, {
-    httpOnly: true,
-    secure: true,
-    sameSite: "lax",
-    path: "/",
-  });
+      <form onSubmit={handleLogin}>
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
 
-  cookieStore.set("sb-refresh-token", data.session.refresh_token, {
-    httpOnly: true,
-    secure: true,
-    sameSite: "lax",
-    path: "/",
-  });
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
 
-  return NextResponse.json({ user: data.user });
+        <button type="submit">Login</button>
+      </form>
+    </div>
+  );
 }
