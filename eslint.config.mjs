@@ -18,6 +18,8 @@ const eslintConfig = [
       "out/**",
       "build/**",
       "next-env.d.ts",
+      "nexobot-frontend/**",  // carpeta anidada (artifact del setup)
+      ".wrangler/**",
     ],
   },
 ];

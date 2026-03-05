@@ -14,32 +14,48 @@ export async function POST(req: Request) {
       );
     }
 
-    // Cliente Supabase
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      process.env.SUPABASE_SERVICE_ROLE_KEY! // usamos SERVICE ROLE aquí
     );
 
-    const { data, error } = await supabase.auth.signUp({
+    // 1) Crear usuario en Supabase Auth
+    const { data, error } = await supabase.auth.admin.createUser({
       email,
       password,
+      email_confirm: true, // opcional: lo marcamos como confirmado
     });
 
-    if (error) {
+    if (error || !data.user) {
       return NextResponse.json(
-        { error: error.message },
+        { error: error?.message || "Error al crear usuario en Auth" },
         { status: 400 }
+      );
+    }
+
+    // 2) Guardar usuario en tu tabla "users"
+    const { error: insertError } = await supabase.from("users").insert({
+      auth_user_id: data.user.id,
+      email,
+    });
+
+    if (insertError) {
+      return NextResponse.json(
+        { error: "Usuario creado en Auth, pero error al guardar en users" },
+        { status: 500 }
       );
     }
 
     return NextResponse.json(
       {
         message: "Usuario creado correctamente",
-        user: data.user,
+        user: {
+          id: data.user.id,
+          email: data.user.email,
+        },
       },
       { status: 200 }
     );
-
   } catch (err) {
     console.error("Error en signup:", err);
     return NextResponse.json(

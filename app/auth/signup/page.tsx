@@ -2,20 +2,21 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function SignupPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const form = e.target;
-    const email = form.email.value;
-    const password = form.password.value;
-    const confirm = form.confirm_password.value;
+    const form = e.currentTarget;
+    const password = (form.elements.namedItem("password") as HTMLInputElement).value;
+    const confirm = (form.elements.namedItem("confirm_password") as HTMLInputElement).value;
 
     // Validación: contraseñas iguales
     if (password !== confirm) {
@@ -30,8 +31,8 @@ export default function SignupPage() {
     }
 
     setError("");
+    setLoading(true);
 
-    // Enviar datos a la API
     const formData = new FormData(form);
 
     const res = await fetch("/api/auth/signup", {
@@ -40,14 +41,27 @@ export default function SignupPage() {
     });
 
     const data = await res.json();
+    setLoading(false);
 
     if (!res.ok) {
       setError(data.error || "Error al crear la cuenta");
       return;
     }
 
-    // Registro exitoso → redirigir al dashboard
-    router.push("/dashboard");
+    // Registro exitoso → hacer login automático
+    const email = (form.elements.namedItem("email") as HTMLInputElement).value;
+    const loginRes = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
+
+    if (loginRes.ok) {
+      router.push("/dashboard");
+    } else {
+      // Si no se puede hacer login automático, redirigir al login
+      router.push("/auth/login");
+    }
   };
 
   return (
@@ -119,24 +133,25 @@ export default function SignupPage() {
           {/* SUBMIT */}
           <button
             type="submit"
-            className="w-full bg-black text-white py-2 rounded-lg font-semibold hover:bg-gray-800 transition"
+            disabled={loading}
+            className="w-full bg-black text-white py-2 rounded-lg font-semibold hover:bg-gray-800 transition disabled:opacity-60"
           >
-            Registrarme
+            {loading ? "Creando cuenta..." : "Registrarme"}
           </button>
         </form>
 
         <p className="text-center text-sm text-gray-500 mt-4">
           ¿Olvidaste tu contraseña?{" "}
-          <a href="/auth/reset" className="text-black font-medium">
+          <Link href="/auth/reset" className="text-black font-medium">
             Recuperar cuenta
-          </a>
+          </Link>
         </p>
 
         <p className="text-center text-sm text-gray-500 mt-2">
           ¿Ya tienes cuenta?{" "}
-          <a href="/auth/login" className="text-black font-medium">
+          <Link href="/auth/login" className="text-black font-medium">
             Inicia sesión
-          </a>
+          </Link>
         </p>
       </div>
     </div>

@@ -1,335 +1,246 @@
+import Link from "next/link";
+
 export default function HomeFR() {
   return (
-    <main className="bg-white text-gray-900">
+    <main className="min-h-screen bg-white text-gray-900">
+      {/* Navbar */}
+      <nav className="max-w-6xl mx-auto px-6 py-5 flex items-center justify-between">
+        <Link href="/fr" className="text-2xl font-extrabold text-blue-600">NexoBot</Link>
+        <div className="flex items-center gap-4">
+          <a href="#pricing" className="text-sm font-medium text-gray-600 hover:text-blue-600 transition">Tarifs</a>
+          <a href="#faq" className="text-sm font-medium text-gray-600 hover:text-blue-600 transition">FAQ</a>
+          <Link href="/auth/login" className="text-sm font-medium text-gray-700 hover:text-blue-600 transition">Se connecter</Link>
+          <Link href="/auth/signup" className="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition">Commencer gratuitement</Link>
+        </div>
+      </nav>
 
-      {/* HERO */}
-      <section className="py-32 px-6 text-center max-w-4xl mx-auto">
-        <h1 className="text-5xl font-extrabold leading-tight">
-          Automatisez vos ventes et votre support client avec{" "}
-          <span className="text-blue-600">NexoBot</span>
+      {/* Hero */}
+      <section className="max-w-4xl mx-auto px-6 py-24 text-center">
+        <span className="inline-block bg-blue-100 text-blue-700 text-xs font-semibold px-3 py-1 rounded-full mb-6 uppercase tracking-wide">
+          IA pour les Ventes &amp; le Support
+        </span>
+        <h1 className="text-5xl font-extrabold leading-tight mb-6">
+          Automatisez vos Ventes et votre Support Client avec NexoBot
         </h1>
-
-        <p className="mt-6 text-lg text-gray-600">
-          Votre assistant intelligent qui répond aux clients, génère des ventes
-          et travaille pour vous 24h/24 et 7j/7. Gagnez du temps, augmentez vos
-          revenus et développez votre entreprise sans effort.
+        <p className="text-xl text-gray-600 mb-10">
+          NexoBot gère vos leads, répond aux clients et booste vos ventes 24h/24 — pendant que vous vous concentrez sur ce qui compte vraiment.
         </p>
-
-        <div className="mt-10 flex justify-center gap-4">
-          <a
-            href="/en"
-            className="px-10 py-4 bg-blue-600 text-white rounded-xl font-semibold shadow-md hover:bg-blue-700 transition-all"
-          >
-            Commencer
-          </a>
-
-          <a
-            href="#how"
-            className="px-10 py-4 bg-white border border-gray-300 rounded-xl font-semibold hover:bg-gray-100 transition-all"
-          >
-            Voir comment ça marche
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <Link href="/auth/signup" className="px-8 py-4 bg-blue-600 text-white text-lg font-semibold rounded-xl hover:bg-blue-700 transition shadow-lg">
+            Commencer gratuitement
+          </Link>
+          <a href="#pricing" className="px-8 py-4 border border-gray-300 text-gray-700 text-lg font-semibold rounded-xl hover:border-blue-600 hover:text-blue-600 transition">
+            Voir les tarifs
           </a>
         </div>
+        <p className="mt-4 text-sm text-gray-500">Aucune carte de crédit requise</p>
       </section>
 
-      {/* INTRO */}
-      <section className="py-20 px-6 text-center max-w-3xl mx-auto">
-        <h2 className="text-4xl font-bold">
-          Tout ce dont vous avez besoin pour automatiser votre entreprise
-        </h2>
-
-        <p className="mt-6 text-gray-600 text-lg">
-          NexoBot combine intelligence artificielle, automatisation et
-          communication multicanale pour vous aider à servir plus de clients et
-          conclure plus de ventes sans effort.
-        </p>
-      </section>
-
-      {/* FEATURES */}
-      <section className="py-20 px-6 max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-10">
-
-        <div className="p-8 border rounded-2xl shadow-sm hover:shadow-md transition">
-          <h3 className="text-xl font-bold mb-3">Réponses automatiques 24/7</h3>
-          <p className="text-gray-600">
-            NexoBot répond à vos clients en temps réel, même pendant votre sommeil.
+      {/* Features */}
+      <section className="bg-gray-50 py-20">
+        <div className="max-w-6xl mx-auto px-6">
+          <h2 className="text-3xl font-extrabold text-center mb-4">Pourquoi choisir NexoBot ?</h2>
+          <p className="text-center text-gray-500 mb-14 max-w-2xl mx-auto">
+            Tout ce dont vous avez besoin pour automatiser votre activité et offrir une expérience client exceptionnelle.
           </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
+              <div className="text-3xl mb-4">🤖</div>
+              <h3 className="text-xl font-bold mb-2">IA Conversationnelle</h3>
+              <p className="text-gray-600">Répond automatiquement aux questions fréquentes et qualifie vos leads en temps réel, 24h/24 et 7j/7.</p>
+            </div>
+            <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
+              <div className="text-3xl mb-4">📈</div>
+              <h3 className="text-xl font-bold mb-2">Boost des Ventes</h3>
+              <p className="text-gray-600">Convertissez plus de visiteurs en clients grâce à des conversations personnalisées et des relances automatiques.</p>
+            </div>
+            <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
+              <div className="text-3xl mb-4">🔗</div>
+              <h3 className="text-xl font-bold mb-2">Intégrations Faciles</h3>
+              <p className="text-gray-600">Connectez NexoBot à vos outils existants : CRM, e-mail, WhatsApp, Slack et bien plus encore.</p>
+            </div>
+            <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
+              <div className="text-3xl mb-4">📊</div>
+              <h3 className="text-xl font-bold mb-2">Analyses &amp; Rapports</h3>
+              <p className="text-gray-600">Suivez les performances de votre bot avec des tableaux de bord intuitifs et des rapports détaillés.</p>
+            </div>
+            <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
+              <div className="text-3xl mb-4">🛡️</div>
+              <h3 className="text-xl font-bold mb-2">Sécurité &amp; Conformité</h3>
+              <p className="text-gray-600">Vos données sont protégées avec un chiffrement de bout en bout et une conformité RGPD garantie.</p>
+            </div>
+            <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
+              <div className="text-3xl mb-4">⚡</div>
+              <h3 className="text-xl font-bold mb-2">Configuration Rapide</h3>
+              <p className="text-gray-600">Déployez votre bot en moins de 10 minutes sans aucune compétence technique requise.</p>
+            </div>
+          </div>
         </div>
+      </section>
 
-        <div className="p-8 border rounded-2xl shadow-sm hover:shadow-md transition">
-          <h3 className="text-xl font-bold mb-3">Génération de ventes</h3>
-          <p className="text-gray-600">
-            Transformez les conversations en ventes grâce à des messages intelligents
-            et personnalisés.
+      {/* Pricing */}
+      <section id="pricing" className="py-20">
+        <div className="max-w-6xl mx-auto px-6">
+          <h2 className="text-3xl font-extrabold text-center mb-4">Tarifs simples et transparents</h2>
+          <p className="text-center text-gray-500 mb-14 max-w-2xl mx-auto">
+            Choisissez le plan qui correspond à vos besoins. Changez ou annulez à tout moment.
           </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* Starter */}
+            <div className="rounded-2xl border border-gray-200 p-8 flex flex-col">
+              <h3 className="text-xl font-bold mb-2">Starter</h3>
+              <p className="text-gray-500 text-sm mb-6">Idéal pour les indépendants et petites équipes.</p>
+              <div className="text-4xl font-extrabold mb-1">$29<span className="text-lg font-medium text-gray-500">/mois</span></div>
+              <ul className="mt-6 mb-8 space-y-3 text-sm text-gray-700 flex-1">
+                <li>✅ 1 bot actif</li>
+                <li>✅ Jusqu&apos;à 500 conversations/mois</li>
+                <li>✅ Intégrations de base</li>
+                <li>✅ Support par e-mail</li>
+              </ul>
+              <Link href="/auth/signup?priceId=price_1T18BGRap0JkQNsmaUVhyNFr" className="block text-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition">
+                Commencer
+              </Link>
+            </div>
+            {/* Pro */}
+            <div className="rounded-2xl border-2 border-blue-600 p-8 flex flex-col relative shadow-lg">
+              <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-xs font-bold px-4 py-1 rounded-full">Le plus populaire</span>
+              <h3 className="text-xl font-bold mb-2">Pro</h3>
+              <p className="text-gray-500 text-sm mb-6">Pour les entreprises en pleine croissance.</p>
+              <div className="text-4xl font-extrabold mb-1">$59<span className="text-lg font-medium text-gray-500">/mois</span></div>
+              <ul className="mt-6 mb-8 space-y-3 text-sm text-gray-700 flex-1">
+                <li>✅ 5 bots actifs</li>
+                <li>✅ Jusqu&apos;à 5 000 conversations/mois</li>
+                <li>✅ Intégrations avancées</li>
+                <li>✅ Support prioritaire</li>
+                <li>✅ Analyses détaillées</li>
+              </ul>
+              <Link href="/auth/signup?priceId=price_1T15gVRap0JkQNsm59vukMuR" className="block text-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition">
+                Commencer
+              </Link>
+            </div>
+            {/* Premium */}
+            <div className="rounded-2xl border border-gray-200 p-8 flex flex-col">
+              <h3 className="text-xl font-bold mb-2">Premium</h3>
+              <p className="text-gray-500 text-sm mb-6">Pour les grandes entreprises avec des besoins avancés.</p>
+              <div className="text-4xl font-extrabold mb-1">$99<span className="text-lg font-medium text-gray-500">/mois</span></div>
+              <ul className="mt-6 mb-8 space-y-3 text-sm text-gray-700 flex-1">
+                <li>✅ Bots illimités</li>
+                <li>✅ Conversations illimitées</li>
+                <li>✅ Toutes les intégrations</li>
+                <li>✅ Support dédié 24/7</li>
+                <li>✅ Personnalisation avancée</li>
+                <li>✅ SLA garanti</li>
+              </ul>
+              <Link href="/auth/signup?priceId=price_1T15jDRap0JkQNsmQRvEkpcm" className="block text-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition">
+                Commencer
+              </Link>
+            </div>
+          </div>
         </div>
+      </section>
 
-        <div className="p-8 border rounded-2xl shadow-sm hover:shadow-md transition">
-          <h3 className="text-xl font-bold mb-3">Multicanal</h3>
-          <p className="text-gray-600">
-            WhatsApp, Instagram, Facebook et site web : tout en un seul endroit.
+      {/* Additional Services */}
+      <section className="bg-gray-50 py-20">
+        <div className="max-w-6xl mx-auto px-6">
+          <h2 className="text-3xl font-extrabold text-center mb-4">Services Additionnels</h2>
+          <p className="text-center text-gray-500 mb-14 max-w-2xl mx-auto">
+            Améliorez votre expérience NexoBot avec nos services complémentaires à la carte.
           </p>
-        </div>
-
-      </section>
-      {/* PRICING */}
-      <section className="py-24 px-6 bg-gray-50" id="pricing">
-        <h2 className="text-4xl font-bold text-center mb-16">
-          Choisissez le plan parfait pour votre entreprise
-        </h2>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 max-w-6xl mx-auto">
-
-          {/* BASIC */}
-          <div className="p-10 bg-white border rounded-2xl shadow-sm hover:shadow-md transition">
-            <h3 className="text-2xl font-bold mb-4">Basic</h3>
-            <p className="text-gray-600 mb-6">
-              Idéal pour les petites entreprises qui souhaitent commencer avec l’automatisation.
-            </p>
-            <p className="text-4xl font-extrabold mb-6">19€<span className="text-lg">/mois</span></p>
-
-            <ul className="text-gray-600 space-y-3 mb-8">
-              <li>✔ Réponses automatiques 24/7</li>
-              <li>✔ Jusqu’à 500 messages par mois</li>
-              <li>✔ 1 canal connecté</li>
-              <li>✔ Support basique</li>
-            </ul>
-
-            <a
-              href="/en"
-              className="block text-center px-8 py-3 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition"
-            >
-              Commencer
-            </a>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="bg-white rounded-2xl border border-gray-200 p-8 flex flex-col">
+              <div className="text-3xl mb-4">🎨</div>
+              <h3 className="text-xl font-bold mb-2">Personnalisation Avancée</h3>
+              <p className="text-gray-600 mb-6 flex-1">Adaptez l&apos;apparence et le comportement de votre bot à votre identité de marque.</p>
+              <div className="text-2xl font-extrabold mb-4">$99</div>
+              <Link href="/auth/signup?priceId=price_1T161uRap0JkQNsm3BJZGOEu" className="block text-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition">
+                En savoir plus
+              </Link>
+            </div>
+            <div className="bg-white rounded-2xl border border-gray-200 p-8 flex flex-col">
+              <div className="text-3xl mb-4">⚙️</div>
+              <h3 className="text-xl font-bold mb-2">Automatisations Avancées</h3>
+              <p className="text-gray-600 mb-6 flex-1">Créez des flux de travail complexes et des automatisations pour optimiser vos processus métier.</p>
+              <div className="text-2xl font-extrabold mb-4">$149</div>
+              <Link href="/auth/signup?priceId=price_1T163sRap0JkQNsmOrHBQuJp" className="block text-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition">
+                En savoir plus
+              </Link>
+            </div>
+            <div className="bg-white rounded-2xl border border-gray-200 p-8 flex flex-col">
+              <div className="text-3xl mb-4">🔌</div>
+              <h3 className="text-xl font-bold mb-2">Intégrations Externes</h3>
+              <p className="text-gray-600 mb-6 flex-1">Connectez NexoBot à vos systèmes internes et outils tiers avec des intégrations sur mesure.</p>
+              <div className="text-2xl font-extrabold mb-4">$199</div>
+              <Link href="/auth/signup?priceId=price_1T166cRap0JkQNsmuPTOPBBu" className="block text-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition">
+                En savoir plus
+              </Link>
+            </div>
           </div>
-
-          {/* PRO */}
-          <div className="p-10 bg-white border-2 border-blue-600 rounded-2xl shadow-md hover:shadow-lg transition">
-            <h3 className="text-2xl font-bold mb-4">Pro</h3>
-            <p className="text-gray-600 mb-6">
-              Parfait pour les entreprises qui veulent évoluer et augmenter leurs ventes.
-            </p>
-            <p className="text-4xl font-extrabold mb-6">49€<span className="text-lg">/mois</span></p>
-
-            <ul className="text-gray-600 space-y-3 mb-8">
-              <li>✔ Réponses automatiques avancées</li>
-              <li>✔ Messages illimités</li>
-              <li>✔ 3 canaux connectés</li>
-              <li>✔ Automatisations intelligentes</li>
-              <li>✔ Support prioritaire</li>
-            </ul>
-
-            <a
-              href="/en"
-              className="block text-center px-8 py-3 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition"
-            >
-              Choisir Pro
-            </a>
-          </div>
-
-          {/* ENTERPRISE */}
-          <div className="p-10 bg-white border rounded-2xl shadow-sm hover:shadow-md transition">
-            <h3 className="text-2xl font-bold mb-4">Enterprise</h3>
-            <p className="text-gray-600 mb-6">
-              Pour les entreprises ayant besoin de solutions personnalisées et d’une évolutivité totale.
-            </p>
-            <p className="text-4xl font-extrabold mb-6">99€<span className="text-lg">/mois</span></p>
-
-            <ul className="text-gray-600 space-y-3 mb-8">
-              <li>✔ Toutes les fonctionnalités Pro</li>
-              <li>✔ Canaux illimités</li>
-              <li>✔ Automatisations avancées</li>
-              <li>✔ Support dédié</li>
-              <li>✔ Intégrations personnalisées</li>
-            </ul>
-
-            <a
-              href="/en"
-              className="block text-center px-8 py-3 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition"
-            >
-              Nous contacter
-            </a>
-          </div>
-
         </div>
       </section>
 
-      {/* SERVICES SUPPLÉMENTAIRES */}
-      <section className="py-24 px-6 max-w-6xl mx-auto">
-        <h2 className="text-4xl font-bold text-center mb-16">
-          Services supplémentaires
-        </h2>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-
-          <div className="p-8 border rounded-2xl shadow-sm hover:shadow-md transition">
-            <h3 className="text-xl font-bold mb-3">Configuration WhatsApp</h3>
-            <p className="text-gray-600 mb-4">
-              Mise en place complète de votre canal WhatsApp Business API.
-            </p>
-            <p className="font-bold text-blue-600">49€ frais uniques</p>
-          </div>
-
-          <div className="p-8 border rounded-2xl shadow-sm hover:shadow-md transition">
-            <h3 className="text-xl font-bold mb-3">Création de chatbot personnalisé</h3>
-            <p className="text-gray-600 mb-4">
-              Nous construisons un chatbot sur mesure pour votre entreprise.
-            </p>
-            <p className="font-bold text-blue-600">99€ frais uniques</p>
-          </div>
-
-          <div className="p-8 border rounded-2xl shadow-sm hover:shadow-md transition">
-            <h3 className="text-xl font-bold mb-3">Intégration site web</h3>
-            <p className="text-gray-600 mb-4">
-              Nous intégrons NexoBot à votre site de manière professionnelle.
-            </p>
-            <p className="font-bold text-blue-600">39€ frais uniques</p>
-          </div>
-
-        </div>
-      </section>
-
-      {/* COMMENT ÇA MARCHE */}
-      <section className="py-24 px-6 bg-gray-50" id="how">
-        <h2 className="text-4xl font-bold text-center mb-16">
-          Comment fonctionne NexoBot
-        </h2>
-
-        <div className="max-w-4xl mx-auto space-y-12">
-
-          <div>
-            <h3 className="text-2xl font-bold mb-3">1. Connectez vos canaux</h3>
-            <p className="text-gray-600">
-              WhatsApp, Instagram, Facebook ou site web : choisissez où automatiser.
-            </p>
-          </div>
-
-          <div>
-            <h3 className="text-2xl font-bold mb-3">2. Configurez vos automatisations</h3>
-            <p className="text-gray-600">
-              Définissez ce que NexoBot doit faire : répondre, vendre, qualifier les clients, etc.
-            </p>
-          </div>
-
-          <div>
-            <h3 className="text-2xl font-bold mb-3">3. Laissez-le travailler pour vous</h3>
-            <p className="text-gray-600">
-              NexoBot répond aux clients 24/7 et vous aide à générer plus de ventes.
-            </p>
-          </div>
-
-        </div>
-      </section>
       {/* FAQ */}
-      <section className="py-24 px-6 max-w-5xl mx-auto">
-        <h2 className="text-4xl font-bold text-center mb-16">
-          Questions fréquentes
-        </h2>
-
-        <div className="space-y-10">
-
-          <div>
-            <h3 className="text-2xl font-bold mb-3">
-              NexoBot fonctionne-t-il avec WhatsApp ?
-            </h3>
-            <p className="text-gray-600">
-              Oui, NexoBot s’intègre parfaitement avec WhatsApp Business API pour
-              automatiser les réponses, les ventes et le support.
-            </p>
+      <section id="faq" className="py-20">
+        <div className="max-w-3xl mx-auto px-6">
+          <h2 className="text-3xl font-extrabold text-center mb-14">Questions Fréquentes</h2>
+          <div className="space-y-8">
+            <div>
+              <h3 className="text-lg font-bold mb-2">Comment fonctionne NexoBot ?</h3>
+              <p className="text-gray-600">NexoBot utilise l&apos;intelligence artificielle pour analyser les messages de vos clients et y répondre automatiquement de manière naturelle et pertinente, 24h/24.</p>
+            </div>
+            <div>
+              <h3 className="text-lg font-bold mb-2">Puis-je essayer NexoBot gratuitement ?</h3>
+              <p className="text-gray-600">Oui ! Vous pouvez commencer avec notre essai gratuit sans carte de crédit. Découvrez toutes les fonctionnalités avant de vous engager.</p>
+            </div>
+            <div>
+              <h3 className="text-lg font-bold mb-2">Quelles plateformes sont supportées ?</h3>
+              <p className="text-gray-600">NexoBot s&apos;intègre avec votre site web, WhatsApp, Facebook Messenger, Instagram, Slack et de nombreuses autres plateformes.</p>
+            </div>
+            <div>
+              <h3 className="text-lg font-bold mb-2">Puis-je changer de plan à tout moment ?</h3>
+              <p className="text-gray-600">Absolument. Vous pouvez upgrader ou downgrader votre plan à n&apos;importe quel moment depuis votre tableau de bord, sans frais cachés.</p>
+            </div>
+            <div>
+              <h3 className="text-lg font-bold mb-2">Mes données sont-elles en sécurité ?</h3>
+              <p className="text-gray-600">La sécurité est notre priorité. Toutes les données sont chiffrées et nous sommes conformes au RGPD. Vos informations ne sont jamais partagées avec des tiers.</p>
+            </div>
           </div>
-
-          <div>
-            <h3 className="text-2xl font-bold mb-3">
-              Puis-je aussi l’utiliser sur Instagram et Facebook ?
-            </h3>
-            <p className="text-gray-600">
-              Bien sûr. Vous pouvez connecter plusieurs canaux et tout gérer depuis
-              une seule plateforme.
-            </p>
-          </div>
-
-          <div>
-            <h3 className="text-2xl font-bold mb-3">
-              Ai-je besoin de compétences techniques ?
-            </h3>
-            <p className="text-gray-600">
-              Non. NexoBot est conçu pour être simple et intuitif. Vous pouvez
-              commencer en quelques minutes.
-            </p>
-          </div>
-
-          <div>
-            <h3 className="text-2xl font-bold mb-3">
-              Puis-je annuler quand je veux ?
-            </h3>
-            <p className="text-gray-600">
-              Oui, vous pouvez annuler ou changer de plan à tout moment sans frais
-              supplémentaires.
-            </p>
-          </div>
-
         </div>
       </section>
 
-      {/* TÉMOIGNAGES */}
-      <section className="py-24 px-6 bg-gray-50">
-        <h2 className="text-4xl font-bold text-center mb-16">
-          Ce que disent nos clients
-        </h2>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 max-w-6xl mx-auto">
-
-          <div className="p-8 bg-white border rounded-2xl shadow-sm">
-            <p className="text-gray-700 italic mb-4">
-              “NexoBot a réduit de 70% le temps passé à répondre aux clients.
-              C’est incroyable.”
-            </p>
-            <p className="font-bold">Marc R.</p>
-            <p className="text-gray-500 text-sm">E-commerce</p>
-          </div>
-
-          <div className="p-8 bg-white border rounded-2xl shadow-sm">
-            <p className="text-gray-700 italic mb-4">
-              “Nous avons augmenté nos ventes de 40% en un mois. Indispensable.”
-            </p>
-            <p className="font-bold">Julie S.</p>
-            <p className="text-gray-500 text-sm">Services numériques</p>
-          </div>
-
-          <div className="p-8 bg-white border rounded-2xl shadow-sm">
-            <p className="text-gray-700 italic mb-4">
-              “Facile à utiliser, rapide à configurer et super efficace.”
-            </p>
-            <p className="font-bold">Lucas M.</p>
-            <p className="text-gray-500 text-sm">Restauration</p>
-          </div>
-
+      {/* Final CTA */}
+      <section className="bg-blue-600 py-20">
+        <div className="max-w-3xl mx-auto px-6 text-center text-white">
+          <h2 className="text-3xl font-extrabold mb-4">Prêt à transformer votre activité ?</h2>
+          <p className="text-blue-100 mb-8 text-lg">
+            Rejoignez des milliers d&apos;entreprises qui utilisent NexoBot pour automatiser leur croissance.
+          </p>
+          <Link href="/auth/signup" className="inline-block px-10 py-4 bg-white text-blue-600 text-lg font-bold rounded-xl hover:bg-blue-50 transition shadow-lg">
+            Commencer gratuitement
+          </Link>
+          <p className="mt-4 text-blue-200 text-sm">Aucune carte de crédit requise · Annulez à tout moment</p>
         </div>
       </section>
 
-      {/* CTA FINALE */}
-      <section className="py-32 px-6 text-center max-w-4xl mx-auto">
-        <h2 className="text-5xl font-extrabold mb-6">
-          Prêt à développer votre entreprise ?
-        </h2>
-
-        <p className="text-lg text-gray-600 mb-10">
-          Commencez aujourd’hui avec NexoBot et automatisez vos ventes, votre support
-          et votre communication.
-        </p>
-
-        <a
-          href="/en"
-          className="px-12 py-4 bg-blue-600 text-white rounded-xl font-semibold shadow-md hover:bg-blue-700 transition-all"
-        >
-          Commencer maintenant
-        </a>
-      </section>
-
-      {/* FOOTER */}
-      <footer className="py-10 text-center text-gray-500 text-sm border-t">
-        © {new Date().getFullYear()} NexoBot — Tous droits réservés.
+      {/* Footer */}
+      <footer className="bg-gray-900 text-gray-400 py-12">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+            <div>
+              <Link href="/fr" className="text-xl font-extrabold text-white">NexoBot</Link>
+              <p className="text-sm mt-1">Automatisez vos ventes et votre support client.</p>
+            </div>
+            <div className="flex gap-6 text-sm">
+              <a href="#pricing" className="hover:text-white transition">Tarifs</a>
+              <a href="#faq" className="hover:text-white transition">FAQ</a>
+              <Link href="/auth/login" className="hover:text-white transition">Se connecter</Link>
+              <Link href="/auth/signup" className="hover:text-white transition">S&apos;inscrire</Link>
+            </div>
+          </div>
+          <div className="border-t border-gray-800 mt-8 pt-8 text-center text-xs">
+            <p>&copy; {new Date().getFullYear()} NexoBot. Tous droits réservés.</p>
+          </div>
+        </div>
       </footer>
-
     </main>
   );
 }

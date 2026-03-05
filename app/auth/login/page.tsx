@@ -2,18 +2,20 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const form = e.target;
-    const email = form.email.value;
-    const password = form.password.value;
+    const form = e.currentTarget;
+    const email = (form.elements.namedItem("email") as HTMLInputElement).value;
+    const password = (form.elements.namedItem("password") as HTMLInputElement).value;
 
     // Validación básica
     if (!email || !password) {
@@ -22,16 +24,16 @@ export default function LoginPage() {
     }
 
     setError("");
-
-    // Enviar datos a la API
-    const formData = new FormData(form);
+    setLoading(true);
 
     const res = await fetch("/api/auth/login", {
       method: "POST",
-      body: formData,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
     });
 
     const data = await res.json();
+    setLoading(false);
 
     if (!res.ok) {
       setError(data.error || "Credenciales incorrectas");
@@ -91,26 +93,27 @@ export default function LoginPage() {
           {/* SUBMIT */}
           <button
             type="submit"
-            className="w-full bg-black text-white py-2 rounded-lg font-semibold hover:bg-gray-800 transition"
+            disabled={loading}
+            className="w-full bg-black text-white py-2 rounded-lg font-semibold hover:bg-gray-800 transition disabled:opacity-60"
           >
-            Entrar
+            {loading ? "Entrando..." : "Entrar"}
           </button>
         </form>
 
         {/* RECUPERAR CUENTA */}
         <p className="text-center text-sm text-gray-500 mt-4">
           ¿Olvidaste tu contraseña?{" "}
-          <a href="/auth/reset" className="text-black font-medium">
+          <Link href="/auth/reset" className="text-black font-medium">
             Recuperar cuenta
-          </a>
+          </Link>
         </p>
 
         {/* REGISTRO */}
         <p className="text-center text-sm text-gray-500 mt-2">
           ¿No tienes cuenta?{" "}
-          <a href="/auth/signup" className="text-black font-medium">
+          <Link href="/auth/signup" className="text-black font-medium">
             Crear cuenta
-          </a>
+          </Link>
         </p>
       </div>
     </div>

@@ -38,7 +38,7 @@ export async function GET() {
     }
 
     return NextResponse.json({ user: data.user });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Error interno" },
       { status: 500 }

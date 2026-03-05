@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Link from "next/link";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -13,8 +14,20 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "NexoBot",
-  description: "Your intelligent assistant that automates sales and customer support.",
+  title: {
+    default: "NexoBot — Automatiza tus ventas con IA",
+    template: "%s | NexoBot",
+  },
+  description:
+    "Automatiza ventas, atención al cliente y generación de leads con tu asistente inteligente. Responde 24/7 en WhatsApp, web y redes sociales.",
+  keywords: ["chatbot", "automatización", "ventas", "WhatsApp", "IA", "NexoBot"],
+  authors: [{ name: "NexoBot" }],
+  openGraph: {
+    title: "NexoBot — Automatiza tus ventas con IA",
+    description: "Tu asistente inteligente que trabaja 24/7 para hacer crecer tu negocio.",
+    type: "website",
+    locale: "es_ES",
+  },
 };
 
 export default function RootLayout({
@@ -23,20 +36,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="es">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
 
         {/* LANGUAGE SELECTOR */}
-        <div className="flex justify-end gap-4 p-4 text-sm font-semibold">
-          <a href="/" className="hover:text-blue-600 transition">🇪🇸 ES</a>
-          <a href="/en" className="hover:text-blue-600 transition">🇺🇸 EN</a>
-          <a href="/pt" className="hover:text-blue-600 transition">🇧🇷 PT</a>
-          <a href="/fr" className="hover:text-blue-600 transition">🇫🇷 FR</a>
-          <a href="/it" className="hover:text-blue-600 transition">🇮🇹 IT</a>
-          <a href="/de" className="hover:text-blue-600 transition">🇩🇪 DE</a>
-          <a href="/nl" className="hover:text-blue-600 transition">🇳🇱 NL</a>
-          <a href="/ar" className="hover:text-blue-600 transition">🇸🇦 AR</a>
-        </div>
+        <nav className="flex justify-end gap-4 p-4 text-sm font-semibold border-b border-gray-100 bg-white">
+          <Link href="/" className="hover:text-blue-600 transition">🇪🇸 ES</Link>
+          <Link href="/en" className="hover:text-blue-600 transition">🇺🇸 EN</Link>
+          <Link href="/pt" className="hover:text-blue-600 transition">🇧🇷 PT</Link>
+          <Link href="/fr" className="hover:text-blue-600 transition">🇫🇷 FR</Link>
+          <Link href="/it" className="hover:text-blue-600 transition">🇮🇹 IT</Link>
+          <Link href="/de" className="hover:text-blue-600 transition">🇩🇪 DE</Link>
+          <Link href="/nl" className="hover:text-blue-600 transition">🇳🇱 NL</Link>
+          <Link href="/ar" className="hover:text-blue-600 transition">🇸🇦 AR</Link>
+        </nav>
 
         {children}
       </body>

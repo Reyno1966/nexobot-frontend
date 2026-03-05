@@ -1,34 +1,57 @@
+import Link from "next/link";
+
 export default function Home() {
   return (
     <main className="min-h-screen bg-white text-gray-900">
 
+      {/* Navbar */}
+      <nav className="max-w-6xl mx-auto px-6 py-5 flex items-center justify-between">
+        <Link href="/" className="text-2xl font-extrabold text-blue-600">NexoBot</Link>
+        <div className="flex items-center gap-4">
+          <a href="#pricing" className="text-sm font-medium text-gray-600 hover:text-blue-600 transition">Precios</a>
+          <a href="#faq" className="text-sm font-medium text-gray-600 hover:text-blue-600 transition">FAQ</a>
+          <a href="/auth/login" className="text-sm font-medium text-gray-700 hover:text-blue-600 transition">Iniciar sesión</a>
+          <a
+            href="/auth/signup"
+            className="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition"
+          >
+            Empezar gratis
+          </a>
+        </div>
+      </nav>
+
       {/* Hero Section */}
-      <section className="max-w-6xl mx-auto px-6 py-32 text-center">
-  <h1 className="text-6xl font-extrabold leading-tight tracking-tight">
-    Automatiza tus ventas y atención al cliente con{" "}
-    <span className="text-blue-600">NexoBot</span>
-  </h1>
+      <section className="max-w-6xl mx-auto px-6 py-24 text-center">
+        <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-700 text-sm font-medium px-4 py-1.5 rounded-full mb-8">
+          <span>✨</span> Automatización con IA para tu negocio
+        </div>
+        <h1 className="text-6xl font-extrabold leading-tight tracking-tight">
+          Automatiza tus ventas y atención al cliente con{" "}
+          <span className="text-blue-600">NexoBot</span>
+        </h1>
 
-  <p className="mt-6 text-xl text-gray-600 max-w-2xl mx-auto">
-    Tu asistente inteligente que responde clientes, genera ventas y trabaja por ti 24/7. 
-    Ahorra tiempo, aumenta ingresos y escala tu negocio sin esfuerzo.
-  </p>
+        <p className="mt-6 text-xl text-gray-600 max-w-2xl mx-auto">
+          Tu asistente inteligente que responde clientes, genera ventas y trabaja por ti 24/7.
+          Ahorra tiempo, aumenta ingresos y escala tu negocio sin esfuerzo.
+        </p>
 
-  <div className="mt-12 flex justify-center gap-6">
-    <a
-      href="/dashboard"
-      className="px-10 py-4 bg-blue-600 text-white rounded-xl font-semibold shadow-md hover:bg-blue-700 hover:shadow-lg transition-all"
-    >
-      Empezar ahora
-    </a>
-    <a
-      href="#features"
-      className="px-10 py-4 border border-gray-300 rounded-xl font-semibold hover:bg-gray-100 transition-all"
-    >
-      Ver cómo funciona
-    </a>
-  </div>
-</section>
+        <div className="mt-12 flex justify-center gap-4 flex-wrap">
+          <a
+            href="/auth/signup"
+            className="px-10 py-4 bg-blue-600 text-white rounded-xl font-semibold shadow-md hover:bg-blue-700 hover:shadow-lg transition-all"
+          >
+            Empezar gratis →
+          </a>
+          <a
+            href="#features"
+            className="px-10 py-4 border border-gray-300 rounded-xl font-semibold hover:bg-gray-100 transition-all"
+          >
+            Ver cómo funciona
+          </a>
+        </div>
+
+        <p className="mt-5 text-sm text-gray-400">Sin tarjeta de crédito · Cancela cuando quieras</p>
+      </section>
 
 
       {/* Features */}
@@ -173,27 +196,7 @@ export default function Home() {
       Lleva tu NexoBot al siguiente nivel con configuraciones profesionales, personalización avanzada e integraciones a medida.
     </p>
 
-    <div className="mt-16 grid md:grid-cols-4 gap-10">
-
-      {/* Configuración inicial */}
-      <div className="border rounded-2xl p-8 bg-white shadow-sm hover:shadow-md transition">
-        <h3 className="text-xl font-semibold">Configuración inicial</h3>
-        <p className="mt-2 text-gray-600">Todo listo para empezar en minutos</p>
-        <p className="mt-6 text-3xl font-bold">$49</p>
-
-        <ul className="mt-6 space-y-3 text-gray-600 text-left">
-          <li>✔ Instalación completa del bot</li>
-          <li>✔ Configuración básica optimizada</li>
-          <li>✔ Conexión a tu sitio web</li>
-        </ul>
-
-        <a
-          href={`/checkout?priceId=price_1T15yVRap0JkQNsmSzyskbsI`}
-          className="block mt-8 px-6 py-3 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition"
-        >
-          Comprar
-        </a>
-      </div>
+    <div className="mt-16 grid md:grid-cols-3 gap-10">
 
       {/* Personalización avanzada */}
       <div className="border rounded-2xl p-8 bg-white shadow-sm hover:shadow-md transition">
@@ -424,18 +427,30 @@ export default function Home() {
     </p>
 
     <a
-      href="/dashboard"
+      href="/auth/signup"
       className="inline-block mt-10 px-12 py-4 bg-white text-blue-600 font-semibold rounded-xl shadow-lg hover:bg-gray-100 transition-all text-lg"
     >
-      Empezar ahora
+      Empezar gratis →
     </a>
+    <p className="mt-4 text-blue-200 text-sm">Sin tarjeta de crédito · Cancela cuando quieras</p>
   </div>
 </section>
 
 
       {/* Footer */}
-      <footer className="py-10 text-center text-gray-500 border-t">
-        © {new Date().getFullYear()} NexoBot — Todos los derechos reservados.
+      <footer className="py-12 border-t bg-gray-50">
+        <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
+          <div>
+            <p className="text-xl font-extrabold text-blue-600">NexoBot</p>
+            <p className="text-sm text-gray-400 mt-1">© {new Date().getFullYear()} NexoBot — Todos los derechos reservados.</p>
+          </div>
+          <div className="flex gap-6 text-sm text-gray-500">
+            <a href="#pricing" className="hover:text-blue-600 transition">Precios</a>
+            <a href="#faq" className="hover:text-blue-600 transition">FAQ</a>
+            <a href="#features" className="hover:text-blue-600 transition">Características</a>
+            <a href="/auth/login" className="hover:text-blue-600 transition">Iniciar sesión</a>
+          </div>
+        </div>
       </footer>
 
     </main>
