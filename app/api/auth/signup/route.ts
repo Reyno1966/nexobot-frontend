@@ -33,19 +33,6 @@ export async function POST(req: Request) {
       );
     }
 
-    // 2) Guardar usuario en tu tabla "users"
-    const { error: insertError } = await supabase.from("users").insert({
-      auth_user_id: data.user.id,
-      email,
-    });
-
-    if (insertError) {
-      return NextResponse.json(
-        { error: "Usuario creado en Auth, pero error al guardar en users" },
-        { status: 500 }
-      );
-    }
-
     return NextResponse.json(
       {
         message: "Usuario creado correctamente",
