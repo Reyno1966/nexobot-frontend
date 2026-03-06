@@ -73,9 +73,10 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ url: session.url });
   } catch (err) {
-    console.error("Error creando sesión de Stripe:", err);
+    const message = err instanceof Error ? err.message : "Error desconocido";
+    console.error("Error creando sesión de Stripe:", message);
     return NextResponse.json(
-      { error: "Error al iniciar el proceso de pago" },
+      { error: message },
       { status: 500 }
     );
   }
