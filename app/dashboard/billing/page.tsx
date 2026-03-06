@@ -45,6 +45,7 @@ export default function BillingPage() {
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [loading, setLoading] = useState(true);
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
 
   useEffect(() => {
     async function load() {
@@ -57,6 +58,7 @@ export default function BillingPage() {
 
   async function handleCheckout(priceId: string) {
     setCheckoutLoading(priceId);
+    setCheckoutError(null);
     try {
       const res = await fetch("/api/stripe/create-checkout-session", {
         method: "POST",
@@ -65,7 +67,13 @@ export default function BillingPage() {
         body: JSON.stringify({ priceId }),
       });
       const data = await res.json();
-      if (data.url) window.location.href = data.url;
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        setCheckoutError(data.error || "Error al iniciar el pago");
+      }
+    } catch {
+      setCheckoutError("Error de conexión. Inténtalo de nuevo.");
     } finally {
       setCheckoutLoading(null);
     }
@@ -140,6 +148,13 @@ export default function BillingPage() {
           )}
         </div>
       </div>
+
+      {/* Checkout error */}
+      {checkoutError && (
+        <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 mb-6 text-sm">
+          ⚠️ {checkoutError}
+        </div>
+      )}
 
       {/* Plans */}
       <div id="planes">
