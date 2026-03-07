@@ -33,6 +33,7 @@ export default function BotsPage() {
   const [showForm, setShowForm] = useState(false);
   const [editingBot, setEditingBot] = useState<Bot | null>(null);
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState("");
   const [deleting, setDeleting] = useState<string | null>(null);
   const [form, setForm] = useState({ name: "", description: "", channel: "web" });
 
@@ -59,6 +60,7 @@ export default function BotsPage() {
   async function handleSave() {
     if (!form.name.trim()) return;
     setSaving(true);
+    setSaveError("");
     try {
       if (editingBot) {
         const res = await fetch(`/api/bots/${editingBot.id}`, {
@@ -67,9 +69,12 @@ export default function BotsPage() {
           credentials: "include",
           body: JSON.stringify({ ...form, status: editingBot.status }),
         });
+        const data = await res.json();
         if (res.ok) {
-          const { bot } = await res.json();
-          setBots((prev) => prev.map((b) => (b.id === bot.id ? bot : b)));
+          setBots((prev) => prev.map((b) => (b.id === data.bot.id ? data.bot : b)));
+          setShowForm(false);
+        } else {
+          setSaveError(data.error ?? "Error al guardar. Intenta de nuevo.");
         }
       } else {
         const res = await fetch("/api/bots", {
@@ -78,12 +83,16 @@ export default function BotsPage() {
           credentials: "include",
           body: JSON.stringify(form),
         });
+        const data = await res.json();
         if (res.ok) {
-          const { bot } = await res.json();
-          setBots((prev) => [bot, ...prev]);
+          setBots((prev) => [data.bot, ...prev]);
+          setShowForm(false);
+        } else {
+          setSaveError(data.error ?? "Error al crear el bot. Intenta de nuevo.");
         }
       }
-      setShowForm(false);
+    } catch {
+      setSaveError("Error de conexión. Verifica tu internet e intenta de nuevo.");
     } finally {
       setSaving(false);
     }
@@ -179,9 +188,15 @@ export default function BotsPage() {
                 </select>
               </div>
             </div>
+            {saveError && (
+              <div className="mt-4 bg-red-50 border border-red-100 text-red-700 text-sm rounded-xl px-4 py-3">
+                ⚠️ {saveError}
+              </div>
+            )}
+
             <div className="flex gap-3 mt-6">
               <button
-                onClick={() => setShowForm(false)}
+                onClick={() => { setShowForm(false); setSaveError(""); }}
                 className="flex-1 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 transition"
               >
                 Cancelar
