@@ -1,19 +1,37 @@
 import { NextResponse } from "next/server";
-import { stripe } from "@/lib/stripe";
 
 export async function GET() {
+  const key = process.env.STRIPE_SECRET_KEY ?? "";
+
+  // Show key info without exposing full key
+  const keyInfo = {
+    set: !!key,
+    length: key.length,
+    starts: key.substring(0, 15),
+    ends: key.slice(-6),
+  };
+
+  if (!key) {
+    return NextResponse.json({ ok: false, error: "STRIPE_SECRET_KEY not set", keyInfo });
+  }
+
+  // Test with direct fetch instead of SDK
   try {
-    const products = await stripe.products.list({ limit: 1 });
+    const res = await fetch("https://api.stripe.com/v1/products?limit=1", {
+      headers: {
+        Authorization: `Bearer ${key}`,
+        "Stripe-Version": "2026-02-25",
+      },
+    });
+    const data = await res.json();
     return NextResponse.json({
-      ok: true,
-      count: products.data.length,
-      key_preview:
-        (process.env.STRIPE_SECRET_KEY?.substring(0, 20) ?? "") +
-        "..." +
-        (process.env.STRIPE_SECRET_KEY?.slice(-6) ?? ""),
+      ok: res.ok,
+      status: res.status,
+      keyInfo,
+      stripeResponse: res.ok ? { count: data.data?.length } : data,
     });
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Unknown error";
-    return NextResponse.json({ ok: false, error: message }, { status: 500 });
+    const message = err instanceof Error ? err.message : "Unknown";
+    return NextResponse.json({ ok: false, error: message, keyInfo }, { status: 500 });
   }
 }
