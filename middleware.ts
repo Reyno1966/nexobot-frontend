@@ -41,6 +41,7 @@ export function middleware(req: NextRequest) {
     "/checkout",
     "/privacy",
     "/terms",
+    "/widget",
   ];
 
   const isPublic = publicPrefixes.some(

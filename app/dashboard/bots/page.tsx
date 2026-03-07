@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 interface Bot {
   id: string;
@@ -247,6 +248,12 @@ export default function BotsPage() {
               <div className="flex items-center justify-between pt-2 border-t border-gray-50">
                 <p className="text-xs text-gray-400">{bot.messages_count ?? 0} mensajes procesados</p>
                 <div className="flex items-center gap-2">
+                  <Link
+                    href={`/dashboard/bots/${bot.id}`}
+                    className="text-xs text-blue-600 hover:text-blue-700 font-semibold transition px-2 py-1 rounded-lg hover:bg-blue-50"
+                  >
+                    ⚙️ Configurar
+                  </Link>
                   <button
                     onClick={() => openEdit(bot)}
                     className="text-xs text-gray-500 hover:text-blue-600 font-medium transition px-2 py-1 rounded-lg hover:bg-blue-50"
