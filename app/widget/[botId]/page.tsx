@@ -81,8 +81,8 @@ export default function WidgetPage() {
     <div className="flex flex-col h-screen bg-gray-50 font-sans">
 
       {/* Header */}
-      <div className="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-[#050816] to-[#0d1537] flex-shrink-0">
-        <div className="w-9 h-9 rounded-full overflow-hidden bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+      <div className="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-[#041414] to-[#062828] flex-shrink-0">
+        <div className="w-9 h-9 rounded-full overflow-hidden bg-gradient-to-br from-[#2CC5C5] to-[#F5A623] flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
           {showLogo ? (
             <Image
               src={companyLogo}
@@ -110,7 +110,7 @@ export default function WidgetPage() {
         {messages.map((msg, i) => (
           <div key={i} className={`flex gap-2 ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
             {msg.role === "assistant" && (
-              <div className="w-7 h-7 rounded-full overflow-hidden bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0 mt-0.5">
+              <div className="w-7 h-7 rounded-full overflow-hidden bg-gradient-to-br from-[#2CC5C5] to-[#F5A623] flex items-center justify-center text-white text-xs font-bold flex-shrink-0 mt-0.5">
                 {showLogo ? (
                   <Image src={companyLogo} alt={botName} width={28} height={28} className="w-full h-full object-cover" onError={() => setLogoError(true)} />
                 ) : (
@@ -120,7 +120,7 @@ export default function WidgetPage() {
             )}
             <div className={`max-w-[80%] px-3 py-2 rounded-2xl text-sm leading-relaxed ${
               msg.role === "user"
-                ? "bg-blue-600 text-white rounded-br-sm"
+                ? "bg-[#F5A623] text-white rounded-br-sm"
                 : "bg-white text-gray-800 rounded-bl-sm shadow-sm border border-gray-100"
             }`}>
               {msg.content}
@@ -129,7 +129,7 @@ export default function WidgetPage() {
         ))}
         {loading && (
           <div className="flex gap-2">
-            <div className="w-7 h-7 rounded-full overflow-hidden bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+            <div className="w-7 h-7 rounded-full overflow-hidden bg-gradient-to-br from-[#2CC5C5] to-[#F5A623] flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
               {showLogo ? (
                 <Image src={companyLogo} alt={botName} width={28} height={28} className="w-full h-full object-cover" onError={() => setLogoError(true)} />
               ) : (
@@ -156,12 +156,12 @@ export default function WidgetPage() {
           onChange={(e) => setInput(e.target.value)}
           placeholder="Escribe tu mensaje..."
           disabled={loading}
-          className="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+          className="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2CC5C5] disabled:opacity-50"
         />
         <button
           type="submit"
           disabled={loading || !input.trim()}
-          className="w-9 h-9 bg-gradient-to-r from-blue-600 to-violet-600 text-white rounded-xl flex items-center justify-center hover:opacity-90 transition disabled:opacity-40 flex-shrink-0"
+          className="w-9 h-9 bg-gradient-to-r from-[#2CC5C5] to-[#F5A623] text-white rounded-xl flex items-center justify-center hover:opacity-90 transition disabled:opacity-40 flex-shrink-0"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />

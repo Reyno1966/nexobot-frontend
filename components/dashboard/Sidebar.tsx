@@ -109,10 +109,10 @@ export default function Sidebar({ userEmail }: SidebarProps) {
       {/* Logo */}
       <div className="px-6 py-5 border-b border-gray-100">
         <Link href="/" className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-violet-600 flex items-center justify-center shadow-sm">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#2CC5C5] to-[#F5A623] flex items-center justify-center shadow-sm">
             <span className="text-white font-bold text-sm">N</span>
           </div>
-          <span className="text-lg font-black bg-gradient-to-r from-blue-600 to-violet-600 bg-clip-text text-transparent">
+          <span className="text-lg font-black bg-gradient-to-r from-[#2CC5C5] to-[#F5A623] bg-clip-text text-transparent">
             NexoBot
           </span>
         </Link>
@@ -132,11 +132,11 @@ export default function Sidebar({ userEmail }: SidebarProps) {
               onClick={() => setMobileOpen(false)}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
                 isActive
-                  ? "bg-gradient-to-r from-blue-50 to-violet-50 text-blue-700 shadow-sm border border-blue-100"
+                  ? "bg-gradient-to-r from-[#EEF9F9] to-[#FEF3DC] text-[#2CC5C5] shadow-sm border border-[#D9F5F5]"
                   : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
               }`}
             >
-              <span className={isActive ? "text-blue-600" : "text-gray-400"}>
+              <span className={isActive ? "text-[#2CC5C5]" : "text-gray-400"}>
                 {item.icon}
               </span>
               {item.label}
@@ -148,7 +148,7 @@ export default function Sidebar({ userEmail }: SidebarProps) {
       {/* Footer usuario */}
       <div className="px-3 py-4 border-t border-gray-100">
         <div className="flex items-center gap-3 px-3 py-2 mb-2 rounded-xl bg-gray-50">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center flex-shrink-0">
+          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#2CC5C5] to-[#F5A623] flex items-center justify-center flex-shrink-0">
             <span className="text-white font-semibold text-xs uppercase">
               {userEmail?.charAt(0) ?? "U"}
             </span>
@@ -175,10 +175,10 @@ export default function Sidebar({ userEmail }: SidebarProps) {
       {/* Mobile top bar */}
       <div className="lg:hidden flex items-center justify-between px-4 py-3 bg-white border-b border-gray-100 fixed top-0 left-0 right-0 z-30">
         <Link href="/" className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-blue-600 to-violet-600 flex items-center justify-center">
+          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#2CC5C5] to-[#F5A623] flex items-center justify-center">
             <span className="text-white font-bold text-xs">N</span>
           </div>
-          <span className="font-black bg-gradient-to-r from-blue-600 to-violet-600 bg-clip-text text-transparent">NexoBot</span>
+          <span className="font-black bg-gradient-to-r from-[#2CC5C5] to-[#F5A623] bg-clip-text text-transparent">NexoBot</span>
         </Link>
         <button
           onClick={() => setMobileOpen(!mobileOpen)}
