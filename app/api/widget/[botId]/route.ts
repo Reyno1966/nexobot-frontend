@@ -10,6 +10,7 @@ import {
   needsMonthlyReset,
 } from "@/lib/openai";
 import { PLAN_LIMITS } from "@/lib/plans";
+import { sendLimitAlertEmail } from "@/lib/email";
 
 interface Message {
   role: "user" | "assistant";
@@ -225,8 +226,28 @@ export async function POST(
       // No interrumpir el flujo principal si falla el historial
     }
 
-    // ── 10. Respuesta final con mensajes restantes ──
-    const messagesLeft = limits.messages === -1 ? -1 : limits.messages - currentCount - 1;
+    // ── 10. Alerta al 80% del límite mensual (se dispara una sola vez) ──
+    const newCount = currentCount + 1;
+    if (limits.messages !== -1) {
+      const threshold80 = Math.floor(limits.messages * 0.8);
+      if (newCount === threshold80) {
+        // Obtener email del dueño del bot
+        const { data: ownerData } = await supabase.auth.admin.getUserById(bot.user_id);
+        const ownerEmail = ownerData?.user?.email;
+        if (ownerEmail) {
+          sendLimitAlertEmail({
+            to:             ownerEmail,
+            botName:        bot.name,
+            planName:       planName,
+            messagesUsed:   newCount,
+            messagesLimit:  limits.messages,
+          }).catch(() => {}); // No bloquear respuesta
+        }
+      }
+    }
+
+    // ── 11. Respuesta final con mensajes restantes ──
+    const messagesLeft = limits.messages === -1 ? -1 : limits.messages - newCount;
 
     return NextResponse.json({ reply, messagesLeft }, { headers: CORS });
 

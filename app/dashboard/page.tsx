@@ -4,8 +4,15 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 
 interface User { id: string; email: string; created_at?: string }
-interface Bot { id: string; name: string; channel: string; status: string; messages_count: number; created_at: string }
+interface Bot  { id: string; name: string; channel: string; status: string; messages_count: number; messages_this_month: number; created_at: string }
 interface Subscription { plan_name: string; status: string; current_period_end?: string; cancel_at_period_end?: boolean }
+
+const PLAN_MSG_LIMITS: Record<string, number> = {
+  free:    100,
+  Starter: 5000,
+  Pro:     20000,
+  Premium: -1,
+};
 
 const CHANNEL_LABELS: Record<string, string> = {
   web: "Web", whatsapp: "WhatsApp", telegram: "Telegram", instagram: "Instagram",
@@ -43,14 +50,18 @@ export default function DashboardPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+        <div className="w-10 h-10 border-4 border-[#2CC5C5] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
-  const activeBots = bots.filter((b) => b.status === "active").length;
-  const totalMessages = bots.reduce((acc, b) => acc + (b.messages_count ?? 0), 0);
-  const planName = subscription?.plan_name ?? "Gratis";
+  const activeBots      = bots.filter((b) => b.status === "active").length;
+  const totalMessages   = bots.reduce((acc, b) => acc + (b.messages_count ?? 0), 0);
+  const msgsThisMonth   = bots.reduce((acc, b) => acc + (b.messages_this_month ?? 0), 0);
+  const planName        = subscription?.plan_name ?? "Gratis";
+  const planLimit       = PLAN_MSG_LIMITS[planName] ?? 100;
+  const usagePct        = planLimit === -1 ? 0 : Math.min(Math.round((msgsThisMonth / planLimit) * 100), 100);
+  const usageColor      = usagePct >= 80 ? "from-red-400 to-orange-400" : usagePct >= 50 ? "from-[#F5A623] to-yellow-400" : "from-[#2CC5C5] to-[#F5A623]";
   const renewsOn = subscription?.current_period_end
     ? new Date(subscription.current_period_end).toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric" })
     : null;
@@ -67,7 +78,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Subscription banner */}
-      <div className={`rounded-2xl p-5 mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 ${subscription ? "bg-gradient-to-r from-blue-600 to-violet-600 text-white" : "bg-gradient-to-r from-gray-900 to-slate-800 text-white"}`}>
+      <div className={`rounded-2xl p-5 mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 ${subscription ? "bg-gradient-to-r from-[#2CC5C5] to-[#F5A623] text-white" : "bg-gradient-to-r from-gray-900 to-slate-800 text-white"}`}>
         <div>
           <p className="text-sm font-medium opacity-80">Plan actual</p>
           <p className="text-xl font-bold mt-0.5">{planName}</p>
@@ -110,14 +121,60 @@ export default function DashboardPage() {
         </div>
       </div>
 
+      {/* ── Panel de uso mensual ── */}
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 mb-6">
+        <div className="flex items-center justify-between mb-3">
+          <div>
+            <p className="text-sm font-semibold text-gray-900">Uso mensual de mensajes</p>
+            <p className="text-xs text-gray-400 mt-0.5">Se reinicia el 1 de cada mes</p>
+          </div>
+          <span className={`text-xs font-bold px-3 py-1 rounded-full ${
+            usagePct >= 80 ? "bg-red-50 text-red-600" :
+            usagePct >= 50 ? "bg-yellow-50 text-yellow-600" :
+            "bg-[#EEF9F9] text-[#2CC5C5]"
+          }`}>
+            {planLimit === -1 ? "Ilimitado ∞" : `${usagePct}% usado`}
+          </span>
+        </div>
+
+        {/* Barra de progreso */}
+        {planLimit !== -1 && (
+          <>
+            <div className="w-full bg-gray-100 rounded-full h-3 mb-2 overflow-hidden">
+              <div
+                className={`h-full rounded-full bg-gradient-to-r ${usageColor} transition-all duration-500`}
+                style={{ width: `${usagePct}%` }}
+              />
+            </div>
+            <div className="flex justify-between text-xs text-gray-400">
+              <span>{msgsThisMonth.toLocaleString()} mensajes usados</span>
+              <span>{(planLimit - msgsThisMonth).toLocaleString()} restantes de {planLimit.toLocaleString()}</span>
+            </div>
+            {usagePct >= 80 && (
+              <div className="mt-3 flex items-center gap-2 bg-red-50 rounded-xl px-4 py-2.5">
+                <span className="text-red-500 text-sm">⚠️</span>
+                <p className="text-xs text-red-600 font-medium">
+                  Estás cerca del límite.{" "}
+                  <a href="/dashboard/billing" className="underline font-bold">Mejora tu plan</a>{" "}
+                  para no interrumpir el servicio.
+                </p>
+              </div>
+            )}
+          </>
+        )}
+        {planLimit === -1 && (
+          <p className="text-sm text-gray-500">Plan Premium — mensajes ilimitados ✅</p>
+        )}
+      </div>
+
       {/* Quick actions */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
         <Link
           href="/dashboard/bots"
-          className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:border-blue-200 hover:shadow-md transition group"
+          className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:border-[#B8EDED] hover:shadow-md transition group"
         >
-          <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center mb-3 group-hover:bg-blue-100 transition">
-            <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="w-10 h-10 bg-[#EEF9F9] rounded-xl flex items-center justify-center mb-3 group-hover:bg-[#D9F5F5] transition">
+            <svg className="w-5 h-5 text-[#2CC5C5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
           </div>
@@ -127,10 +184,10 @@ export default function DashboardPage() {
 
         <Link
           href="/dashboard/billing"
-          className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:border-purple-200 hover:shadow-md transition group"
+          className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:border-[#FEE8B8] hover:shadow-md transition group"
         >
-          <div className="w-10 h-10 bg-purple-50 rounded-xl flex items-center justify-center mb-3 group-hover:bg-purple-100 transition">
-            <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="w-10 h-10 bg-[#FEF3DC] rounded-xl flex items-center justify-center mb-3 group-hover:bg-[#FEE8B8] transition">
+            <svg className="w-5 h-5 text-[#F5A623]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
           </div>
@@ -157,7 +214,7 @@ export default function DashboardPage() {
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm">
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
           <h2 className="font-semibold text-gray-900">Mis bots recientes</h2>
-          <Link href="/dashboard/bots" className="text-sm text-blue-600 hover:text-blue-700 font-medium">
+          <Link href="/dashboard/bots" className="text-sm text-[#2CC5C5] hover:text-[#23A5A5] font-medium">
             Ver todos →
           </Link>
         </div>
@@ -174,7 +231,7 @@ export default function DashboardPage() {
             <p className="text-gray-400 text-sm mt-1 mb-4">Crea tu primer bot de IA en segundos</p>
             <Link
               href="/dashboard/bots"
-              className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-violet-600 text-white px-5 py-2 rounded-xl text-sm font-semibold hover:opacity-90 transition"
+              className="inline-flex items-center gap-2 bg-gradient-to-r from-[#2CC5C5] to-[#F5A623] text-white px-5 py-2 rounded-xl text-sm font-semibold hover:opacity-90 transition"
             >
               + Crear mi primer bot
             </Link>
@@ -184,8 +241,8 @@ export default function DashboardPage() {
             {bots.slice(0, 5).map((bot) => (
               <div key={bot.id} className="flex items-center justify-between px-6 py-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 bg-blue-50 rounded-xl flex items-center justify-center">
-                    <span className="text-blue-600 font-bold text-sm">{bot.name.charAt(0).toUpperCase()}</span>
+                  <div className="w-9 h-9 bg-[#EEF9F9] rounded-xl flex items-center justify-center">
+                    <span className="text-[#2CC5C5] font-bold text-sm">{bot.name.charAt(0).toUpperCase()}</span>
                   </div>
                   <div>
                     <p className="font-medium text-gray-900 text-sm">{bot.name}</p>
