@@ -48,3 +48,7 @@ next-env.d.ts
 
 # carpeta duplicada interna
 /nexobot-frontend
+
+# archivos grandes que no deben subirse a GitHub
+*.zip
+*.tar.gz
