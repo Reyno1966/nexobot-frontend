@@ -10,7 +10,7 @@ import {
   needsMonthlyReset,
 } from "@/lib/openai";
 import { PLAN_LIMITS } from "@/lib/plans";
-import { sendLimitAlertEmail } from "@/lib/email";
+import { sendLimitAlertEmail, sendNewLeadEmail, sendLimitReachedEmail } from "@/lib/email";
 
 interface Message {
   role: "user" | "assistant";
@@ -222,27 +222,50 @@ export async function POST(
           { conversation_id: conversationId, bot_id: botId, role: "assistant", content: reply, tokens_used: tokensUsed },
         ]);
       }
+
+      // ── Notificar nuevo lead al dueño (solo en conversación nueva) ──
+      if (!existingConv) {
+        supabase.auth.admin.getUserById(bot.user_id).then(({ data }) => {
+          const email = data?.user?.email;
+          if (email) sendNewLeadEmail({ to: email, botName: bot.name }).catch(() => {});
+        }).catch(() => {});
+      }
     } catch {
       // No interrumpir el flujo principal si falla el historial
     }
 
-    // ── 10. Alerta al 80% del límite mensual (se dispara una sola vez) ──
+    // ── 10. Alertas por email al 80% y al 100% del límite mensual ──
     const newCount = currentCount + 1;
     if (limits.messages !== -1) {
       const threshold80 = Math.floor(limits.messages * 0.8);
+      // Alerta al 80% (se dispara una sola vez)
       if (newCount === threshold80) {
-        // Obtener email del dueño del bot
-        const { data: ownerData } = await supabase.auth.admin.getUserById(bot.user_id);
-        const ownerEmail = ownerData?.user?.email;
-        if (ownerEmail) {
-          sendLimitAlertEmail({
-            to:             ownerEmail,
-            botName:        bot.name,
-            planName:       planName,
-            messagesUsed:   newCount,
-            messagesLimit:  limits.messages,
-          }).catch(() => {}); // No bloquear respuesta
-        }
+        supabase.auth.admin.getUserById(bot.user_id).then(({ data: ownerData }) => {
+          const ownerEmail = ownerData?.user?.email;
+          if (ownerEmail) {
+            sendLimitAlertEmail({
+              to:            ownerEmail,
+              botName:       bot.name,
+              planName:      planName,
+              messagesUsed:  newCount,
+              messagesLimit: limits.messages,
+            }).catch(() => {});
+          }
+        }).catch(() => {});
+      }
+      // Alerta al 100% — último mensaje procesado antes del bloqueo
+      if (newCount >= limits.messages) {
+        supabase.auth.admin.getUserById(bot.user_id).then(({ data: ownerData }) => {
+          const ownerEmail = ownerData?.user?.email;
+          if (ownerEmail) {
+            sendLimitReachedEmail({
+              to:            ownerEmail,
+              botName:       bot.name,
+              planName:      planName,
+              messagesLimit: limits.messages,
+            }).catch(() => {});
+          }
+        }).catch(() => {});
       }
     }
 

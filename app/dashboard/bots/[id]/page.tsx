@@ -137,7 +137,7 @@ export default function BotDetailPage() {
 
   if (loading) return (
     <div className="flex items-center justify-center min-h-screen">
-      <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+      <div className="w-10 h-10 border-4 border-[#2CC5C5] border-t-transparent rounded-full animate-spin" />
     </div>
   );
 
@@ -195,7 +195,7 @@ export default function BotDetailPage() {
                   type="text"
                   value={botName}
                   onChange={(e) => setBotName(e.target.value)}
-                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#2CC5C5]"
                 />
               </div>
               <div>
@@ -205,7 +205,7 @@ export default function BotDetailPage() {
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="¿Para qué sirve este bot?"
-                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#2CC5C5]"
                 />
               </div>
             </div>
@@ -226,7 +226,7 @@ export default function BotDetailPage() {
               onChange={(e) => setSystemPrompt(e.target.value.substring(0, 800))}
               rows={7}
               placeholder={`Ejemplo:\nEres un asistente de ventas amable de [Tu Empresa]. Tu objetivo es ayudar a los clientes a encontrar el producto ideal, responder preguntas sobre precios y disponibilidad, y guiarlos hacia la compra. Responde siempre en español, de forma profesional y concisa. Si no sabes algo, ofrece contactar a un asesor humano.`}
-              className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none mt-3 leading-relaxed"
+              className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#2CC5C5] resize-none mt-3 leading-relaxed"
             />
             <p className="text-xs text-gray-400 mt-2">
               💡 Un buen prompt define el tono, objetivo y limitaciones del bot. Máximo 800 caracteres.
@@ -237,7 +237,7 @@ export default function BotDetailPage() {
             <button
               onClick={handleSave}
               disabled={saving}
-              className="px-6 py-2.5 bg-gradient-to-r from-blue-600 to-violet-600 text-white rounded-xl font-semibold hover:opacity-90 transition disabled:opacity-50 text-sm"
+              className="px-6 py-2.5 bg-gradient-to-r from-[#2CC5C5] to-[#F5A623] text-white rounded-xl font-semibold hover:opacity-90 transition disabled:opacity-50 text-sm"
             >
               {saving ? "Guardando..." : "Guardar cambios"}
             </button>
@@ -255,8 +255,8 @@ export default function BotDetailPage() {
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col" style={{ height: "560px" }}>
 
           {/* Chat header */}
-          <div className="flex items-center gap-3 px-5 py-4 border-b border-gray-100 bg-gradient-to-r from-[#050816] to-[#0d1537]">
-            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+          <div className="flex items-center gap-3 px-5 py-4 border-b border-gray-100 bg-gradient-to-r from-[#041414] to-[#062828]">
+            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#2CC5C5] to-[#F5A623] flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
               {bot?.name.charAt(0).toUpperCase()}
             </div>
             <div>
@@ -279,13 +279,13 @@ export default function BotDetailPage() {
             {chatHistory.map((msg, i) => (
               <div key={i} className={`flex gap-2 ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
                 {msg.role === "assistant" && (
-                  <div className="w-7 h-7 rounded-full bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0 mt-0.5">
+                  <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#2CC5C5] to-[#F5A623] flex items-center justify-center text-white text-xs font-bold flex-shrink-0 mt-0.5">
                     {bot?.name.charAt(0).toUpperCase()}
                   </div>
                 )}
                 <div className={`max-w-[75%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
                   msg.role === "user"
-                    ? "bg-blue-600 text-white rounded-br-sm"
+                    ? "bg-[#F5A623] text-white rounded-br-sm"
                     : "bg-white text-gray-800 rounded-bl-sm shadow-sm border border-gray-100"
                 }`}>
                   {msg.content}
@@ -294,7 +294,7 @@ export default function BotDetailPage() {
             ))}
             {chatLoading && (
               <div className="flex gap-2 justify-start">
-                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#2CC5C5] to-[#F5A623] flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
                   {bot?.name.charAt(0).toUpperCase()}
                 </div>
                 <div className="bg-white border border-gray-100 rounded-2xl rounded-bl-sm px-4 py-3 shadow-sm">
@@ -322,12 +322,12 @@ export default function BotDetailPage() {
               onChange={(e) => setChatInput(e.target.value)}
               placeholder="Escribe un mensaje..."
               disabled={chatLoading}
-              className="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+              className="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#2CC5C5] disabled:opacity-50"
             />
             <button
               type="submit"
               disabled={chatLoading || !chatInput.trim()}
-              className="w-10 h-10 bg-gradient-to-r from-blue-600 to-violet-600 text-white rounded-xl flex items-center justify-center hover:opacity-90 transition disabled:opacity-40 flex-shrink-0"
+              className="w-10 h-10 bg-gradient-to-r from-[#2CC5C5] to-[#F5A623] text-white rounded-xl flex items-center justify-center hover:opacity-90 transition disabled:opacity-40 flex-shrink-0"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
@@ -344,7 +344,7 @@ export default function BotDetailPage() {
             <h2 className="font-semibold text-gray-900 mb-1">ID único de tu bot</h2>
             <p className="text-sm text-gray-500 mb-3">Usa este ID para conectar tu bot desde cualquier sitio web</p>
             <div className="flex items-center gap-3 bg-gray-50 rounded-xl px-4 py-3 border border-gray-200">
-              <code className="text-sm text-blue-600 font-mono flex-1 break-all">{id}</code>
+              <code className="text-sm text-[#2CC5C5] font-mono flex-1 break-all">{id}</code>
               <button
                 onClick={() => navigator.clipboard.writeText(id)}
                 className="text-gray-400 hover:text-gray-600 transition flex-shrink-0"
@@ -359,7 +359,7 @@ export default function BotDetailPage() {
 
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
             <h2 className="font-semibold text-gray-900 mb-1">Opción 1 — Widget flotante (recomendado)</h2>
-            <p className="text-sm text-gray-500 mb-4">Pega este código antes de cerrar la etiqueta <code className="text-blue-600">&lt;/body&gt;</code> en tu sitio web</p>
+            <p className="text-sm text-gray-500 mb-4">Pega este código antes de cerrar la etiqueta <code className="text-[#2CC5C5]">&lt;/body&gt;</code> en tu sitio web</p>
             <div className="relative">
               <pre className="bg-gray-950 text-green-400 text-xs rounded-xl p-4 overflow-x-auto leading-relaxed font-mono">
                 {embedCode}
@@ -390,7 +390,7 @@ export default function BotDetailPage() {
           </div>
 
           <div className="bg-blue-50 border border-blue-100 rounded-2xl p-5">
-            <p className="text-sm font-semibold text-blue-800 mb-2">🔗 URL pública de tu widget</p>
+            <p className="text-sm font-semibold text-[#23A5A5] mb-2">🔗 URL pública de tu widget</p>
             <code className="text-blue-700 text-sm break-all">{APP_URL}/widget/{id}</code>
           </div>
         </div>

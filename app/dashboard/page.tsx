@@ -4,8 +4,9 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 
 interface User { id: string; email: string; created_at?: string }
-interface Bot  { id: string; name: string; channel: string; status: string; messages_count: number; messages_this_month: number; created_at: string }
+interface Bot  { id: string; name: string; channel: string; status: string; messages_count: number; messages_this_month: number; system_prompt?: string; created_at: string }
 interface Subscription { plan_name: string; status: string; current_period_end?: string; cancel_at_period_end?: boolean }
+interface Profile { company_logo_url?: string | null; company_name?: string | null }
 
 const PLAN_MSG_LIMITS: Record<string, number> = {
   free:    100,
@@ -24,28 +25,41 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 export default function DashboardPage() {
-  const [user, setUser] = useState<User | null>(null);
-  const [bots, setBots] = useState<Bot[]>([]);
+  const [user, setUser]               = useState<User | null>(null);
+  const [bots, setBots]               = useState<Bot[]>([]);
   const [subscription, setSubscription] = useState<Subscription | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [profile, setProfile]         = useState<Profile | null>(null);
+  const [loading, setLoading]         = useState(true);
+  const [onboardingDismissed, setOnboardingDismissed] = useState(false);
 
   useEffect(() => {
     async function load() {
       try {
-        const [meRes, botsRes, subRes] = await Promise.all([
+        const [meRes, botsRes, subRes, profileRes] = await Promise.all([
           fetch("/api/auth/me", { credentials: "include" }),
           fetch("/api/bots", { credentials: "include" }),
           fetch("/api/dashboard/subscription", { credentials: "include" }),
+          fetch("/api/profile", { credentials: "include" }),
         ]);
-        if (meRes.ok) setUser((await meRes.json()).user);
-        if (botsRes.ok) setBots((await botsRes.json()).bots ?? []);
-        if (subRes.ok) setSubscription((await subRes.json()).subscription);
+        if (meRes.ok)      setUser((await meRes.json()).user);
+        if (botsRes.ok)    setBots((await botsRes.json()).bots ?? []);
+        if (subRes.ok)     setSubscription((await subRes.json()).subscription);
+        if (profileRes.ok) setProfile((await profileRes.json()).profile);
       } finally {
         setLoading(false);
       }
     }
     load();
+    // Leer estado de onboarding desde localStorage
+    if (localStorage.getItem("nexobot_onboarding_dismissed") === "true") {
+      setOnboardingDismissed(true);
+    }
   }, []);
+
+  function dismissOnboarding() {
+    localStorage.setItem("nexobot_onboarding_dismissed", "true");
+    setOnboardingDismissed(true);
+  }
 
   if (loading) {
     return (
@@ -66,6 +80,42 @@ export default function DashboardPage() {
     ? new Date(subscription.current_period_end).toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric" })
     : null;
 
+  // ── Onboarding: pasos de configuración inicial ──
+  const firstBot = bots[0];
+  const onboardingSteps = [
+    {
+      id: "bot",
+      label: "Crea tu primer bot",
+      desc: "El primer paso para automatizar tu negocio",
+      done: bots.length > 0,
+      href: "/dashboard/bots",
+    },
+    {
+      id: "prompt",
+      label: "Personaliza la inteligencia del bot",
+      desc: "Define la personalidad y el rol de tu asistente",
+      done: bots.some((b) => !!b.system_prompt?.trim()),
+      href: firstBot ? `/dashboard/bots/${firstBot.id}` : "/dashboard/bots",
+    },
+    {
+      id: "logo",
+      label: "Añade el logo de tu empresa",
+      desc: "Tu marca visible en el widget del chat",
+      done: !!profile?.company_logo_url,
+      href: "/dashboard/settings",
+    },
+    {
+      id: "install",
+      label: "Instala el widget en tu sitio web",
+      desc: "Comparte tu bot con tus clientes",
+      done: false,
+      href: firstBot ? `/dashboard/bots/${firstBot.id}` : "/dashboard/bots",
+    },
+  ];
+  const completedCount = onboardingSteps.filter((s) => s.done).length;
+  // Mostrar mientras los 3 primeros pasos no estén completos
+  const showOnboarding = !onboardingDismissed && completedCount < 3;
+
   return (
     <div className="p-6 max-w-6xl mx-auto">
 
@@ -76,6 +126,75 @@ export default function DashboardPage() {
         </h1>
         <p className="text-gray-500 mt-1">Aquí tienes un resumen de tu cuenta NexoBot.</p>
       </div>
+
+      {/* ── Onboarding: Primeros pasos ── */}
+      {showOnboarding && (
+        <div className="bg-white rounded-2xl border border-[#D9F5F5] shadow-sm p-5 mb-6">
+          <div className="flex items-start justify-between mb-4">
+            <div>
+              <p className="font-semibold text-gray-900 flex items-center gap-2">
+                🚀 Primeros pasos
+                <span className="text-xs font-bold bg-[#EEF9F9] text-[#2CC5C5] px-2 py-0.5 rounded-full">
+                  {completedCount}/{onboardingSteps.length}
+                </span>
+              </p>
+              <p className="text-sm text-gray-500 mt-0.5">Configura NexoBot en minutos y empieza a recibir leads</p>
+            </div>
+            <button
+              onClick={dismissOnboarding}
+              className="text-gray-300 hover:text-gray-500 transition text-xl leading-none mt-0.5 flex-shrink-0"
+              title="Cerrar"
+            >
+              ×
+            </button>
+          </div>
+
+          {/* Barra de progreso del onboarding */}
+          <div className="w-full bg-gray-100 rounded-full h-1.5 mb-4 overflow-hidden">
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-[#2CC5C5] to-[#F5A623] transition-all duration-500"
+              style={{ width: `${(completedCount / onboardingSteps.length) * 100}%` }}
+            />
+          </div>
+
+          <div className="space-y-2">
+            {onboardingSteps.map((step) => (
+              <Link
+                key={step.id}
+                href={step.href}
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition group ${
+                  step.done
+                    ? "opacity-60 cursor-default pointer-events-none"
+                    : "hover:bg-[#EEF9F9]"
+                }`}
+              >
+                {/* Círculo de estado */}
+                <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 ${
+                  step.done ? "bg-green-100" : "bg-gray-100 group-hover:bg-[#D9F5F5]"
+                }`}>
+                  {step.done
+                    ? <svg className="w-3.5 h-3.5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
+                    : <span className="w-2 h-2 rounded-full bg-gray-300 group-hover:bg-[#2CC5C5] transition" />
+                  }
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className={`text-sm font-medium ${step.done ? "text-gray-400 line-through" : "text-gray-800"}`}>
+                    {step.label}
+                  </p>
+                  {!step.done && (
+                    <p className="text-xs text-gray-400">{step.desc}</p>
+                  )}
+                </div>
+                {!step.done && (
+                  <svg className="w-4 h-4 text-gray-300 group-hover:text-[#2CC5C5] transition flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                )}
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Subscription banner */}
       <div className={`rounded-2xl p-5 mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 ${subscription ? "bg-gradient-to-r from-[#2CC5C5] to-[#F5A623] text-white" : "bg-gradient-to-r from-gray-900 to-slate-800 text-white"}`}>
@@ -112,7 +231,7 @@ export default function DashboardPage() {
         <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
           <p className="text-sm text-gray-500">Mensajes procesados</p>
           <p className="text-3xl font-bold text-gray-900 mt-1">{totalMessages.toLocaleString()}</p>
-          <p className="text-xs text-gray-400 mt-1">este mes</p>
+          <p className="text-xs text-gray-400 mt-1">historial total</p>
         </div>
         <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
           <p className="text-sm text-gray-500">Estado de cuenta</p>
