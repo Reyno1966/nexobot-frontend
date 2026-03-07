@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -107,14 +108,16 @@ export default function Sidebar({ userEmail }: SidebarProps) {
   const SidebarContent = () => (
     <div className="flex flex-col h-full">
       {/* Logo */}
-      <div className="px-6 py-5 border-b border-gray-100">
-        <Link href="/" className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#2CC5C5] to-[#F5A623] flex items-center justify-center shadow-sm">
-            <span className="text-white font-bold text-sm">N</span>
-          </div>
-          <span className="text-lg font-black bg-gradient-to-r from-[#2CC5C5] to-[#F5A623] bg-clip-text text-transparent">
-            NexoBot
-          </span>
+      <div className="px-6 py-4 border-b border-gray-100">
+        <Link href="/" className="flex items-center">
+          <Image
+            src="/nexobot-logo.png"
+            alt="NexoBot"
+            width={140}
+            height={44}
+            className="h-11 w-auto object-contain"
+            priority
+          />
         </Link>
       </div>
 
@@ -173,12 +176,16 @@ export default function Sidebar({ userEmail }: SidebarProps) {
   return (
     <>
       {/* Mobile top bar */}
-      <div className="lg:hidden flex items-center justify-between px-4 py-3 bg-white border-b border-gray-100 fixed top-0 left-0 right-0 z-30">
-        <Link href="/" className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#2CC5C5] to-[#F5A623] flex items-center justify-center">
-            <span className="text-white font-bold text-xs">N</span>
-          </div>
-          <span className="font-black bg-gradient-to-r from-[#2CC5C5] to-[#F5A623] bg-clip-text text-transparent">NexoBot</span>
+      <div className="lg:hidden flex items-center justify-between px-4 py-2.5 bg-white border-b border-gray-100 fixed top-0 left-0 right-0 z-30">
+        <Link href="/">
+          <Image
+            src="/nexobot-logo.png"
+            alt="NexoBot"
+            width={120}
+            height={38}
+            className="h-9 w-auto object-contain"
+            priority
+          />
         </Link>
         <button
           onClick={() => setMobileOpen(!mobileOpen)}

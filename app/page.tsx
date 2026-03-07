@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 export default function Home() {
   return (
@@ -7,10 +8,15 @@ export default function Home() {
       {/* ── NAVBAR ── */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link href="/" className="text-xl font-black tracking-tight">
-            <span className="bg-gradient-to-r from-[#2CC5C5] to-[#F5A623] bg-clip-text text-transparent">
-              NexoBot
-            </span>
+          <Link href="/" className="flex items-center">
+            <Image
+              src="/nexobot-logo.png"
+              alt="NexoBot"
+              width={130}
+              height={40}
+              className="h-10 w-auto object-contain"
+              priority
+            />
           </Link>
           <div className="hidden md:flex items-center gap-8">
             <a href="#features" className="text-sm font-medium text-gray-500 hover:text-gray-900 transition">Características</a>
