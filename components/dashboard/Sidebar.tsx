@@ -68,11 +68,13 @@ export default function Sidebar({ userEmail }: SidebarProps) {
     <div className="flex flex-col h-full">
       {/* Logo */}
       <div className="px-6 py-5 border-b border-gray-100">
-        <Link href="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+        <Link href="/" className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-violet-600 flex items-center justify-center shadow-sm">
             <span className="text-white font-bold text-sm">N</span>
           </div>
-          <span className="text-lg font-bold text-gray-900">NexoBot</span>
+          <span className="text-lg font-black bg-gradient-to-r from-blue-600 to-violet-600 bg-clip-text text-transparent">
+            NexoBot
+          </span>
         </Link>
       </div>
 
@@ -88,9 +90,9 @@ export default function Sidebar({ userEmail }: SidebarProps) {
               key={item.href}
               href={item.href}
               onClick={() => setMobileOpen(false)}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
                 isActive
-                  ? "bg-blue-50 text-blue-700"
+                  ? "bg-gradient-to-r from-blue-50 to-violet-50 text-blue-700 shadow-sm border border-blue-100"
                   : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
               }`}
             >
@@ -105,9 +107,9 @@ export default function Sidebar({ userEmail }: SidebarProps) {
 
       {/* Footer usuario */}
       <div className="px-3 py-4 border-t border-gray-100">
-        <div className="flex items-center gap-3 px-3 py-2 mb-2">
-          <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-            <span className="text-blue-700 font-semibold text-xs uppercase">
+        <div className="flex items-center gap-3 px-3 py-2 mb-2 rounded-xl bg-gray-50">
+          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center flex-shrink-0">
+            <span className="text-white font-semibold text-xs uppercase">
               {userEmail?.charAt(0) ?? "U"}
             </span>
           </div>
@@ -116,7 +118,7 @@ export default function Sidebar({ userEmail }: SidebarProps) {
         <button
           onClick={handleLogout}
           disabled={loggingOut}
-          className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-red-500 hover:bg-red-50 transition-colors disabled:opacity-50"
+          className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-red-500 hover:bg-red-50 transition-colors disabled:opacity-50"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
@@ -131,16 +133,16 @@ export default function Sidebar({ userEmail }: SidebarProps) {
   return (
     <>
       {/* Mobile top bar */}
-      <div className="lg:hidden flex items-center justify-between px-4 py-3 bg-white border-b border-gray-200 fixed top-0 left-0 right-0 z-30">
+      <div className="lg:hidden flex items-center justify-between px-4 py-3 bg-white border-b border-gray-100 fixed top-0 left-0 right-0 z-30">
         <Link href="/" className="flex items-center gap-2">
-          <div className="w-7 h-7 bg-blue-600 rounded-lg flex items-center justify-center">
+          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-blue-600 to-violet-600 flex items-center justify-center">
             <span className="text-white font-bold text-xs">N</span>
           </div>
-          <span className="font-bold text-gray-900">NexoBot</span>
+          <span className="font-black bg-gradient-to-r from-blue-600 to-violet-600 bg-clip-text text-transparent">NexoBot</span>
         </Link>
         <button
           onClick={() => setMobileOpen(!mobileOpen)}
-          className="p-2 rounded-lg text-gray-500 hover:bg-gray-100"
+          className="p-2 rounded-xl text-gray-500 hover:bg-gray-100 transition"
         >
           {mobileOpen ? (
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -157,7 +159,7 @@ export default function Sidebar({ userEmail }: SidebarProps) {
       {/* Mobile overlay */}
       {mobileOpen && (
         <div
-          className="lg:hidden fixed inset-0 z-20 bg-black/30"
+          className="lg:hidden fixed inset-0 z-20 bg-black/30 backdrop-blur-sm"
           onClick={() => setMobileOpen(false)}
         />
       )}
@@ -168,7 +170,7 @@ export default function Sidebar({ userEmail }: SidebarProps) {
       </div>
 
       {/* Desktop sidebar */}
-      <aside className="hidden lg:flex flex-col w-64 bg-white border-r border-gray-200 fixed top-0 left-0 h-full z-10">
+      <aside className="hidden lg:flex flex-col w-64 bg-white border-r border-gray-100 fixed top-0 left-0 h-full z-10">
         <SidebarContent />
       </aside>
     </>

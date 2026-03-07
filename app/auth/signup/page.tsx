@@ -13,18 +13,14 @@ export default function SignupPage() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
     const form = e.currentTarget;
     const password = (form.elements.namedItem("password") as HTMLInputElement).value;
     const confirm = (form.elements.namedItem("confirm_password") as HTMLInputElement).value;
 
-    // Validación: contraseñas iguales
     if (password !== confirm) {
       setError("Las contraseñas no coinciden");
       return;
     }
-
-    // Validación: longitud mínima
     if (password.length < 6) {
       setError("La contraseña debe tener al menos 6 caracteres");
       return;
@@ -34,12 +30,7 @@ export default function SignupPage() {
     setLoading(true);
 
     const formData = new FormData(form);
-
-    const res = await fetch("/api/auth/signup", {
-      method: "POST",
-      body: formData,
-    });
-
+    const res = await fetch("/api/auth/signup", { method: "POST", body: formData });
     const data = await res.json();
     setLoading(false);
 
@@ -48,7 +39,6 @@ export default function SignupPage() {
       return;
     }
 
-    // Registro exitoso → hacer login automático
     const email = (form.elements.namedItem("email") as HTMLInputElement).value;
     const loginRes = await fetch("/api/auth/login", {
       method: "POST",
@@ -56,103 +46,104 @@ export default function SignupPage() {
       body: JSON.stringify({ email, password }),
     });
 
-    if (loginRes.ok) {
-      router.push("/dashboard");
-    } else {
-      // Si no se puede hacer login automático, redirigir al login
-      router.push("/auth/login");
-    }
+    router.push(loginRes.ok ? "/dashboard" : "/auth/login");
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
-      <div className="bg-white shadow-lg rounded-xl p-8 w-full max-w-md">
-        <h1 className="text-2xl font-bold mb-6 text-center">Crear cuenta</h1>
+    <div className="min-h-screen flex items-center justify-center bg-[#050816] px-4 relative overflow-hidden">
+      {/* Gradient orbs */}
+      <div className="absolute top-1/4 right-1/4 w-72 h-72 bg-violet-600/20 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-1/4 left-1/4 w-64 h-64 bg-blue-600/20 rounded-full blur-3xl pointer-events-none" />
 
-        {error && (
-          <div className="bg-red-100 text-red-700 p-3 rounded-lg mb-4 text-sm text-center">
-            {error}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-5">
-          {/* EMAIL */}
-          <div>
-            <label className="block text-sm font-medium mb-1">Email</label>
-            <input
-              type="email"
-              name="email"
-              placeholder="tuemail@example.com"
-              required
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-black focus:outline-none"
-            />
-          </div>
-
-          {/* PASSWORD */}
-          <div>
-            <label className="block text-sm font-medium mb-1">Contraseña</label>
-            <div className="relative">
-              <input
-                type={showPassword ? "text" : "password"}
-                name="password"
-                placeholder="••••••••"
-                required
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-black focus:outline-none"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-2 text-sm text-gray-600"
-              >
-                {showPassword ? "Ocultar" : "Ver"}
-              </button>
-            </div>
-          </div>
-
-          {/* CONFIRM PASSWORD */}
-          <div>
-            <label className="block text-sm font-medium mb-1">Confirmar contraseña</label>
-            <div className="relative">
-              <input
-                type={showConfirm ? "text" : "password"}
-                name="confirm_password"
-                placeholder="••••••••"
-                required
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-black focus:outline-none"
-              />
-              <button
-                type="button"
-                onClick={() => setShowConfirm(!showConfirm)}
-                className="absolute right-3 top-2 text-sm text-gray-600"
-              >
-                {showConfirm ? "Ocultar" : "Ver"}
-              </button>
-            </div>
-          </div>
-
-          {/* SUBMIT */}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-black text-white py-2 rounded-lg font-semibold hover:bg-gray-800 transition disabled:opacity-60"
-          >
-            {loading ? "Creando cuenta..." : "Registrarme"}
-          </button>
-        </form>
-
-        <p className="text-center text-sm text-gray-500 mt-4">
-          ¿Olvidaste tu contraseña?{" "}
-          <Link href="/auth/reset" className="text-black font-medium">
-            Recuperar cuenta
+      <div className="relative z-10 w-full max-w-md">
+        {/* Logo */}
+        <div className="text-center mb-8">
+          <Link href="/" className="inline-block">
+            <span className="text-3xl font-black bg-gradient-to-r from-blue-400 to-violet-400 bg-clip-text text-transparent">
+              NexoBot
+            </span>
           </Link>
-        </p>
+          <p className="text-white/40 text-sm mt-2">Crea tu cuenta gratis</p>
+        </div>
 
-        <p className="text-center text-sm text-gray-500 mt-2">
-          ¿Ya tienes cuenta?{" "}
-          <Link href="/auth/login" className="text-black font-medium">
-            Inicia sesión
-          </Link>
-        </p>
+        <div className="bg-white/5 border border-white/10 backdrop-blur-xl rounded-2xl p-8 shadow-2xl">
+          <h1 className="text-xl font-bold text-white mb-6 text-center">Crear cuenta</h1>
+
+          {error && (
+            <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-3 rounded-xl mb-5 text-sm text-center">
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div>
+              <label className="block text-sm font-medium text-white/70 mb-1.5">Email</label>
+              <input
+                type="email"
+                name="email"
+                placeholder="tuemail@example.com"
+                required
+                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:outline-none transition text-sm"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-white/70 mb-1.5">Contraseña</label>
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  placeholder="••••••••"
+                  required
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:outline-none transition text-sm pr-16"
+                />
+                <button type="button" onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-3 text-xs text-white/40 hover:text-white/70 transition">
+                  {showPassword ? "Ocultar" : "Ver"}
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-white/70 mb-1.5">Confirmar contraseña</label>
+              <div className="relative">
+                <input
+                  type={showConfirm ? "text" : "password"}
+                  name="confirm_password"
+                  placeholder="••••••••"
+                  required
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:outline-none transition text-sm pr-16"
+                />
+                <button type="button" onClick={() => setShowConfirm(!showConfirm)}
+                  className="absolute right-4 top-3 text-xs text-white/40 hover:text-white/70 transition">
+                  {showConfirm ? "Ocultar" : "Ver"}
+                </button>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-3 bg-gradient-to-r from-blue-600 to-violet-600 text-white rounded-xl font-semibold hover:opacity-90 transition disabled:opacity-50 shadow-lg shadow-blue-900/30"
+            >
+              {loading ? "Creando cuenta..." : "Registrarme →"}
+            </button>
+          </form>
+
+          <p className="text-center text-sm text-white/40 mt-5">
+            ¿Ya tienes cuenta?{" "}
+            <Link href="/auth/login" className="text-blue-400 hover:text-blue-300 font-medium transition">
+              Inicia sesión
+            </Link>
+          </p>
+
+          <p className="text-center text-xs text-white/20 mt-3">
+            Al registrarte aceptas nuestros{" "}
+            <Link href="/terms" className="text-white/40 hover:text-white/60 transition">Términos</Link>
+            {" "}y{" "}
+            <Link href="/privacy" className="text-white/40 hover:text-white/60 transition">Privacidad</Link>
+          </p>
+        </div>
       </div>
     </div>
   );

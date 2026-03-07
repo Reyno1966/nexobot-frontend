@@ -67,7 +67,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Subscription banner */}
-      <div className={`rounded-2xl p-5 mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 ${subscription ? "bg-blue-600 text-white" : "bg-gray-900 text-white"}`}>
+      <div className={`rounded-2xl p-5 mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 ${subscription ? "bg-gradient-to-r from-blue-600 to-violet-600 text-white" : "bg-gradient-to-r from-gray-900 to-slate-800 text-white"}`}>
         <div>
           <p className="text-sm font-medium opacity-80">Plan actual</p>
           <p className="text-xl font-bold mt-0.5">{planName}</p>
@@ -174,7 +174,7 @@ export default function DashboardPage() {
             <p className="text-gray-400 text-sm mt-1 mb-4">Crea tu primer bot de IA en segundos</p>
             <Link
               href="/dashboard/bots"
-              className="inline-flex items-center gap-2 bg-blue-600 text-white px-5 py-2 rounded-xl text-sm font-semibold hover:bg-blue-700 transition"
+              className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-violet-600 text-white px-5 py-2 rounded-xl text-sm font-semibold hover:opacity-90 transition"
             >
               + Crear mi primer bot
             </Link>
