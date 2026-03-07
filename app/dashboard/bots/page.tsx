@@ -14,10 +14,12 @@ interface Bot {
 }
 
 const CHANNELS = [
-  { value: "web", label: "Web" },
-  { value: "whatsapp", label: "WhatsApp" },
-  { value: "telegram", label: "Telegram" },
-  { value: "instagram", label: "Instagram" },
+  { value: "web", label: "🌐 Web" },
+  { value: "whatsapp", label: "💬 WhatsApp" },
+  { value: "telegram", label: "✈️ Telegram" },
+  { value: "instagram", label: "📸 Instagram" },
+  { value: "email", label: "📧 Email" },
+  { value: "messenger", label: "💙 Messenger" },
 ];
 
 const CHANNEL_COLORS: Record<string, string> = {
@@ -25,6 +27,8 @@ const CHANNEL_COLORS: Record<string, string> = {
   whatsapp: "bg-green-100 text-green-700",
   telegram: "bg-sky-100 text-sky-700",
   instagram: "bg-pink-100 text-pink-700",
+  email: "bg-violet-100 text-violet-700",
+  messenger: "bg-indigo-100 text-indigo-700",
 };
 
 export default function BotsPage() {

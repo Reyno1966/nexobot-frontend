@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
-import { createClient } from "@supabase/supabase-js";
+import { getAuth } from "@/lib/auth";
 import { openai, AI_MODEL, MAX_OUTPUT_TOKENS, MAX_HISTORY_MESSAGES, MAX_SYSTEM_PROMPT_CHARS } from "@/lib/openai";
 import { PLAN_LIMITS } from "@/lib/plans";
 
@@ -11,21 +10,11 @@ interface Message {
 
 export async function POST(req: Request) {
   try {
-    // ── 1. Autenticación ──
-    const cookieStore = await cookies();
-    const accessToken = cookieStore.get("sb-access-token")?.value;
-    if (!accessToken) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+    // ── 1. Autenticación con auto-refresh ──
+    const auth = await getAuth();
+    if (!auth) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
 
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      { global: { headers: { Authorization: `Bearer ${accessToken}` } } }
-    );
-
-    const { data: userData, error: authError } = await supabase.auth.getUser();
-    if (authError || !userData?.user) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
-
-    const userId = userData.user.id;
+    const { supabase, userId } = auth;
 
     // ── 2. Leer body ──
     const body = await req.json();
