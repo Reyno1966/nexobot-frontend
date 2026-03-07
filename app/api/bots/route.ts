@@ -43,7 +43,7 @@ export async function POST(req: Request) {
   const { supabase, userId } = auth;
 
   const body = await req.json();
-  const { name, description, channel } = body;
+  const { name, description, channel, system_prompt } = body;
 
   if (!name?.trim()) {
     return NextResponse.json({ error: "El nombre es requerido" }, { status: 400 });
@@ -57,6 +57,7 @@ export async function POST(req: Request) {
       description: description?.trim() ?? "",
       channel: channel ?? "web",
       status: "active",
+      system_prompt: system_prompt?.trim() ?? "",
     })
     .select()
     .single();

@@ -28,7 +28,7 @@ export async function PUT(
 
   const { supabase, userId } = auth;
   const { id } = await params;
-  const { name, description, channel, status } = await req.json();
+  const { name, description, channel, status, system_prompt } = await req.json();
 
   const { data: bot, error } = await supabase
     .from("bots")
@@ -37,6 +37,7 @@ export async function PUT(
       description,
       channel,
       status,
+      system_prompt: system_prompt ?? "",
       updated_at: new Date().toISOString(),
     })
     .eq("id", id)
