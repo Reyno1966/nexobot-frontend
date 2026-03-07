@@ -2,13 +2,13 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useParams } from "next/navigation";
+import Image from "next/image";
 
 interface Message {
   role: "user" | "assistant";
   content: string;
 }
 
-// Generar o recuperar session_id del visitante
 function getSessionId(): string {
   if (typeof window === "undefined") return `ssr-${Date.now()}`;
   const key = "nexobot_session_id";
@@ -22,17 +22,27 @@ function getSessionId(): string {
 
 export default function WidgetPage() {
   const { botId } = useParams<{ botId: string }>();
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [botName, setBotName] = useState("NexoBot");
-  const [sessionId, setSessionId] = useState<string>("");
+  const [messages, setMessages]     = useState<Message[]>([]);
+  const [input, setInput]           = useState("");
+  const [loading, setLoading]       = useState(false);
+  const [botName, setBotName]       = useState("NexoBot");
+  const [companyLogo, setCompanyLogo] = useState<string>("");
+  const [sessionId, setSessionId]   = useState<string>("");
+  const [logoError, setLogoError]   = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setSessionId(getSessionId());
     setMessages([{ role: "assistant", content: "¡Hola! 👋 ¿En qué puedo ayudarte hoy?" }]);
-  }, []);
+    // Cargar nombre del bot y logo de la empresa
+    fetch(`/api/widget/${botId}/info`)
+      .then((r) => r.ok ? r.json() : null)
+      .then((d) => {
+        if (d?.bot?.name)                  setBotName(d.bot.name);
+        if (d?.profile?.company_logo_url)  setCompanyLogo(d.profile.company_logo_url);
+      })
+      .catch(() => {});
+  }, [botId]);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -46,16 +56,11 @@ export default function WidgetPage() {
     const newMessages = [...messages, { role: "user" as const, content: userMsg }];
     setMessages(newMessages);
     setLoading(true);
-
     try {
       const res = await fetch(`/api/widget/${botId}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          message: userMsg,
-          history: messages.slice(-6),
-          sessionId,
-        }),
+        body: JSON.stringify({ message: userMsg, history: messages.slice(-6), sessionId }),
       });
       const data = await res.json();
       setMessages([...newMessages, {
@@ -63,21 +68,33 @@ export default function WidgetPage() {
         content: data.reply || "Lo siento, no pude responder en este momento.",
       }]);
     } catch {
-      setMessages([...newMessages, {
-        role: "assistant",
-        content: "Error de conexión. Inténtalo de nuevo.",
-      }]);
+      setMessages([...newMessages, { role: "assistant", content: "Error de conexión. Inténtalo de nuevo." }]);
     } finally {
       setLoading(false);
     }
   }
 
+  const initials = botName.charAt(0).toUpperCase();
+  const showLogo = companyLogo && !logoError;
+
   return (
     <div className="flex flex-col h-screen bg-gray-50 font-sans">
+
       {/* Header */}
       <div className="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-[#050816] to-[#0d1537] flex-shrink-0">
-        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center text-white font-bold text-sm">
-          N
+        <div className="w-9 h-9 rounded-full overflow-hidden bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+          {showLogo ? (
+            <Image
+              src={companyLogo}
+              alt={botName}
+              width={36}
+              height={36}
+              className="w-full h-full object-cover"
+              onError={() => setLogoError(true)}
+            />
+          ) : (
+            <span>{initials}</span>
+          )}
         </div>
         <div>
           <p className="text-white font-semibold text-sm">{botName}</p>
@@ -93,8 +110,12 @@ export default function WidgetPage() {
         {messages.map((msg, i) => (
           <div key={i} className={`flex gap-2 ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
             {msg.role === "assistant" && (
-              <div className="w-7 h-7 rounded-full bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0 mt-0.5">
-                N
+              <div className="w-7 h-7 rounded-full overflow-hidden bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0 mt-0.5">
+                {showLogo ? (
+                  <Image src={companyLogo} alt={botName} width={28} height={28} className="w-full h-full object-cover" onError={() => setLogoError(true)} />
+                ) : (
+                  <span>{initials}</span>
+                )}
               </div>
             )}
             <div className={`max-w-[80%] px-3 py-2 rounded-2xl text-sm leading-relaxed ${
@@ -108,7 +129,13 @@ export default function WidgetPage() {
         ))}
         {loading && (
           <div className="flex gap-2">
-            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">N</div>
+            <div className="w-7 h-7 rounded-full overflow-hidden bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+              {showLogo ? (
+                <Image src={companyLogo} alt={botName} width={28} height={28} className="w-full h-full object-cover" onError={() => setLogoError(true)} />
+              ) : (
+                <span>{initials}</span>
+              )}
+            </div>
             <div className="bg-white border border-gray-100 rounded-2xl rounded-bl-sm px-4 py-3 shadow-sm">
               <div className="flex gap-1">
                 <span className="w-2 h-2 bg-gray-300 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
