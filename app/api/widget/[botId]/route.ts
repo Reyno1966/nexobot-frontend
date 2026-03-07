@@ -1,6 +1,14 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import { callOpenAI, AI_MODEL, MAX_OUTPUT_TOKENS, MAX_HISTORY_MESSAGES, MAX_SYSTEM_PROMPT_CHARS, needsMonthlyReset } from "@/lib/openai";
+import {
+  callOpenAI,
+  AI_MODEL,
+  MAX_OUTPUT_TOKENS,
+  MAX_HISTORY_MESSAGES,
+  MAX_SYSTEM_PROMPT_CHARS,
+  MAX_MESSAGES_PER_SESSION,
+  needsMonthlyReset,
+} from "@/lib/openai";
 import { PLAN_LIMITS } from "@/lib/plans";
 
 interface Message {
@@ -15,23 +23,31 @@ function getAdminClient() {
   );
 }
 
-const CORS = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type",
-};
+// ── CORS dinámico según dominio registrado ──
+function getCorsHeaders(allowedOrigin: string) {
+  return {
+    "Access-Control-Allow-Origin": allowedOrigin,
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type",
+  };
+}
 
 export async function POST(
   req: Request,
   { params }: { params: Promise<{ botId: string }> }
 ) {
+  const requestOrigin = req.headers.get("origin") || "*";
+
   try {
     const { botId } = await params;
     const body = await req.json();
     const { message, history = [], sessionId } = body;
 
     if (!message?.trim()) {
-      return NextResponse.json({ error: "Mensaje vacío" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Mensaje vacío" },
+        { status: 400, headers: getCorsHeaders(requestOrigin) }
+      );
     }
 
     const supabase = getAdminClient();
@@ -43,15 +59,56 @@ export async function POST(
       .eq("id", botId)
       .single();
 
-    if (botError || !bot) return NextResponse.json({ error: "Bot no encontrado" }, { status: 404, headers: CORS });
-    if (bot.status !== "active") return NextResponse.json({ error: "Bot inactivo" }, { status: 403, headers: CORS });
+    if (botError || !bot) {
+      return NextResponse.json(
+        { error: "Bot no encontrado" },
+        { status: 404, headers: getCorsHeaders(requestOrigin) }
+      );
+    }
+    if (bot.status !== "active") {
+      return NextResponse.json(
+        { error: "Bot inactivo" },
+        { status: 403, headers: getCorsHeaders(requestOrigin) }
+      );
+    }
 
-    // ── 2. Reset mensual automático ──
+    // ── 2. Validar origen por dominio registrado del cliente ──
+    let allowedOrigin = "*";
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("company_website")
+      .eq("user_id", bot.user_id)
+      .single();
+
+    if (profile?.company_website) {
+      try {
+        const website = profile.company_website.startsWith("http")
+          ? profile.company_website
+          : `https://${profile.company_website}`;
+        const registeredOrigin = new URL(website).origin;
+        allowedOrigin = registeredOrigin;
+
+        // Si el origen de la petición no coincide con el dominio registrado → rechazar
+        if (requestOrigin !== "*" && requestOrigin !== registeredOrigin) {
+          return NextResponse.json(
+            { error: "Origen no autorizado" },
+            { status: 403, headers: getCorsHeaders(allowedOrigin) }
+          );
+        }
+      } catch {
+        // URL inválida en perfil → permitir todo
+        allowedOrigin = "*";
+      }
+    }
+
+    const CORS = getCorsHeaders(allowedOrigin);
+
+    // ── 3. Reset mensual automático ──
     let currentCount = bot.messages_this_month ?? 0;
     const resetNeeded = needsMonthlyReset(bot.last_reset_at);
     if (resetNeeded) currentCount = 0;
 
-    // ── 3. Verificar límite del plan del dueño ──
+    // ── 4. Verificar límite del plan del dueño ──
     const { data: subData } = await supabase
       .from("subscriptions")
       .select("plan_name")
@@ -63,13 +120,39 @@ export async function POST(
     const limits = PLAN_LIMITS[planName] ?? PLAN_LIMITS["free"];
 
     if (limits.messages !== -1 && currentCount >= limits.messages) {
-      return NextResponse.json({
-        reply: "Este bot ha alcanzado el límite de mensajes del mes. Por favor, contacta al administrador.",
-        limitReached: true,
-      }, { headers: CORS });
+      return NextResponse.json(
+        {
+          reply: "Este bot ha alcanzado el límite de mensajes del mes. Por favor, contacta al administrador.",
+          limitReached: true,
+          messagesLeft: 0,
+        },
+        { headers: CORS }
+      );
     }
 
-    // ── 4. System prompt ──
+    // ── 5. Verificar límite por sesión de visitante ──
+    const visitorSession = sessionId || `anon-${Date.now()}`;
+    const { data: existingConv } = await supabase
+      .from("conversations")
+      .select("id, message_count")
+      .eq("bot_id", botId)
+      .eq("session_id", visitorSession)
+      .single();
+
+    // message_count se incrementa de 2 en 2 (user + assistant), dividimos para obtener turnos reales
+    const sessionTurns = Math.floor((existingConv?.message_count ?? 0) / 2);
+    if (sessionTurns >= MAX_MESSAGES_PER_SESSION) {
+      return NextResponse.json(
+        {
+          reply: "Has alcanzado el límite de mensajes para esta sesión. Por favor, recarga la página para continuar.",
+          limitReached: true,
+          messagesLeft: limits.messages === -1 ? -1 : limits.messages - currentCount,
+        },
+        { headers: CORS }
+      );
+    }
+
+    // ── 6. System prompt ──
     const systemPrompt = bot.system_prompt?.trim()
       ? bot.system_prompt.substring(0, MAX_SYSTEM_PROMPT_CHARS)
       : `Eres ${bot.name}, un asistente de IA amable y útil. Responde siempre de forma concisa y profesional.`;
@@ -80,7 +163,7 @@ export async function POST(
 
     const userMessage = message.trim().substring(0, 800);
 
-    // ── 5. Llamar a OpenAI con reintentos automáticos ──
+    // ── 7. Llamar a OpenAI con reintentos automáticos ──
     const completion = await callOpenAI({
       model: AI_MODEL,
       max_tokens: MAX_OUTPUT_TOKENS,
@@ -95,7 +178,7 @@ export async function POST(
     const reply = completion.choices[0]?.message?.content ?? "Lo siento, no pude procesar tu mensaje.";
     const tokensUsed = completion.usage?.total_tokens ?? 0;
 
-    // ── 6. Actualizar contadores ──
+    // ── 8. Actualizar contadores del bot ──
     await supabase
       .from("bots")
       .update({
@@ -105,17 +188,9 @@ export async function POST(
       })
       .eq("id", botId);
 
-    // ── 7. Guardar conversación y mensajes en historial ──
+    // ── 9. Guardar conversación y mensajes en historial ──
     try {
-      const visitorSession = sessionId || `anon-${Date.now()}`;
       let conversationId: string | null = null;
-
-      const { data: existingConv } = await supabase
-        .from("conversations")
-        .select("id, message_count")
-        .eq("bot_id", botId)
-        .eq("session_id", visitorSession)
-        .single();
 
       if (existingConv) {
         conversationId = existingConv.id;
@@ -150,14 +225,26 @@ export async function POST(
       // No interrumpir el flujo principal si falla el historial
     }
 
-    return NextResponse.json({ reply }, { headers: CORS });
+    // ── 10. Respuesta final con mensajes restantes ──
+    const messagesLeft = limits.messages === -1 ? -1 : limits.messages - currentCount - 1;
+
+    return NextResponse.json({ reply, messagesLeft }, { headers: CORS });
 
   } catch (err) {
     console.error("Widget chat error:", err);
-    return NextResponse.json({ error: "Error al procesar" }, { status: 500, headers: CORS });
+    return NextResponse.json(
+      { error: "Error al procesar" },
+      { status: 500, headers: getCorsHeaders(requestOrigin) }
+    );
   }
 }
 
 export async function OPTIONS() {
-  return new NextResponse(null, { headers: CORS });
+  return new NextResponse(null, {
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type",
+    },
+  });
 }

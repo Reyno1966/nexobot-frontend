@@ -11,6 +11,7 @@ export const AI_MODEL = "gpt-4o-mini";
 export const MAX_OUTPUT_TOKENS = 350;
 export const MAX_HISTORY_MESSAGES = 6;
 export const MAX_SYSTEM_PROMPT_CHARS = 800;
+export const MAX_MESSAGES_PER_SESSION = 30; // máx mensajes por visitante por sesión en widget
 
 // ── Costo estimado por mensaje (USD) ──
 // gpt-4o-mini: $0.15/1M input, $0.60/1M output
