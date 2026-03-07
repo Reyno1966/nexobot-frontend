@@ -8,9 +8,9 @@ export const openai = new OpenAI({
 export const AI_MODEL = "gpt-4o-mini";
 
 // ── Límites para no gastar más de lo que se gana ──
-export const MAX_OUTPUT_TOKENS = 350;      // Máx tokens por respuesta
-export const MAX_HISTORY_MESSAGES = 6;    // Solo últimas 3 conversaciones (6 mensajes)
-export const MAX_SYSTEM_PROMPT_CHARS = 800; // Límite de caracteres del system prompt
+export const MAX_OUTPUT_TOKENS = 350;
+export const MAX_HISTORY_MESSAGES = 6;
+export const MAX_SYSTEM_PROMPT_CHARS = 800;
 
 // ── Costo estimado por mensaje (USD) ──
 // gpt-4o-mini: $0.15/1M input, $0.60/1M output
@@ -18,3 +18,31 @@ export const MAX_SYSTEM_PROMPT_CHARS = 800; // Límite de caracteres del system 
 // Starter (5000 msgs): ~$1.50 costo vs $29 ingreso = 95% margen ✅
 // Pro (20000 msgs): ~$6 costo vs $59 ingreso = 90% margen ✅
 // Premium (unlimited): ~$30 costo máx vs $99 ingreso = 70% margen ✅
+
+// ── Reintentos automáticos si OpenAI falla ──
+export async function callOpenAI(
+  params: Parameters<typeof openai.chat.completions.create>[0],
+  maxRetries = 3
+) {
+  let lastError: unknown;
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      return await openai.chat.completions.create(params);
+    } catch (err) {
+      lastError = err;
+      if (attempt < maxRetries) {
+        // Espera 1.5s, 3s antes de reintentar
+        await new Promise((resolve) => setTimeout(resolve, attempt * 1500));
+      }
+    }
+  }
+  throw lastError;
+}
+
+// ── Verificar si hay que resetear contador mensual ──
+export function needsMonthlyReset(lastResetAt: string | null | undefined): boolean {
+  if (!lastResetAt) return true;
+  const last = new Date(lastResetAt);
+  const now = new Date();
+  return last.getMonth() !== now.getMonth() || last.getFullYear() !== now.getFullYear();
+}

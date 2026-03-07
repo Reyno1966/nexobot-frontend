@@ -8,16 +8,29 @@ interface Message {
   content: string;
 }
 
+// Generar o recuperar session_id del visitante
+function getSessionId(): string {
+  if (typeof window === "undefined") return `ssr-${Date.now()}`;
+  const key = "nexobot_session_id";
+  let sid = localStorage.getItem(key);
+  if (!sid) {
+    sid = `visitor-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+    localStorage.setItem(key, sid);
+  }
+  return sid;
+}
+
 export default function WidgetPage() {
   const { botId } = useParams<{ botId: string }>();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [botName, setBotName] = useState("NexoBot");
+  const [sessionId, setSessionId] = useState<string>("");
   const endRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Mensaje de bienvenida
+    setSessionId(getSessionId());
     setMessages([{ role: "assistant", content: "¡Hola! 👋 ¿En qué puedo ayudarte hoy?" }]);
   }, []);
 
@@ -41,6 +54,7 @@ export default function WidgetPage() {
         body: JSON.stringify({
           message: userMsg,
           history: messages.slice(-6),
+          sessionId,
         }),
       });
       const data = await res.json();
