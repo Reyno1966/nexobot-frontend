@@ -38,6 +38,7 @@ export async function POST(req: Request) {
       secure: true,
       sameSite: "lax",
       path: "/",
+      maxAge: 60 * 60 * 24 * 7, // 7 días
     });
 
     cookieStore.set("sb-refresh-token", data.session.refresh_token, {
@@ -45,6 +46,7 @@ export async function POST(req: Request) {
       secure: true,
       sameSite: "lax",
       path: "/",
+      maxAge: 60 * 60 * 24 * 30, // 30 días
     });
 
     return NextResponse.json({ user: data.user });
