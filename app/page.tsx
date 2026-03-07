@@ -444,11 +444,13 @@ export default function Home() {
             <p className="text-xl font-extrabold text-blue-600">NexoBot</p>
             <p className="text-sm text-gray-400 mt-1">© {new Date().getFullYear()} NexoBot — Todos los derechos reservados.</p>
           </div>
-          <div className="flex gap-6 text-sm text-gray-500">
+          <div className="flex flex-wrap gap-6 text-sm text-gray-500">
             <a href="#pricing" className="hover:text-blue-600 transition">Precios</a>
             <a href="#faq" className="hover:text-blue-600 transition">FAQ</a>
             <a href="#features" className="hover:text-blue-600 transition">Características</a>
             <a href="/auth/login" className="hover:text-blue-600 transition">Iniciar sesión</a>
+            <a href="/privacy" className="hover:text-blue-600 transition">Privacidad</a>
+            <a href="/terms" className="hover:text-blue-600 transition">Términos</a>
           </div>
         </div>
       </footer>

@@ -39,6 +39,8 @@ export function middleware(req: NextRequest) {
     "/auth",
     "/api",
     "/checkout",
+    "/privacy",
+    "/terms",
   ];
 
   const isPublic = publicPrefixes.some(
