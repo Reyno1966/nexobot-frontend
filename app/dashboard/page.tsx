@@ -4,8 +4,15 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 
 interface User { id: string; email: string; created_at?: string }
-interface Bot { id: string; name: string; channel: string; status: string; messages_count: number; created_at: string }
+interface Bot  { id: string; name: string; channel: string; status: string; messages_count: number; messages_this_month: number; created_at: string }
 interface Subscription { plan_name: string; status: string; current_period_end?: string; cancel_at_period_end?: boolean }
+
+const PLAN_MSG_LIMITS: Record<string, number> = {
+  free:    100,
+  Starter: 5000,
+  Pro:     20000,
+  Premium: -1,
+};
 
 const CHANNEL_LABELS: Record<string, string> = {
   web: "Web", whatsapp: "WhatsApp", telegram: "Telegram", instagram: "Instagram",
@@ -48,9 +55,13 @@ export default function DashboardPage() {
     );
   }
 
-  const activeBots = bots.filter((b) => b.status === "active").length;
-  const totalMessages = bots.reduce((acc, b) => acc + (b.messages_count ?? 0), 0);
-  const planName = subscription?.plan_name ?? "Gratis";
+  const activeBots      = bots.filter((b) => b.status === "active").length;
+  const totalMessages   = bots.reduce((acc, b) => acc + (b.messages_count ?? 0), 0);
+  const msgsThisMonth   = bots.reduce((acc, b) => acc + (b.messages_this_month ?? 0), 0);
+  const planName        = subscription?.plan_name ?? "Gratis";
+  const planLimit       = PLAN_MSG_LIMITS[planName] ?? 100;
+  const usagePct        = planLimit === -1 ? 0 : Math.min(Math.round((msgsThisMonth / planLimit) * 100), 100);
+  const usageColor      = usagePct >= 80 ? "from-red-400 to-orange-400" : usagePct >= 50 ? "from-[#F5A623] to-yellow-400" : "from-[#2CC5C5] to-[#F5A623]";
   const renewsOn = subscription?.current_period_end
     ? new Date(subscription.current_period_end).toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric" })
     : null;
@@ -108,6 +119,52 @@ export default function DashboardPage() {
           <p className="text-3xl font-bold text-green-600 mt-1">Activa</p>
           <p className="text-xs text-gray-400 mt-1">{planName}</p>
         </div>
+      </div>
+
+      {/* ── Panel de uso mensual ── */}
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 mb-6">
+        <div className="flex items-center justify-between mb-3">
+          <div>
+            <p className="text-sm font-semibold text-gray-900">Uso mensual de mensajes</p>
+            <p className="text-xs text-gray-400 mt-0.5">Se reinicia el 1 de cada mes</p>
+          </div>
+          <span className={`text-xs font-bold px-3 py-1 rounded-full ${
+            usagePct >= 80 ? "bg-red-50 text-red-600" :
+            usagePct >= 50 ? "bg-yellow-50 text-yellow-600" :
+            "bg-[#EEF9F9] text-[#2CC5C5]"
+          }`}>
+            {planLimit === -1 ? "Ilimitado ∞" : `${usagePct}% usado`}
+          </span>
+        </div>
+
+        {/* Barra de progreso */}
+        {planLimit !== -1 && (
+          <>
+            <div className="w-full bg-gray-100 rounded-full h-3 mb-2 overflow-hidden">
+              <div
+                className={`h-full rounded-full bg-gradient-to-r ${usageColor} transition-all duration-500`}
+                style={{ width: `${usagePct}%` }}
+              />
+            </div>
+            <div className="flex justify-between text-xs text-gray-400">
+              <span>{msgsThisMonth.toLocaleString()} mensajes usados</span>
+              <span>{(planLimit - msgsThisMonth).toLocaleString()} restantes de {planLimit.toLocaleString()}</span>
+            </div>
+            {usagePct >= 80 && (
+              <div className="mt-3 flex items-center gap-2 bg-red-50 rounded-xl px-4 py-2.5">
+                <span className="text-red-500 text-sm">⚠️</span>
+                <p className="text-xs text-red-600 font-medium">
+                  Estás cerca del límite.{" "}
+                  <a href="/dashboard/billing" className="underline font-bold">Mejora tu plan</a>{" "}
+                  para no interrumpir el servicio.
+                </p>
+              </div>
+            )}
+          </>
+        )}
+        {planLimit === -1 && (
+          <p className="text-sm text-gray-500">Plan Premium — mensajes ilimitados ✅</p>
+        )}
       </div>
 
       {/* Quick actions */}

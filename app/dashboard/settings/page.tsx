@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 
 interface User    { id: string; email: string; created_at?: string }
@@ -23,13 +23,16 @@ export default function SettingsPage() {
   const [pwMessage, setPwMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   // Branding form
-  const [profile, setProfile]       = useState<Profile>({
+  const [profile, setProfile] = useState<Profile>({
     company_name: "", company_logo_url: "", company_address: "",
     company_phone: "", company_email: "", company_website: "",
   });
-  const [brandSaving, setBrandSaving] = useState(false);
+  const [brandSaving, setBrandSaving]   = useState(false);
   const [brandMessage, setBrandMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const [logoPreview, setLogoPreview]   = useState<string>("");
+  const [logoUploading, setLogoUploading] = useState(false);
+  const [logoError, setLogoError]       = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     async function load() {
@@ -57,6 +60,41 @@ export default function SettingsPage() {
     load();
   }, []);
 
+  // ── Subida directa de logo ──
+  async function handleLogoUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setLogoUploading(true);
+    setLogoError(false);
+    setBrandMessage(null);
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const res  = await fetch("/api/profile/upload-logo", {
+        method: "POST",
+        credentials: "include",
+        body: formData,
+      });
+      const data = await res.json();
+
+      if (res.ok && data.url) {
+        setProfile((p) => ({ ...p, company_logo_url: data.url }));
+        setLogoPreview(data.url);
+        setBrandMessage({ type: "success", text: "✅ Logo subido correctamente. Recuerda guardar los cambios." });
+      } else {
+        setBrandMessage({ type: "error", text: data.error ?? "Error al subir el logo." });
+      }
+    } catch {
+      setBrandMessage({ type: "error", text: "Error de conexión al subir la imagen." });
+    } finally {
+      setLogoUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  }
+
   async function handleChangePassword(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setPwMessage(null);
@@ -68,7 +106,7 @@ export default function SettingsPage() {
     }
     setPwLoading(true);
     try {
-      const res = await fetch("/api/auth/update-password", {
+      const res  = await fetch("/api/auth/update-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -89,7 +127,7 @@ export default function SettingsPage() {
     setBrandMessage(null);
     setBrandSaving(true);
     try {
-      const res = await fetch("/api/profile", {
+      const res  = await fetch("/api/profile", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -110,7 +148,7 @@ export default function SettingsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+        <div className="w-10 h-10 border-4 border-[#2CC5C5] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -129,7 +167,7 @@ export default function SettingsPage() {
       {/* ── BRANDING DE EMPRESA ── */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-6">
         <div className="flex items-center gap-3 mb-5">
-          <div className="w-9 h-9 bg-gradient-to-br from-blue-500 to-violet-600 rounded-xl flex items-center justify-center">
+          <div className="w-9 h-9 bg-gradient-to-br from-[#2CC5C5] to-[#F5A623] rounded-xl flex items-center justify-center">
             <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                 d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
@@ -141,11 +179,15 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        {/* Preview */}
-        <div className="mb-5 bg-gradient-to-r from-[#050816] to-[#0d1537] rounded-2xl p-4 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full overflow-hidden bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center flex-shrink-0">
-            {logoPreview ? (
-              <Image src={logoPreview} alt="Logo" width={40} height={40} className="w-full h-full object-cover" onError={() => setLogoPreview("")} />
+        {/* Preview del widget */}
+        <div className="mb-5 bg-gradient-to-r from-[#041414] to-[#062828] rounded-2xl p-4 flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full overflow-hidden bg-gradient-to-br from-[#2CC5C5] to-[#F5A623] flex items-center justify-center flex-shrink-0">
+            {logoPreview && !logoError ? (
+              <Image
+                src={logoPreview} alt="Logo" width={40} height={40}
+                className="w-full h-full object-cover"
+                onError={() => setLogoError(true)}
+              />
             ) : (
               <span className="text-white font-bold text-sm">
                 {profile.company_name?.charAt(0)?.toUpperCase() || "E"}
@@ -165,24 +207,69 @@ export default function SettingsPage() {
         </div>
 
         <form onSubmit={handleSaveBranding} className="space-y-4">
-          {/* Logo URL */}
+
+          {/* ── LOGO: subida directa + URL ── */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              URL del Logo
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Logo de la empresa</label>
+
+            {/* Zona de subida */}
+            <div
+              onClick={() => fileInputRef.current?.click()}
+              className="border-2 border-dashed border-gray-200 rounded-xl p-5 text-center cursor-pointer hover:border-[#2CC5C5] hover:bg-[#EEF9F9] transition-all group mb-3"
+            >
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/jpg,image/png,image/webp,image/gif,image/svg+xml"
+                onChange={handleLogoUpload}
+                className="hidden"
+              />
+
+              {logoUploading ? (
+                <div className="flex flex-col items-center gap-2">
+                  <div className="w-8 h-8 border-3 border-[#2CC5C5] border-t-transparent rounded-full animate-spin" />
+                  <p className="text-sm text-[#2CC5C5] font-medium">Subiendo imagen...</p>
+                </div>
+              ) : logoPreview && !logoError ? (
+                <div className="flex flex-col items-center gap-2">
+                  <Image
+                    src={logoPreview} alt="Logo preview" width={64} height={64}
+                    className="w-16 h-16 object-contain rounded-xl"
+                    onError={() => setLogoError(true)}
+                  />
+                  <p className="text-xs text-gray-400">Haz clic para cambiar el logo</p>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center gap-2">
+                  <div className="w-12 h-12 bg-[#EEF9F9] rounded-xl flex items-center justify-center group-hover:bg-[#D9F5F5] transition">
+                    <svg className="w-6 h-6 text-[#2CC5C5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <p className="text-sm font-medium text-gray-700">Haz clic para subir tu logo</p>
+                  <p className="text-xs text-gray-400">JPG, PNG, WebP, GIF o SVG · Máx. 2MB</p>
+                </div>
+              )}
+            </div>
+
+            {/* URL manual como alternativa */}
+            <div className="flex items-center gap-2 mb-1">
+              <div className="flex-1 h-px bg-gray-100" />
+              <span className="text-xs text-gray-400">o pega una URL</span>
+              <div className="flex-1 h-px bg-gray-100" />
+            </div>
             <input
               type="url"
               value={profile.company_logo_url ?? ""}
               onChange={(e) => {
                 setProfile((p) => ({ ...p, company_logo_url: e.target.value }));
                 setLogoPreview(e.target.value);
+                setLogoError(false);
               }}
               placeholder="https://tuempresa.com/logo.png"
-              className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#2CC5C5] mt-2"
             />
-            <p className="text-xs text-gray-400 mt-1">
-              💡 Sube tu logo a <a href="https://imgur.com" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">imgur.com</a> o cualquier hosting de imágenes y pega la URL aquí
-            </p>
           </div>
 
           {/* Nombre de empresa */}
@@ -193,7 +280,7 @@ export default function SettingsPage() {
               value={profile.company_name ?? ""}
               onChange={(e) => setProfile((p) => ({ ...p, company_name: e.target.value }))}
               placeholder="Ej: Acme Solutions S.A."
-              className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#2CC5C5]"
             />
           </div>
 
@@ -205,7 +292,7 @@ export default function SettingsPage() {
                 value={profile.company_email ?? ""}
                 onChange={(e) => setProfile((p) => ({ ...p, company_email: e.target.value }))}
                 placeholder="contacto@tuempresa.com"
-                className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#2CC5C5]"
               />
             </div>
             <div>
@@ -215,7 +302,7 @@ export default function SettingsPage() {
                 value={profile.company_phone ?? ""}
                 onChange={(e) => setProfile((p) => ({ ...p, company_phone: e.target.value }))}
                 placeholder="+1 555 0000"
-                className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#2CC5C5]"
               />
             </div>
           </div>
@@ -227,7 +314,7 @@ export default function SettingsPage() {
               value={profile.company_address ?? ""}
               onChange={(e) => setProfile((p) => ({ ...p, company_address: e.target.value }))}
               placeholder="Calle Principal 123, Ciudad, País"
-              className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#2CC5C5]"
             />
           </div>
 
@@ -238,7 +325,7 @@ export default function SettingsPage() {
               value={profile.company_website ?? ""}
               onChange={(e) => setProfile((p) => ({ ...p, company_website: e.target.value }))}
               placeholder="https://tuempresa.com"
-              className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#2CC5C5]"
             />
           </div>
 
@@ -248,14 +335,14 @@ export default function SettingsPage() {
                 ? "bg-green-50 text-green-700 border border-green-200"
                 : "bg-red-50 text-red-600 border border-red-200"
             }`}>
-              {brandMessage.type === "success" ? "✅" : "⚠️"} {brandMessage.text}
+              {brandMessage.text}
             </div>
           )}
 
           <button
             type="submit"
-            disabled={brandSaving}
-            className="w-full py-2.5 bg-gradient-to-r from-blue-600 to-violet-600 text-white rounded-xl text-sm font-semibold hover:opacity-90 transition disabled:opacity-50"
+            disabled={brandSaving || logoUploading}
+            className="w-full py-2.5 bg-gradient-to-r from-[#2CC5C5] to-[#F5A623] text-white rounded-xl text-sm font-semibold hover:opacity-90 transition disabled:opacity-50"
           >
             {brandSaving ? "Guardando..." : "💾 Guardar branding"}
           </button>
@@ -266,11 +353,11 @@ export default function SettingsPage() {
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-6">
         <h2 className="text-base font-semibold text-gray-900 mb-4">Información de cuenta</h2>
         <div className="flex items-center gap-4 mb-4">
-          <div className="w-14 h-14 bg-blue-100 rounded-2xl flex items-center justify-center overflow-hidden">
-            {logoPreview ? (
-              <Image src={logoPreview} alt="Logo" width={56} height={56} className="w-full h-full object-cover" onError={() => setLogoPreview("")} />
+          <div className="w-14 h-14 bg-[#EEF9F9] rounded-2xl flex items-center justify-center overflow-hidden">
+            {logoPreview && !logoError ? (
+              <Image src={logoPreview} alt="Logo" width={56} height={56} className="w-full h-full object-cover" onError={() => setLogoError(true)} />
             ) : (
-              <span className="text-blue-700 font-bold text-xl uppercase">
+              <span className="text-[#2CC5C5] font-bold text-xl uppercase">
                 {profile.company_name?.charAt(0) || user?.email?.charAt(0) || "U"}
               </span>
             )}
@@ -294,7 +381,7 @@ export default function SettingsPage() {
               value={pwForm.next}
               onChange={(e) => setPwForm((f) => ({ ...f, next: e.target.value }))}
               placeholder="Mínimo 8 caracteres"
-              className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#2CC5C5]"
             />
           </div>
           <div>
@@ -304,7 +391,7 @@ export default function SettingsPage() {
               value={pwForm.confirm}
               onChange={(e) => setPwForm((f) => ({ ...f, confirm: e.target.value }))}
               placeholder="Repite la contraseña"
-              className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#2CC5C5]"
             />
           </div>
           {pwMessage && (
@@ -319,7 +406,7 @@ export default function SettingsPage() {
           <button
             type="submit"
             disabled={pwLoading || !pwForm.next || !pwForm.confirm}
-            className="w-full py-2.5 bg-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-blue-700 transition disabled:opacity-50"
+            className="w-full py-2.5 bg-gradient-to-r from-[#2CC5C5] to-[#F5A623] text-white rounded-xl text-sm font-semibold hover:opacity-90 transition disabled:opacity-50"
           >
             {pwLoading ? "Actualizando..." : "Actualizar contraseña"}
           </button>
@@ -331,7 +418,7 @@ export default function SettingsPage() {
         <h2 className="text-base font-semibold text-gray-900 mb-2">Soporte</h2>
         <p className="text-sm text-gray-500 mb-4">¿Tienes algún problema o pregunta? Escríbenos.</p>
         <a href="mailto:support@nexobot.net"
-          className="inline-flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-700 transition">
+          className="inline-flex items-center gap-2 text-sm font-medium text-[#2CC5C5] hover:text-[#23A5A5] transition">
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
               d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
