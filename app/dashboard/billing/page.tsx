@@ -161,33 +161,40 @@ export default function BillingPage() {
         <h2 className="text-base font-semibold text-gray-900 mb-4">
           {subscription ? "Cambiar plan" : "Elegir un plan"}
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
           {PLANS.map((plan) => {
             const isCurrent = subscription?.plan_name === plan.name;
+            const isPro = plan.name === "Pro";
             return (
               <div
                 key={plan.name}
-                className={`bg-white rounded-2xl border-2 shadow-sm p-6 flex flex-col ${isCurrent ? "border-blue-500 ring-2 ring-blue-100" : plan.color}`}
+                className={`rounded-2xl border-2 p-6 flex flex-col transition-all ${
+                  isPro
+                    ? "bg-gradient-to-b from-[#050816] to-[#0d1537] border-blue-500 shadow-xl shadow-blue-900/30 -translate-y-2"
+                    : isCurrent
+                    ? "bg-white border-blue-500 ring-2 ring-blue-100 shadow-sm"
+                    : "bg-white border-gray-200 shadow-sm hover:shadow-md hover:-translate-y-1"
+                }`}
               >
-                {plan.badge && (
-                  <span className="self-start text-xs font-semibold bg-blue-600 text-white px-2.5 py-1 rounded-full mb-3">
-                    {plan.badge}
+                {plan.badge && !isCurrent && (
+                  <span className="self-start text-xs font-bold bg-gradient-to-r from-blue-500 to-violet-500 text-white px-3 py-1 rounded-full mb-3">
+                    ⭐ {plan.badge}
                   </span>
                 )}
                 {isCurrent && (
                   <span className="self-start text-xs font-semibold bg-green-100 text-green-700 px-2.5 py-1 rounded-full mb-3">
-                    Plan actual
+                    ✓ Plan actual
                   </span>
                 )}
-                <p className="font-bold text-xl text-gray-900">{plan.name}</p>
+                <p className={`font-bold text-xl ${isPro ? "text-white" : "text-gray-900"}`}>{plan.name}</p>
                 <div className="flex items-end gap-1 mt-1 mb-4">
-                  <span className="text-3xl font-extrabold text-gray-900">{plan.price}</span>
-                  <span className="text-gray-400 text-sm mb-1">{plan.period}</span>
+                  <span className={`text-3xl font-extrabold ${isPro ? "text-white" : "text-gray-900"}`}>{plan.price}</span>
+                  <span className={`text-sm mb-1 ${isPro ? "text-white/40" : "text-gray-400"}`}>{plan.period}</span>
                 </div>
                 <ul className="space-y-2 flex-1 mb-6">
                   {plan.features.map((f) => (
-                    <li key={f} className="flex items-center gap-2 text-sm text-gray-600">
-                      <svg className="w-4 h-4 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <li key={f} className={`flex items-center gap-2 text-sm ${isPro ? "text-white/70" : "text-gray-600"}`}>
+                      <svg className={`w-4 h-4 flex-shrink-0 ${isPro ? "text-blue-400" : "text-green-500"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                       </svg>
                       {f}
@@ -197,17 +204,15 @@ export default function BillingPage() {
                 <button
                   onClick={() => !isCurrent && handleCheckout(plan.priceId)}
                   disabled={isCurrent || checkoutLoading === plan.priceId}
-                  className={`w-full py-2.5 rounded-xl text-sm font-semibold transition ${
+                  className={`w-full py-2.5 rounded-xl text-sm font-semibold transition disabled:opacity-60 ${
                     isCurrent
                       ? "bg-gray-100 text-gray-400 cursor-default"
+                      : isPro
+                      ? "bg-gradient-to-r from-blue-500 to-violet-500 text-white hover:opacity-90 shadow-lg shadow-blue-900/30"
                       : "bg-blue-600 text-white hover:bg-blue-700"
-                  } disabled:opacity-60`}
+                  }`}
                 >
-                  {checkoutLoading === plan.priceId
-                    ? "Redirigiendo..."
-                    : isCurrent
-                    ? "Plan actual"
-                    : `Suscribirse a ${plan.name}`}
+                  {checkoutLoading === plan.priceId ? "Redirigiendo..." : isCurrent ? "Plan actual" : `Suscribirse a ${plan.name}`}
                 </button>
               </div>
             );

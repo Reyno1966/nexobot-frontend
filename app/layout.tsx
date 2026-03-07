@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import Link from "next/link";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -38,18 +37,6 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-
-        {/* LANGUAGE SELECTOR */}
-        <nav className="flex justify-end gap-4 p-4 text-sm font-semibold border-b border-gray-100 bg-white">
-          <Link href="/" className="hover:text-blue-600 transition">🇪🇸 ES</Link>
-          <Link href="/en" className="hover:text-blue-600 transition">🇺🇸 EN</Link>
-          <Link href="/pt" className="hover:text-blue-600 transition">🇧🇷 PT</Link>
-          <Link href="/fr" className="hover:text-blue-600 transition">🇫🇷 FR</Link>
-          <Link href="/it" className="hover:text-blue-600 transition">🇮🇹 IT</Link>
-          <Link href="/de" className="hover:text-blue-600 transition">🇩🇪 DE</Link>
-          <Link href="/nl" className="hover:text-blue-600 transition">🇳🇱 NL</Link>
-          <Link href="/ar" className="hover:text-blue-600 transition">🇸🇦 AR</Link>
-        </nav>
 
         {children}
       </body>
