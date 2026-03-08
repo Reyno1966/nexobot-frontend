@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -50,12 +51,17 @@ export default function LoginPage() {
       <div className="relative z-10 w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
-          <Link href="/" className="inline-block">
-            <span className="text-3xl font-black bg-gradient-to-r from-blue-400 to-violet-400 bg-clip-text text-transparent">
-              NexoBot
-            </span>
+          <Link href="/" className="inline-flex justify-center">
+            <Image
+              src="/nexobot-logo.png"
+              alt="NexoBot"
+              width={160}
+              height={50}
+              className="h-12 w-auto object-contain"
+              priority
+            />
           </Link>
-          <p className="text-white/40 text-sm mt-2">Bienvenido de vuelta</p>
+          <p className="text-white/40 text-sm mt-3">Bienvenido de vuelta</p>
         </div>
 
         <div className="bg-white/5 border border-white/10 backdrop-blur-xl rounded-2xl p-8 shadow-2xl">
