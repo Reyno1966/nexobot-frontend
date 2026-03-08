@@ -1,4 +1,5 @@
 import OpenAI from "openai";
+import type { ChatCompletion } from "openai/resources/chat/completions";
 
 export const openai = new OpenAI({
   apiKey: (process.env.OPENAI_API_KEY || "").trim(),
@@ -22,13 +23,13 @@ export const MAX_MESSAGES_PER_SESSION = 30; // máx mensajes por visitante por s
 
 // ── Reintentos automáticos si OpenAI falla ──
 export async function callOpenAI(
-  params: Parameters<typeof openai.chat.completions.create>[0],
+  params: Omit<Parameters<typeof openai.chat.completions.create>[0], "stream">,
   maxRetries = 3
-) {
+): Promise<ChatCompletion> {
   let lastError: unknown;
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
-      return await openai.chat.completions.create(params);
+      return await openai.chat.completions.create({ ...params, stream: false }) as ChatCompletion;
     } catch (err) {
       lastError = err;
       if (attempt < maxRetries) {
