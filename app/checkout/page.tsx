@@ -3,13 +3,14 @@
 import { useEffect, useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 
 // Mapa de productos según el priceId de Stripe
 const PLANS: Record<string, { name: string; price: string; description: string; features: string[]; type: "subscription" | "one-time" }> = {
-  // Suscripciones mensuales
-  price_1T18BGRap0JkQNsmaUVhyNFr: {
+  // ── Suscripciones mensuales ──
+  price_1T8eHgRap0JkQNsmxXKjK3IH: {
     name: "Starter",
-    price: "$29/mes",
+    price: "$14/mes",
     description: "Ideal para emprendedores que están comenzando",
     type: "subscription",
     features: [
@@ -21,9 +22,9 @@ const PLANS: Record<string, { name: string; price: string; description: string; 
       "Panel de control intuitivo",
     ],
   },
-  price_1T15gVRap0JkQNsm59vukMuR: {
+  price_1T8eNZRap0JkQNsmeObpDc8j: {
     name: "Pro",
-    price: "$59/mes",
+    price: "$29/mes",
     description: "Perfecto para negocios que quieren escalar",
     type: "subscription",
     features: [
@@ -35,9 +36,9 @@ const PLANS: Record<string, { name: string; price: string; description: string; 
       "Integración con redes sociales",
     ],
   },
-  price_1T15jDRap0JkQNsmQRvEkpcm: {
+  price_1T8eRdRap0JkQNsmllSsPbVs: {
     name: "Premium",
-    price: "$99/mes",
+    price: "$49/mes",
     description: "Para empresas que necesitan máxima potencia",
     type: "subscription",
     features: [
@@ -49,10 +50,10 @@ const PLANS: Record<string, { name: string; price: string; description: string; 
       "Configuración asistida",
     ],
   },
-  // Servicios adicionales (pago único)
-  price_1T161uRap0JkQNsm3BJZGOEu: {
+  // ── Servicios adicionales (pago único) ──
+  price_1T8ehkRap0JkQNsmtky7j7ZL: {
     name: "Personalización avanzada",
-    price: "$99",
+    price: "$49",
     description: "Haz que tu bot hable como tu marca",
     type: "one-time",
     features: [
@@ -61,9 +62,9 @@ const PLANS: Record<string, { name: string; price: string; description: string; 
       "Optimización del flujo conversacional",
     ],
   },
-  price_1T163sRap0JkQNsmOrHBQuJp: {
+  price_1T8f2CRap0JkQNsmyzuyUvU4: {
     name: "Automatizaciones avanzadas",
-    price: "$149",
+    price: "$79",
     description: "Convierte tu bot en una máquina de ventas",
     type: "one-time",
     features: [
@@ -72,9 +73,9 @@ const PLANS: Record<string, { name: string; price: string; description: string; 
       "Embudos automatizados",
     ],
   },
-  price_1T166cRap0JkQNsmuPTOPBBu: {
+  price_1T8eyARap0JkQNsmWVnTTioZ: {
     name: "Integración con sistemas externos",
-    price: "$199",
+    price: "$99",
     description: "Conecta tu bot con tu ecosistema",
     type: "one-time",
     features: [
@@ -178,8 +179,10 @@ function CheckoutContent() {
 
         {/* Header */}
         <div className="text-center mb-8">
-          <Link href="/" className="text-blue-600 font-bold text-2xl">NexoBot</Link>
-          <p className="text-gray-500 mt-1 text-sm">Proceso de pago seguro</p>
+          <Link href="/" className="inline-flex justify-center">
+            <Image src="/nexobot-logo.png" alt="NexoBot" width={140} height={44} className="h-10 w-auto object-contain" priority />
+          </Link>
+          <p className="text-gray-500 mt-2 text-sm">Proceso de pago seguro</p>
         </div>
 
         {/* Card principal */}
