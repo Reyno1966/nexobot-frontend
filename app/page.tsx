@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import DemoChat from "@/components/landing/DemoChat";
 
 export default function Home() {
   return (
@@ -230,6 +231,69 @@ export default function Home() {
                 <p className="text-gray-500 text-sm leading-relaxed">{s.desc}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── DEMO EN VIVO ── */}
+      <section id="demo" className="py-24 bg-[#041414] relative overflow-hidden">
+        {/* Gradient orbs */}
+        <div className="absolute top-1/3 left-0 w-72 h-72 bg-[#2CC5C5]/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-1/4 right-0 w-64 h-64 bg-[#F5A623]/10 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="relative z-10 max-w-6xl mx-auto px-6">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+
+            {/* Left: pitch */}
+            <div>
+              <span className="text-sm font-bold text-[#2CC5C5] uppercase tracking-widest">Demo en vivo</span>
+              <h2 className="mt-3 text-4xl font-black text-white leading-tight">
+                Habla con NexoBot{" "}
+                <span className="bg-gradient-to-r from-[#2CC5C5] to-[#F5A623] bg-clip-text text-transparent">
+                  ahora mismo
+                </span>
+              </h2>
+              <p className="mt-5 text-white/60 text-lg leading-relaxed">
+                No necesitas crear cuenta. Prueba en tiempo real cómo tu bot responderá a los clientes de tu negocio.
+              </p>
+
+              <ul className="mt-8 space-y-4">
+                {[
+                  { icon: "⚡", text: "Respuestas en menos de 2 segundos" },
+                  { icon: "🧠", text: "IA real — no respuestas pregrabadas" },
+                  { icon: "🎨", text: "Personalizable con el tono de tu marca" },
+                  { icon: "📲", text: "Funciona en web, WhatsApp e Instagram" },
+                ].map((item) => (
+                  <li key={item.text} className="flex items-center gap-3">
+                    <span className="w-8 h-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-base flex-shrink-0">
+                      {item.icon}
+                    </span>
+                    <span className="text-white/70 text-sm">{item.text}</span>
+                  </li>
+                ))}
+              </ul>
+
+              <div className="mt-10 flex flex-wrap gap-4">
+                <a
+                  href="/auth/signup"
+                  className="px-7 py-3.5 bg-gradient-to-r from-[#2CC5C5] to-[#F5A623] text-white rounded-full font-semibold hover:opacity-90 hover:scale-105 transition-all shadow-lg shadow-[#0A5555]/40 text-sm"
+                >
+                  Crear mi bot gratis →
+                </a>
+                <a
+                  href="#pricing"
+                  className="px-7 py-3.5 border border-white/10 text-white/70 rounded-full font-medium hover:bg-white/5 transition-all text-sm"
+                >
+                  Ver precios
+                </a>
+              </div>
+              <p className="mt-3 text-xs text-white/30">Sin tarjeta de crédito · Cancela cuando quieras</p>
+            </div>
+
+            {/* Right: interactive demo */}
+            <div>
+              <DemoChat />
+            </div>
           </div>
         </div>
       </section>
