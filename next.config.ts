@@ -5,6 +5,20 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: false,
   },
+  // Permitir imágenes externas (logos de empresas y Supabase Storage)
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "**.supabase.co",
+        pathname: "/storage/v1/object/public/**",
+      },
+      {
+        protocol: "https",
+        hostname: "**", // Logos pegados como URL desde cualquier dominio
+      },
+    ],
+  },
   // Headers de seguridad para producción
   async headers() {
     return [
