@@ -65,10 +65,7 @@ export async function GET() {
     .in("bot_id", botIds)
     .gte("created_at", todayStart.toISOString());
 
-  // Mensajes de esta semana
-  const weekAgo = new Date();
-  weekAgo.setDate(weekAgo.getDate() - 6);
-  weekAgo.setHours(0, 0, 0, 0);
+  // Mensajes de esta semana (últimos 7 días del array de 30)
   const messagesThisWeek = dailyMessages
     .slice(-7)
     .reduce((acc, d) => acc + d.count, 0);

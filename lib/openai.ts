@@ -17,9 +17,9 @@ export const MAX_MESSAGES_PER_SESSION = 30; // máx mensajes por visitante por s
 // ── Costo estimado por mensaje (USD) ──
 // gpt-4o-mini: $0.15/1M input, $0.60/1M output
 // ~800 input tokens + 350 output = ~$0.0003 por mensaje
-// Starter (5000 msgs): ~$1.50 costo vs $29 ingreso = 95% margen ✅
-// Pro (20000 msgs): ~$6 costo vs $59 ingreso = 90% margen ✅
-// Premium (unlimited): ~$30 costo máx vs $99 ingreso = 70% margen ✅
+// Starter (5000 msgs): ~$1.50 costo vs $14 ingreso = 89% margen ✅
+// Pro (20000 msgs): ~$6 costo vs $29 ingreso = 79% margen ✅
+// Premium (unlimited): ~$30 costo máx vs $49 ingreso = 39% margen ✅
 
 // ── Reintentos automáticos si OpenAI falla ──
 export async function callOpenAI(
