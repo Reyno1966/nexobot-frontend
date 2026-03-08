@@ -45,6 +45,13 @@ export default function BotDetailPage() {
 
   // Tab
   const [activeTab, setActiveTab] = useState<"config" | "test" | "embed">("config");
+  const [copiedLink, setCopiedLink] = useState(false);
+
+  function copyLink() {
+    navigator.clipboard.writeText(`${APP_URL}/widget/${id}`);
+    setCopiedLink(true);
+    setTimeout(() => setCopiedLink(false), 2000);
+  }
 
   useEffect(() => {
     async function load() {
@@ -340,20 +347,54 @@ export default function BotDetailPage() {
       {/* ── TAB: INSTALAR ── */}
       {activeTab === "embed" && (
         <div className="space-y-6">
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-            <h2 className="font-semibold text-gray-900 mb-1">ID único de tu bot</h2>
-            <p className="text-sm text-gray-500 mb-3">Usa este ID para conectar tu bot desde cualquier sitio web</p>
-            <div className="flex items-center gap-3 bg-gray-50 rounded-xl px-4 py-3 border border-gray-200">
-              <code className="text-sm text-[#2CC5C5] font-mono flex-1 break-all">{id}</code>
+
+          {/* SHARE LINK — primera sección, más prominente */}
+          <div className="bg-gradient-to-r from-[#041414] to-[#062828] rounded-2xl p-6 shadow-md">
+            <div className="flex items-start justify-between gap-4 mb-4">
+              <div>
+                <h2 className="font-bold text-white text-lg">🔗 Link directo de tu chatbot</h2>
+                <p className="text-white/50 text-sm mt-1">
+                  Comparte este link con tus clientes — pueden chatear sin instalar nada
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 bg-white/10 rounded-xl px-4 py-3 border border-white/10 mb-4">
+              <span className="text-[#2CC5C5] text-sm font-mono flex-1 break-all">
+                {APP_URL}/widget/{id}
+              </span>
+            </div>
+            <div className="flex flex-wrap gap-3">
               <button
-                onClick={() => navigator.clipboard.writeText(id)}
-                className="text-gray-400 hover:text-gray-600 transition flex-shrink-0"
-                title="Copiar"
+                onClick={copyLink}
+                className="flex items-center gap-2 bg-[#2CC5C5] hover:bg-[#25aFaF] text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition"
+              >
+                {copiedLink ? (
+                  <>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                    </svg>
+                    ¡Copiado!
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                    Copiar link
+                  </>
+                )}
+              </button>
+              <a
+                href={`${APP_URL}/widget/${id}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition border border-white/10"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                 </svg>
-              </button>
+                Ver en vivo
+              </a>
             </div>
           </div>
 
@@ -389,9 +430,9 @@ export default function BotDetailPage() {
             </div>
           </div>
 
-          <div className="bg-blue-50 border border-blue-100 rounded-2xl p-5">
-            <p className="text-sm font-semibold text-[#23A5A5] mb-2">🔗 URL pública de tu widget</p>
-            <code className="text-blue-700 text-sm break-all">{APP_URL}/widget/{id}</code>
+          <div className="bg-gray-50 rounded-2xl border border-gray-200 p-5">
+            <p className="text-xs font-semibold text-gray-500 mb-1">ID único del bot</p>
+            <code className="text-[#2CC5C5] text-sm font-mono break-all">{id}</code>
           </div>
         </div>
       )}
