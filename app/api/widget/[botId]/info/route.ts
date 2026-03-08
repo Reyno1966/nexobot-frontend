@@ -28,7 +28,7 @@ export async function GET(
 
     const { data: bot } = await supabase
       .from("bots")
-      .select("name, user_id, status")
+      .select("name, user_id, status, widget_color, welcome_message")
       .eq("id", botId)
       .single();
 
@@ -44,7 +44,11 @@ export async function GET(
       .single();
 
     return NextResponse.json({
-      bot:     { name: bot.name },
+      bot: {
+        name: bot.name,
+        widget_color: bot.widget_color ?? "#2CC5C5",
+        welcome_message: bot.welcome_message ?? "¡Hola! 👋 ¿En qué puedo ayudarte hoy?",
+      },
       profile: profile ?? null,
     }, { headers: CORS });
 
