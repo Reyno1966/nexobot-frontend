@@ -78,7 +78,7 @@ export async function POST(
     const { data: profile } = await supabase
       .from("profiles")
       .select("company_website")
-      .eq("user_id", bot.user_id)
+      .eq("id", bot.user_id)
       .single();
 
     if (profile?.company_website) {
