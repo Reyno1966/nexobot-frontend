@@ -32,16 +32,16 @@ export async function POST(req: Request) {
 
     // Suscripciones mensuales (modo: subscription)
     const SUBSCRIPTION_PRICE_IDS = [
-      "price_1T18BGRap0JkQNsmaUVhyNFr", // Starter $29/mes
-      "price_1T15gVRap0JkQNsm59vukMuR", // Pro $59/mes
-      "price_1T15jDRap0JkQNsmQRvEkpcm", // Premium $99/mes
+      "price_1T8eHgRap0JkQNsmxXKjK3IH", // Starter $14/mes
+      "price_1T8eNZRap0JkQNsmeObpDc8j", // Pro $29/mes
+      "price_1T8eRdRap0JkQNsmllSsPbVs", // Premium $49/mes
     ];
 
     // Pagos únicos (modo: payment)
     const ONE_TIME_PRICE_IDS = [
-      "price_1T161uRap0JkQNsm3BJZGOEu", // Personalización avanzada $99
-      "price_1T163sRap0JkQNsmOrHBQuJp", // Automatizaciones avanzadas $149
-      "price_1T166cRap0JkQNsmuPTOPBBu", // Integración sistemas externos $199
+      "price_1T8ehkRap0JkQNsmtky7j7ZL", // Personalización avanzada $49
+      "price_1T8f2CRap0JkQNsmyzuyUvU4", // Automatizaciones avanzadas $79
+      "price_1T8eyARap0JkQNsmWVnTTioZ", // Integración sistemas externos $99
     ];
 
     const isSubscription = SUBSCRIPTION_PRICE_IDS.includes(priceId);
