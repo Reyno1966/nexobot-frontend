@@ -225,9 +225,9 @@ export default function BillingPage() {
         <h2 className="text-base font-semibold text-gray-900 mb-4">Servicios adicionales (pago único)</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {[
-            { name: "Personalización Avanzada", price: "$99", priceId: "price_1T161uRap0JkQNsm3BJZGOEu", desc: "Diseño y configuración personalizada de tu bot" },
-            { name: "Automatizaciones Avanzadas", price: "$149", priceId: "price_1T163sRap0JkQNsmOrHBQuJp", desc: "Flujos complejos y automatizaciones a medida" },
-            { name: "Integración Sistemas Externos", price: "$199", priceId: "price_1T166cRap0JkQNsmuPTOPBBu", desc: "Conecta tu bot con CRM, ERP u otros sistemas" },
+            { name: "Personalización Avanzada", price: "$49", priceId: "price_1T8ehkRap0JkQNsmtky7j7ZL", desc: "Diseño y configuración personalizada de tu bot" },
+            { name: "Automatizaciones Avanzadas", price: "$79", priceId: "price_1T8f2CRap0JkQNsmyzuyUvU4", desc: "Flujos complejos y automatizaciones a medida" },
+            { name: "Integración Sistemas Externos", price: "$99", priceId: "price_1T8eyARap0JkQNsmWVnTTioZ", desc: "Conecta tu bot con CRM, ERP u otros sistemas" },
           ].map((addon) => (
             <div key={addon.name} className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5 flex flex-col gap-3">
               <div>
