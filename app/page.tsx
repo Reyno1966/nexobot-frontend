@@ -134,7 +134,7 @@ export default function Home() {
                   <div className="flex gap-2 items-end">
                     <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#2CC5C5] to-[#F5A623] flex-shrink-0 flex items-center justify-center text-white text-xs font-bold">N</div>
                     <div className="bg-white/10 text-white/80 text-xs rounded-2xl rounded-bl-sm px-3 py-2.5 max-w-[190px] leading-relaxed">
-                      ¡Claro! Tenemos 3 planes desde $29/mes. ¿Cuál se adapta a tu negocio? 🚀
+                      ¡Claro! Tenemos 3 planes desde $14/mes. ¿Cuál se adapta a tu negocio? 🚀
                     </div>
                   </div>
 
@@ -250,7 +250,7 @@ export default function Home() {
               <h3 className="text-xl font-bold">Starter</h3>
               <p className="text-gray-500 text-sm mt-1">Ideal para emprendedores comenzando</p>
               <div className="mt-6 flex items-end gap-1">
-                <span className="text-5xl font-black">$29</span>
+                <span className="text-5xl font-black">$14</span>
                 <span className="text-gray-400 text-sm mb-2">/mes</span>
               </div>
               <ul className="mt-8 space-y-3 text-sm">
@@ -261,7 +261,7 @@ export default function Home() {
                   <li key={f} className="flex items-center gap-2 text-gray-300"><span>✗</span>{f}</li>
                 ))}
               </ul>
-              <a href="/checkout?priceId=price_1T18BGRap0JkQNsmaUVhyNFr"
+              <a href="/checkout?priceId=price_1T8eHgRap0JkQNsmxXKjK3IH"
                 className="mt-8 block text-center px-6 py-3 border-2 border-[#2CC5C5] text-[#2CC5C5] rounded-xl font-semibold hover:bg-[#2CC5C5] hover:text-white transition-all">
                 Elegir Starter
               </a>
@@ -275,7 +275,7 @@ export default function Home() {
               <h3 className="text-xl font-bold text-white">Pro</h3>
               <p className="text-white/50 text-sm mt-1">Para negocios que quieren escalar</p>
               <div className="mt-6 flex items-end gap-1">
-                <span className="text-5xl font-black text-white">$59</span>
+                <span className="text-5xl font-black text-white">$29</span>
                 <span className="text-white/40 text-sm mb-2">/mes</span>
               </div>
               <ul className="mt-8 space-y-3 text-sm">
@@ -283,7 +283,7 @@ export default function Home() {
                   <li key={f} className="flex items-center gap-2 text-white/80"><span className="text-[#2CC5C5] font-bold">✓</span>{f}</li>
                 ))}
               </ul>
-              <a href="/checkout?priceId=price_1T15gVRap0JkQNsm59vukMuR"
+              <a href="/checkout?priceId=price_1T8eNZRap0JkQNsmeObpDc8j"
                 className="mt-8 block text-center px-6 py-3 bg-gradient-to-r from-[#2CC5C5] to-[#F5A623] text-white rounded-xl font-semibold hover:opacity-90 transition-all shadow-lg shadow-[#0A5555]/40">
                 Elegir Pro
               </a>
@@ -294,7 +294,7 @@ export default function Home() {
               <h3 className="text-xl font-bold">Premium</h3>
               <p className="text-gray-500 text-sm mt-1">Para empresas que necesitan máxima potencia</p>
               <div className="mt-6 flex items-end gap-1">
-                <span className="text-5xl font-black">$99</span>
+                <span className="text-5xl font-black">$49</span>
                 <span className="text-gray-400 text-sm mb-2">/mes</span>
               </div>
               <ul className="mt-8 space-y-3 text-sm">
@@ -302,7 +302,7 @@ export default function Home() {
                   <li key={f} className="flex items-center gap-2 text-gray-600"><span className="text-[#2CC5C5] font-bold">✓</span>{f}</li>
                 ))}
               </ul>
-              <a href="/checkout?priceId=price_1T15jDRap0JkQNsmQRvEkpcm"
+              <a href="/checkout?priceId=price_1T8eRdRap0JkQNsmllSsPbVs"
                 className="mt-8 block text-center px-6 py-3 border-2 border-[#2CC5C5] text-[#2CC5C5] rounded-xl font-semibold hover:bg-[#2CC5C5] hover:text-white transition-all">
                 Elegir Premium
               </a>
@@ -322,9 +322,9 @@ export default function Home() {
           </div>
           <div className="grid md:grid-cols-3 gap-8">
             {[
-              { title: "Personalización avanzada", desc: "Haz que tu bot hable como tu marca", price: "$99", features: ["Ajustes personalizados", "Respuestas adaptadas a tu negocio", "Optimización del flujo conversacional"], priceId: "price_1T161uRap0JkQNsm3BJZGOEu" },
-              { title: "Automatizaciones avanzadas", desc: "Convierte tu bot en una máquina de ventas", price: "$149", features: ["Flujos inteligentes personalizados", "Segmentación avanzada", "Embudos automatizados"], priceId: "price_1T163sRap0JkQNsmOrHBQuJp" },
-              { title: "Integración sistemas externos", desc: "Conecta tu bot con tu ecosistema", price: "$199", features: ["Integración con CRM", "Conexión con APIs externas", "Sincronización de datos"], priceId: "price_1T166cRap0JkQNsmuPTOPBBu" },
+              { title: "Personalización avanzada", desc: "Haz que tu bot hable como tu marca", price: "$49", features: ["Ajustes personalizados", "Respuestas adaptadas a tu negocio", "Optimización del flujo conversacional"], priceId: "price_1T8ehkRap0JkQNsmtky7j7ZL" },
+              { title: "Automatizaciones avanzadas", desc: "Convierte tu bot en una máquina de ventas", price: "$79", features: ["Flujos inteligentes personalizados", "Segmentación avanzada", "Embudos automatizados"], priceId: "price_1T8f2CRap0JkQNsmyzuyUvU4" },
+              { title: "Integración sistemas externos", desc: "Conecta tu bot con tu ecosistema", price: "$99", features: ["Integración con CRM", "Conexión con APIs externas", "Sincronización de datos"], priceId: "price_1T8eyARap0JkQNsmWVnTTioZ" },
             ].map(s => (
               <div key={s.title} className="bg-white rounded-2xl p-8 border border-gray-100 hover:shadow-lg transition-all hover:-translate-y-1 duration-300">
                 <div className="inline-block bg-[#EEF9F9] text-[#2CC5C5] text-xs font-bold px-3 py-1 rounded-full mb-5">Pago único</div>
