@@ -456,7 +456,7 @@ export default function InvoicesPage() {
           <h3 className="text-lg font-semibold text-gray-900 mb-2">
             {filter === "all" ? "Sin facturas todavía" : `Sin facturas ${STATUS_LABELS[filter]?.label.toLowerCase()}`}
           </h3>
-          <p className="text-gray-500 text-sm">Crea tu primera factura con el botón "Nueva factura"</p>
+          <p className="text-gray-500 text-sm">Crea tu primera factura con el botón &quot;Nueva factura&quot;</p>
         </div>
       ) : (
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
