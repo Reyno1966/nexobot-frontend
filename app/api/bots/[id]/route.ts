@@ -10,7 +10,7 @@ export async function PUT(
 
   const { supabase, userId } = auth;
   const { id } = await params;
-  const { name, description, channel, status, system_prompt } = await req.json();
+  const { name, description, channel, status, system_prompt, widget_color, welcome_message } = await req.json();
 
   const { data: bot, error } = await supabase
     .from("bots")
@@ -20,6 +20,8 @@ export async function PUT(
       channel,
       status,
       system_prompt: system_prompt ?? "",
+      widget_color: widget_color ?? "#2CC5C5",
+      welcome_message: welcome_message ?? "¡Hola! 👋 ¿En qué puedo ayudarte hoy?",
       updated_at: new Date().toISOString(),
     })
     .eq("id", id)
