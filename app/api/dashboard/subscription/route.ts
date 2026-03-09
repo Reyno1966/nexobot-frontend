@@ -21,11 +21,15 @@ export async function GET() {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   }
 
+  // Solo planes de suscripción real, nunca servicios adicionales de pago único
+  const SUBSCRIPTION_PLANS = ["Starter", "Pro", "Premium"];
+
   const { data: subscription } = await supabase
     .from("subscriptions")
     .select("*")
     .eq("user_id", userData.user.id)
     .in("status", ["active", "trialing"])
+    .in("plan_name", SUBSCRIPTION_PLANS)
     .order("created_at", { ascending: false })
     .limit(1)
     .maybeSingle();

@@ -52,12 +52,15 @@ export async function POST(req: Request) {
           { onConflict: "stripe_subscription_id" }
         );
       } else if (session.mode === "payment") {
+        // Pagos únicos (servicios adicionales) — se guardan con stripe_subscription_id
+        // prefijado con "onetime_" para distinguirlos de suscripciones reales.
+        // La API de suscripción los ignora al filtrar por plan_name.
         await supabase.from("subscriptions").insert({
           user_id: userId,
           stripe_customer_id: session.customer as string,
           stripe_subscription_id: `onetime_${session.id}`,
           stripe_price_id: priceId ?? "",
-          plan_name: planName,
+          plan_name: planName,  // ej: "Personalización Avanzada"
           status: "active",
           updated_at: new Date().toISOString(),
         });

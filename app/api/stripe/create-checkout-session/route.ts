@@ -30,11 +30,14 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "priceId requerido" }, { status: 400 });
     }
 
-    // Suscripciones mensuales (modo: subscription)
+    // Suscripciones (modo: subscription) — mensuales y anuales
     const SUBSCRIPTION_PRICE_IDS = [
       "price_1T8eHgRap0JkQNsmxXKjK3IH", // Starter $14/mes
       "price_1T8eNZRap0JkQNsmeObpDc8j", // Pro $29/mes
       "price_1T8eRdRap0JkQNsmllSsPbVs", // Premium $49/mes
+      "price_1T8qkPRap0JkQNsm1MI5XoYm", // Starter $134/año
+      "price_1T8qndRap0JkQNsmswIpSK3M", // Pro $278/año
+      "price_1T8qr5Rap0JkQNsm8wzRX02G", // Premium $470/año
     ];
 
     // Pagos únicos (modo: payment)
