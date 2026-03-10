@@ -57,7 +57,7 @@ export async function POST(
     // ── 1. Obtener bot ──
     const { data: bot, error: botError } = await supabase
       .from("bots")
-      .select("*")
+      .select("id, name, status, user_id, system_prompt, messages_count, messages_this_month, last_reset_at, widget_color, welcome_message")
       .eq("id", botId)
       .single();
 

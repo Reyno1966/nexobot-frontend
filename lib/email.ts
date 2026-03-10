@@ -2,6 +2,50 @@ import { Resend } from "resend";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+// ── Bienvenida al nuevo usuario ──
+export async function sendWelcomeEmail({ to }: { to: string }) {
+  if (!process.env.RESEND_API_KEY) return;
+  try {
+    await resend.emails.send({
+      from: "NexoBot <no-reply@nexobot.net>",
+      to:   [to],
+      subject: "🎉 ¡Bienvenido a NexoBot! Tu asistente ya está listo",
+      html: `
+        <div style="font-family:sans-serif;max-width:600px;margin:0 auto;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
+          <div style="background:linear-gradient(to right,#2CC5C5,#F5A623);padding:32px;">
+            <h1 style="color:#fff;margin:0;font-size:28px;font-weight:900;letter-spacing:-0.5px;">NexoBot</h1>
+            <p style="color:rgba(255,255,255,0.85);margin:6px 0 0;font-size:15px;">Tu asistente inteligente</p>
+          </div>
+          <div style="background:#fafafa;padding:32px;">
+            <h2 style="color:#111;margin:0 0 12px;font-size:22px;">¡Bienvenido! 🎉</h2>
+            <p style="color:#555;line-height:1.7;margin:0 0 20px;">
+              Tu cuenta está activa. Ahora podés crear tu primer bot de IA y empezar a automatizar la atención al cliente en minutos.
+            </p>
+            <div style="background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:20px;margin-bottom:24px;">
+              <p style="margin:0 0 10px;font-weight:700;color:#111;">Primeros pasos:</p>
+              <p style="margin:0 0 8px;color:#555;">① Crea tu primer bot desde el dashboard</p>
+              <p style="margin:0 0 8px;color:#555;">② Personaliza el nombre, color y mensaje de bienvenida</p>
+              <p style="margin:0 0 8px;color:#555;">③ Copia el link o embed code e instálalo en tu sitio</p>
+              <p style="margin:0;color:#555;">④ Tus clientes ya pueden chatear con tu bot 24/7</p>
+            </div>
+            <a href="https://nexobot.net/dashboard"
+              style="display:inline-block;background:linear-gradient(to right,#2CC5C5,#F5A623);color:#fff;padding:14px 28px;border-radius:999px;text-decoration:none;font-weight:700;font-size:15px;">
+              Ir al dashboard →
+            </a>
+            <hr style="border:none;border-top:1px solid #e5e7eb;margin:32px 0 16px;" />
+            <p style="color:#aaa;font-size:12px;margin:0;">
+              Este mensaje fue enviado por <a href="https://nexobot.net" style="color:#2CC5C5;text-decoration:none;">nexobot.net</a>.
+              Si no creaste esta cuenta, ignorá este email.
+            </p>
+          </div>
+        </div>
+      `,
+    });
+  } catch (err) {
+    console.error("Welcome email error:", err);
+  }
+}
+
 // ── Alerta al 80% de mensajes del plan ──
 export async function sendLimitAlertEmail({
   to,
@@ -23,7 +67,7 @@ export async function sendLimitAlertEmail({
 
   try {
     await resend.emails.send({
-      from: "NexoBot <no-reply@nexobot.app>",
+      from: "NexoBot <no-reply@nexobot.net>",
       to:   [to],
       subject: `⚠️ Tu bot "${botName}" ha usado el ${percentage}% de sus mensajes`,
       html: `
@@ -49,7 +93,7 @@ export async function sendLimitAlertEmail({
               Mensajes restantes: <strong style="color:#111;">${remaining.toLocaleString()}</strong> de ${messagesLimit.toLocaleString()}
             </p>
 
-            <a href="https://nexobot.app/dashboard/billing"
+            <a href="https://nexobot.net/dashboard/billing"
               style="display:inline-block;background:linear-gradient(to right,#2CC5C5,#F5A623);color:#fff;padding:14px 28px;border-radius:999px;text-decoration:none;font-weight:700;font-size:15px;">
               Mejorar mi plan →
             </a>
@@ -57,7 +101,7 @@ export async function sendLimitAlertEmail({
             <hr style="border:none;border-top:1px solid #e5e7eb;margin:32px 0 16px;" />
             <p style="color:#aaa;font-size:12px;margin:0;">
               Este mensaje fue enviado automáticamente por
-              <a href="https://nexobot.app" style="color:#2CC5C5;text-decoration:none;">nexobot.app</a>.
+              <a href="https://nexobot.net" style="color:#2CC5C5;text-decoration:none;">nexobot.net</a>.
               Si no deseas recibir estas alertas, actualiza tu plan Premium para tener mensajes ilimitados.
             </p>
           </div>
@@ -82,7 +126,7 @@ export async function sendNewLeadEmail({
   const now = new Date().toLocaleString("es-ES", { dateStyle: "medium", timeStyle: "short" });
   try {
     await resend.emails.send({
-      from: "NexoBot <no-reply@nexobot.app>",
+      from: "NexoBot <no-reply@nexobot.net>",
       to:   [to],
       subject: `💬 Nuevo visitante en tu bot "${botName}"`,
       html: `
@@ -97,14 +141,14 @@ export async function sendNewLeadEmail({
               Un visitante ha iniciado una nueva conversación con tu bot <strong>"${botName}"</strong>.
             </p>
             <p style="color:#888;font-size:13px;margin:4px 0 24px;">${now}</p>
-            <a href="https://nexobot.app/dashboard"
+            <a href="https://nexobot.net/dashboard"
               style="display:inline-block;background:linear-gradient(to right,#2CC5C5,#F5A623);color:#fff;padding:14px 28px;border-radius:999px;text-decoration:none;font-weight:700;font-size:15px;">
               Ver en el dashboard →
             </a>
             <hr style="border:none;border-top:1px solid #e5e7eb;margin:32px 0 16px;" />
             <p style="color:#aaa;font-size:12px;margin:0;">
               Recibes este email porque tienes notificaciones de nuevos leads activadas en
-              <a href="https://nexobot.app" style="color:#2CC5C5;text-decoration:none;">nexobot.app</a>.
+              <a href="https://nexobot.net" style="color:#2CC5C5;text-decoration:none;">nexobot.net</a>.
             </p>
           </div>
         </div>
@@ -143,7 +187,7 @@ export async function sendAppointmentEmail({
 
   try {
     await resend.emails.send({
-      from: "NexoBot <no-reply@nexobot.app>",
+      from: "NexoBot <no-reply@nexobot.net>",
       to:   [to],
       subject: `📅 Nueva cita agendada en "${botName}" — ${dateDisplay} ${time}`,
       html: `
@@ -167,14 +211,14 @@ export async function sendAppointmentEmail({
                 ${service ? `<tr><td style="padding:8px 0;color:#888;font-size:13px;border-top:1px solid #f3f4f6;">Servicio</td><td style="padding:8px 0;color:#111;border-top:1px solid #f3f4f6;">${service}</td></tr>` : ""}
               </table>
             </div>
-            <a href="https://nexobot.app/dashboard/appointments"
+            <a href="https://nexobot.net/dashboard/appointments"
               style="display:inline-block;background:linear-gradient(to right,#2CC5C5,#F5A623);color:#fff;padding:14px 28px;border-radius:999px;text-decoration:none;font-weight:700;font-size:15px;">
               Ver cita en el dashboard →
             </a>
             <hr style="border:none;border-top:1px solid #e5e7eb;margin:32px 0 16px;" />
             <p style="color:#aaa;font-size:12px;margin:0;">
               Este mensaje fue enviado automáticamente por
-              <a href="https://nexobot.app" style="color:#2CC5C5;text-decoration:none;">nexobot.app</a>.
+              <a href="https://nexobot.net" style="color:#2CC5C5;text-decoration:none;">nexobot.net</a>.
             </p>
           </div>
         </div>
@@ -200,7 +244,7 @@ export async function sendLimitReachedEmail({
   if (!process.env.RESEND_API_KEY) return;
   try {
     await resend.emails.send({
-      from: "NexoBot <no-reply@nexobot.app>",
+      from: "NexoBot <no-reply@nexobot.net>",
       to:   [to],
       subject: `🚨 Tu bot "${botName}" alcanzó el límite de mensajes`,
       html: `
@@ -222,14 +266,14 @@ export async function sendLimitReachedEmail({
               <div style="background:linear-gradient(to right,#ef4444,#f97316);width:100%;height:100%;border-radius:999px;"></div>
             </div>
             <p style="color:#dc2626;font-size:13px;font-weight:700;margin:0 0 24px;">100% — Límite alcanzado</p>
-            <a href="https://nexobot.app/dashboard/billing"
+            <a href="https://nexobot.net/dashboard/billing"
               style="display:inline-block;background:linear-gradient(to right,#2CC5C5,#F5A623);color:#fff;padding:14px 28px;border-radius:999px;text-decoration:none;font-weight:700;font-size:15px;">
               Mejorar mi plan ahora →
             </a>
             <hr style="border:none;border-top:1px solid #e5e7eb;margin:32px 0 16px;" />
             <p style="color:#aaa;font-size:12px;margin:0;">
               Este mensaje fue enviado automáticamente por
-              <a href="https://nexobot.app" style="color:#2CC5C5;text-decoration:none;">nexobot.app</a>.
+              <a href="https://nexobot.net" style="color:#2CC5C5;text-decoration:none;">nexobot.net</a>.
             </p>
           </div>
         </div>

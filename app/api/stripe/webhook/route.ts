@@ -92,12 +92,23 @@ export async function POST(req: Request) {
 
     case "invoice.payment_failed": {
       const invoice = event.data.object as Stripe.Invoice;
-      // Usar customer ID para encontrar la suscripción
       if (invoice.customer) {
         await supabase
           .from("subscriptions")
           .update({ status: "past_due", updated_at: new Date().toISOString() })
           .eq("stripe_customer_id", invoice.customer as string);
+      }
+      break;
+    }
+
+    // Pago recuperado luego de un fallo → reactivar suscripción
+    case "invoice.payment_succeeded": {
+      const invoice = event.data.object as Stripe.Invoice & { subscription?: string; billing_reason?: string };
+      if (invoice.subscription && invoice.billing_reason !== "subscription_create") {
+        await supabase
+          .from("subscriptions")
+          .update({ status: "active", updated_at: new Date().toISOString() })
+          .eq("stripe_subscription_id", invoice.subscription);
       }
       break;
     }
