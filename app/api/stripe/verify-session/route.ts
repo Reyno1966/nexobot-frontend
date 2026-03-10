@@ -2,9 +2,15 @@ import { NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe";
 
 const PLAN_NAMES: Record<string, string> = {
+  // Planes mensuales
   price_1T8eHgRap0JkQNsmxXKjK3IH: "Starter",
   price_1T8eNZRap0JkQNsmeObpDc8j: "Pro",
   price_1T8eRdRap0JkQNsmllSsPbVs: "Premium",
+  // Planes anuales
+  price_1T8qkPRap0JkQNsm1MI5XoYm: "Starter",
+  price_1T8qndRap0JkQNsmswIpSK3M: "Pro",
+  price_1T8qr5Rap0JkQNsm8wzRX02G: "Premium",
+  // Servicios adicionales
   price_1T8ehkRap0JkQNsmtky7j7ZL: "Personalización avanzada",
   price_1T8f2CRap0JkQNsmyzuyUvU4: "Automatizaciones avanzadas",
   price_1T8eyARap0JkQNsmWVnTTioZ: "Integración con sistemas externos",

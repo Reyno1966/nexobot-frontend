@@ -1,6 +1,23 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
+const SUPPORTED_LOCALES = [
+  "en", "pt", "fr", "it", "de", "nl", "ar", "zh", "ja", "ru", "ko", "tr", "id",
+];
+
+function detectLocale(req: NextRequest): string {
+  const acceptLanguage = req.headers.get("accept-language") ?? "";
+  // Parse "en-US,en;q=0.9,es;q=0.8" → ["en", "es", ...]
+  const preferred = acceptLanguage
+    .split(",")
+    .map((part) => part.split(";")[0].trim().split("-")[0].toLowerCase());
+
+  for (const lang of preferred) {
+    if (SUPPORTED_LOCALES.includes(lang)) return lang;
+  }
+  return ""; // fallback: stay on Spanish (root)
+}
+
 export function middleware(req: NextRequest) {
   const accessToken = req.cookies.get("sb-access-token")?.value;
   const refreshToken = req.cookies.get("sb-refresh-token")?.value;
@@ -18,6 +35,14 @@ export function middleware(req: NextRequest) {
   }
   if (pathname === "/reset-password") {
     return NextResponse.redirect(new URL("/auth/reset", req.url));
+  }
+
+  // Detección automática de idioma: solo en la raíz exacta "/"
+  if (pathname === "/") {
+    const locale = detectLocale(req);
+    if (locale) {
+      return NextResponse.redirect(new URL(`/${locale}`, req.url));
+    }
   }
 
   // Rutas 100% públicas (landing pages, auth, api, checkout)

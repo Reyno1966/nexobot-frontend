@@ -4,6 +4,7 @@ import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+import { trackPurchase } from "@/lib/gtag";
 
 interface SessionData {
   planName: string;
@@ -55,7 +56,19 @@ function SuccessContent() {
       if (sessionId) {
         try {
           const res = await fetch(`/api/stripe/verify-session?session_id=${sessionId}`);
-          if (res.ok) setSession(await res.json());
+          if (res.ok) {
+            const data = await res.json();
+            setSession(data);
+            // Conversión: pago completado
+            if (data.status === "paid") {
+              trackPurchase({
+                transactionId: sessionId,
+                value: parseFloat(data.amount) || 0,
+                currency: data.currency || "USD",
+                planName: data.planName || "NexoBot",
+              });
+            }
+          }
         } catch {
           // fallback — mostrar página genérica
         }

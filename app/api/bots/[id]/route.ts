@@ -10,7 +10,10 @@ export async function PUT(
 
   const { supabase, userId } = auth;
   const { id } = await params;
-  const { name, description, channel, status, system_prompt, widget_color, welcome_message } = await req.json();
+  const {
+    name, description, channel, status, system_prompt, widget_color, welcome_message,
+    notify_email, notify_whatsapp, notify_telegram_token, notify_telegram_chat_id,
+  } = await req.json();
 
   const { data: bot, error } = await supabase
     .from("bots")
@@ -22,6 +25,10 @@ export async function PUT(
       system_prompt: system_prompt ?? "",
       widget_color: widget_color ?? "#2CC5C5",
       welcome_message: welcome_message ?? "¡Hola! 👋 ¿En qué puedo ayudarte hoy?",
+      notify_email: notify_email ?? null,
+      notify_whatsapp: notify_whatsapp ?? null,
+      notify_telegram_token: notify_telegram_token ?? null,
+      notify_telegram_chat_id: notify_telegram_chat_id ?? null,
       updated_at: new Date().toISOString(),
     })
     .eq("id", id)

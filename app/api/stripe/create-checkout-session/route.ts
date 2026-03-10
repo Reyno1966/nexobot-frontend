@@ -1,28 +1,16 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
-import { createClient } from "@supabase/supabase-js";
+import { getAuth } from "@/lib/auth";
 import { stripe } from "@/lib/stripe";
 
 export async function POST(req: Request) {
   try {
-    // 1) Verificar sesión del usuario
-    const cookieStore = await cookies();
-    const accessToken = cookieStore.get("sb-access-token")?.value;
+    // 1) Verificar sesión del usuario (con auto-refresh)
+    const auth = await getAuth();
+    if (!auth) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
 
-    if (!accessToken) {
-      return NextResponse.json({ error: "No autorizado" }, { status: 401 });
-    }
-
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      { global: { headers: { Authorization: `Bearer ${accessToken}` } } }
-    );
-
-    const { data: userData, error: userError } = await supabase.auth.getUser();
-    if (userError || !userData?.user) {
-      return NextResponse.json({ error: "No autorizado" }, { status: 401 });
-    }
+    const { supabase } = auth;
+    const { data: userData } = await supabase.auth.getUser();
+    if (!userData?.user) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
 
     // 2) Obtener priceId del body
     const { priceId } = await req.json();

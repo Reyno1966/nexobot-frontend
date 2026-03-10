@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { PLAN_PRICES } from "@/lib/plans";
+import { trackBeginCheckout } from "@/lib/gtag";
 
 interface Subscription {
   plan_name: string;
@@ -55,9 +56,11 @@ export default function BillingPage() {
     load();
   }, []);
 
-  async function handleCheckout(priceId: string) {
+  async function handleCheckout(priceId: string, planName?: string, value?: number) {
     setCheckoutLoading(priceId);
     setCheckoutError(null);
+    // Conversión: inicio de checkout
+    if (planName && value) trackBeginCheckout(planName, value);
     try {
       const res = await fetch("/api/stripe/create-checkout-session", {
         method: "POST",
@@ -242,7 +245,7 @@ export default function BillingPage() {
                   </p>
                 ) : (
                   <button
-                    onClick={() => !isCurrent && handleCheckout(priceId)}
+                    onClick={() => !isCurrent && handleCheckout(priceId, plan.name, isAnnual ? parseInt(plan.annual.price.replace("$","")) : parseInt(plan.monthly.price.replace("$","")))}
                     disabled={isCurrent || checkoutLoading === priceId}
                     className={`w-full py-2.5 rounded-xl text-sm font-semibold transition disabled:opacity-60 ${
                       isCurrent

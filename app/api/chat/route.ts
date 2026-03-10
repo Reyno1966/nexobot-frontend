@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
+import { createClient } from "@supabase/supabase-js";
 import { getAuth } from "@/lib/auth";
 import { callOpenAI, AI_MODEL, MAX_OUTPUT_TOKENS, MAX_HISTORY_MESSAGES, MAX_SYSTEM_PROMPT_CHARS, needsMonthlyReset } from "@/lib/openai";
+import { tryExtractAppointment } from "@/lib/appointments";
 import { PLAN_LIMITS } from "@/lib/plans";
 import { sendLimitAlertEmail, sendLimitReachedEmail } from "@/lib/email";
 
@@ -87,6 +89,13 @@ export async function POST(req: Request) {
     const reply = completion.choices[0]?.message?.content ?? "Lo siento, no pude procesar tu mensaje.";
     const tokensUsed = completion.usage?.total_tokens ?? 0;
 
+    // ── 7b. Extracción automática de citas (fire & forget) ──
+    const adminSupabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+    tryExtractAppointment(recentHistory, userMessage, reply, botId, adminSupabase).catch(() => {});
+
     // ── 8. Actualizar contadores (con reset si aplica) ──
     const newCount = currentCount + 1;
     await supabase
@@ -124,7 +133,7 @@ export async function POST(req: Request) {
 
       const { data: existingConv } = await supabase
         .from("conversations")
-        .select("id")
+        .select("id, message_count")
         .eq("bot_id", botId)
         .eq("session_id", sessionId)
         .single();
