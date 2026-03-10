@@ -52,3 +52,6 @@ next-env.d.ts
 # archivos grandes que no deben subirse a GitHub
 *.zip
 *.tar.gz
+
+# Claude Code — nunca subir al repo
+.claude/
