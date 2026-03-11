@@ -157,7 +157,7 @@ function CheckoutContent() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <div className="w-10 h-10 border-4 border-[#2CC5C5] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
           <p className="text-gray-500">Cargando...</p>
         </div>
       </div>
@@ -175,7 +175,7 @@ function CheckoutContent() {
           </p>
           <Link
             href="/#pricing"
-            className="inline-block px-6 py-3 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition"
+            className="inline-block px-6 py-3 bg-gradient-to-r from-[#2CC5C5] to-[#F5A623] text-white rounded-xl font-semibold hover:opacity-90 transition"
           >
             Ver planes
           </Link>
@@ -232,14 +232,14 @@ function CheckoutContent() {
         <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
 
           {/* Banner del plan */}
-          <div className="bg-blue-600 text-white px-8 py-6">
+          <div className="bg-gradient-to-r from-[#2CC5C5] to-[#F5A623] text-white px-8 py-6">
             <div className="flex justify-between items-start">
               <div>
-                <p className="text-blue-200 text-sm font-medium uppercase tracking-wide">
+                <p className="text-white/70 text-sm font-medium uppercase tracking-wide">
                   {plan.type === "subscription" ? "Suscripción mensual" : "Pago único"}
                 </p>
                 <h1 className="text-3xl font-extrabold mt-1">{plan.name}</h1>
-                <p className="text-blue-100 mt-1 text-sm">{plan.description}</p>
+                <p className="text-white/80 mt-1 text-sm">{plan.description}</p>
               </div>
               <div className="text-right">
                 <p className="text-3xl font-extrabold">{plan.price}</p>
@@ -288,7 +288,7 @@ function CheckoutContent() {
             <button
               onClick={handleCheckout}
               disabled={processing}
-              className="w-full py-4 bg-blue-600 text-white rounded-xl font-semibold text-lg hover:bg-blue-700 transition disabled:opacity-60 disabled:cursor-not-allowed"
+              className="w-full py-4 bg-gradient-to-r from-[#2CC5C5] to-[#F5A623] text-white rounded-xl font-semibold text-lg hover:opacity-90 transition disabled:opacity-60 disabled:cursor-not-allowed"
             >
               {processing ? (
                 <span className="flex items-center justify-center gap-2">
@@ -313,7 +313,7 @@ function CheckoutContent() {
 
         {/* Volver */}
         <div className="text-center mt-6">
-          <Link href="/#pricing" className="text-sm text-gray-500 hover:text-blue-600 transition">
+          <Link href="/#pricing" className="text-sm text-gray-500 hover:text-[#2CC5C5] transition">
             ← Volver a planes
           </Link>
         </div>
@@ -329,7 +329,7 @@ export default function CheckoutPage() {
     <Suspense
       fallback={
         <div className="min-h-screen flex items-center justify-center">
-          <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+          <div className="w-10 h-10 border-4 border-[#2CC5C5] border-t-transparent rounded-full animate-spin" />
         </div>
       }
     >
