@@ -10,12 +10,39 @@ import {
   needsMonthlyReset,
 } from "@/lib/openai";
 import { PLAN_LIMITS } from "@/lib/plans";
-import { sendLimitAlertEmail, sendNewLeadEmail, sendLimitReachedEmail } from "@/lib/email";
+import { sendLimitAlertEmail, sendNewLeadEmail, sendLimitReachedEmail, sendLeadCaptureEmail } from "@/lib/email";
 import { tryExtractAppointment } from "@/lib/appointments";
 
 interface Message {
   role: "user" | "assistant";
   content: string;
+}
+
+// Extrae nombre del visitante de la historia de conversación
+function extractNameFromHistory(messages: Message[]): string | null {
+  const nameQ = ["nombre", "cómo te llamas", "como te llamas", "tu nombre", "llamo", "name"];
+  for (let i = 0; i < messages.length - 1; i++) {
+    const msg = messages[i];
+    const next = messages[i + 1];
+    if (
+      msg.role === "assistant" &&
+      nameQ.some((q) => msg.content.toLowerCase().includes(q)) &&
+      next.role === "user"
+    ) {
+      const candidate = next.content.trim();
+      const words = candidate.split(/\s+/);
+      if (
+        words.length >= 1 &&
+        words.length <= 4 &&
+        words.every((w) => w.length >= 2) &&
+        !candidate.includes("@") &&
+        !/\d{5}/.test(candidate)
+      ) {
+        return candidate;
+      }
+    }
+  }
+  return null;
 }
 
 function getAdminClient() {
@@ -136,7 +163,7 @@ export async function POST(
     const visitorSession = sessionId || `anon-${Date.now()}`;
     const { data: existingConv } = await supabase
       .from("conversations")
-      .select("id, message_count")
+      .select("id, message_count, visitor_name")
       .eq("bot_id", botId)
       .eq("session_id", visitorSession)
       .single();
@@ -232,6 +259,36 @@ export async function POST(
         supabase.auth.admin.getUserById(bot.user_id).then(({ data }) => {
           const email = data?.user?.email;
           if (email) sendNewLeadEmail({ to: email, botName: bot.name }).catch(() => {});
+        }).catch(() => {});
+      }
+
+      // ── Captura de datos de contacto: detectar email/teléfono en el mensaje ──
+      const EMAIL_RE = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/;
+      const PHONE_RE = /(?:\+?[\d][\d\s\-().]{6,}[\d])/;
+      const detectedEmail = EMAIL_RE.exec(userMessage)?.[0] ?? null;
+      const detectedPhone = PHONE_RE.exec(userMessage)?.[0] ?? null;
+
+      if ((detectedEmail || detectedPhone) && existingConv?.visitor_name === "Visitante") {
+        const extractedName = extractNameFromHistory([...recentHistory, { role: "user", content: userMessage }]);
+        const displayName = extractedName || null;
+
+        // Actualizar visitor_name en la conversación si tenemos un nombre
+        if (conversationId && displayName) {
+          void supabase.from("conversations").update({ visitor_name: displayName }).eq("id", conversationId);
+        }
+
+        // Enviar email con los datos del lead al dueño del bot
+        supabase.auth.admin.getUserById(bot.user_id).then(({ data: ownerData }) => {
+          const ownerEmail = ownerData?.user?.email;
+          if (ownerEmail) {
+            sendLeadCaptureEmail({
+              to: ownerEmail,
+              botName: bot.name,
+              visitorName: displayName,
+              email: detectedEmail,
+              phone: detectedPhone,
+            }).catch(() => {});
+          }
         }).catch(() => {});
       }
     } catch {

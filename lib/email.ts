@@ -229,6 +229,65 @@ export async function sendAppointmentEmail({
   }
 }
 
+// ── Datos de contacto capturados por el bot en conversación ──
+export async function sendLeadCaptureEmail({
+  to,
+  botName,
+  visitorName,
+  email,
+  phone,
+}: {
+  to: string;
+  botName: string;
+  visitorName?: string | null;
+  email?: string | null;
+  phone?: string | null;
+}) {
+  if (!process.env.RESEND_API_KEY) return;
+  const now = new Date().toLocaleString("es-ES", { dateStyle: "medium", timeStyle: "short" });
+  const displayName = visitorName || "Visitante";
+  try {
+    await resend.emails.send({
+      from: "NexoBot <no-reply@nexobot.net>",
+      to:   [to],
+      subject: `📋 Nuevo lead en "${botName}" — ${displayName}`,
+      html: `
+        <div style="font-family:sans-serif;max-width:600px;margin:0 auto;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
+          <div style="background:linear-gradient(to right,#2CC5C5,#F5A623);padding:28px 32px;">
+            <h1 style="color:#fff;margin:0;font-size:26px;font-weight:900;letter-spacing:-0.5px;">NexoBot</h1>
+            <p style="color:rgba(255,255,255,0.8);margin:4px 0 0;font-size:14px;">Tu asistente inteligente</p>
+          </div>
+          <div style="background:#fafafa;padding:32px;">
+            <h2 style="color:#111;margin:0 0 16px;font-size:20px;">📋 Un visitante dejó sus datos de contacto</h2>
+            <p style="color:#555;line-height:1.6;margin:0 0 20px;">
+              Tu bot <strong>"${botName}"</strong> ha capturado los datos de contacto de un visitante durante la conversación.
+            </p>
+            <div style="background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:20px;margin-bottom:24px;">
+              <table style="width:100%;border-collapse:collapse;">
+                <tr><td style="padding:8px 0;color:#888;font-size:13px;width:120px;">Nombre</td><td style="padding:8px 0;color:#111;font-weight:600;">${displayName}</td></tr>
+                ${email ? `<tr><td style="padding:8px 0;color:#888;font-size:13px;border-top:1px solid #f3f4f6;">Email</td><td style="padding:8px 0;border-top:1px solid #f3f4f6;"><a href="mailto:${email}" style="color:#2CC5C5;text-decoration:none;">${email}</a></td></tr>` : ""}
+                ${phone ? `<tr><td style="padding:8px 0;color:#888;font-size:13px;border-top:1px solid #f3f4f6;">Teléfono</td><td style="padding:8px 0;border-top:1px solid #f3f4f6;"><a href="tel:${phone}" style="color:#2CC5C5;text-decoration:none;">${phone}</a></td></tr>` : ""}
+                <tr><td style="padding:8px 0;color:#888;font-size:13px;border-top:1px solid #f3f4f6;">Captado el</td><td style="padding:8px 0;color:#555;border-top:1px solid #f3f4f6;">${now}</td></tr>
+              </table>
+            </div>
+            <a href="https://nexobot.net/dashboard/conversations"
+              style="display:inline-block;background:linear-gradient(to right,#2CC5C5,#F5A623);color:#fff;padding:14px 28px;border-radius:999px;text-decoration:none;font-weight:700;font-size:15px;">
+              Ver conversación →
+            </a>
+            <hr style="border:none;border-top:1px solid #e5e7eb;margin:32px 0 16px;" />
+            <p style="color:#aaa;font-size:12px;margin:0;">
+              Este mensaje fue enviado automáticamente por
+              <a href="https://nexobot.net" style="color:#2CC5C5;text-decoration:none;">nexobot.net</a>.
+            </p>
+          </div>
+        </div>
+      `,
+    });
+  } catch (err) {
+    console.error("Email send error (lead capture):", err);
+  }
+}
+
 // ── Límite de mensajes alcanzado al 100% ──
 export async function sendLimitReachedEmail({
   to,
