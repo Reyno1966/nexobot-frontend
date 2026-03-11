@@ -1,10 +1,12 @@
 export const PRICE_TO_PLAN: Record<string, string> = {
-  price_1T18BGRap0JkQNsmaUVhyNFr: "Starter",
-  price_1T15gVRap0JkQNsm59vukMuR: "Pro",
-  price_1T15jDRap0JkQNsmQRvEkpcm: "Premium",
-  price_1T161uRap0JkQNsm3BJZGOEu: "Personalización Avanzada",
-  price_1T163sRap0JkQNsmOrHBQuJp: "Automatizaciones Avanzadas",
-  price_1T166cRap0JkQNsmuPTOPBBu: "Integración Sistemas Externos",
+  // Suscripciones mensuales (precios actuales)
+  price_1T8eHgRap0JkQNsmxXKjK3IH: "Starter",
+  price_1T8eNZRap0JkQNsmeObpDc8j: "Pro",
+  price_1T8eRdRap0JkQNsmllSsPbVs: "Premium",
+  // Servicios adicionales (pago único)
+  price_1T8ehkRap0JkQNsmtky7j7ZL: "Personalización Avanzada",
+  price_1T8f2CRap0JkQNsmyzuyUvU4: "Automatizaciones Avanzadas",
+  price_1T8eyARap0JkQNsmWVnTTioZ: "Integración Sistemas Externos",
 };
 
 export const PLAN_LIMITS: Record<string, { bots: number; messages: number; label: string }> = {
@@ -15,7 +17,7 @@ export const PLAN_LIMITS: Record<string, { bots: number; messages: number; label
 };
 
 export const PLAN_PRICES: Record<string, { monthly: string; stripe_price_id: string }> = {
-  Starter: { monthly: "$29", stripe_price_id: "price_1T18BGRap0JkQNsmaUVhyNFr" },
-  Pro:     { monthly: "$59", stripe_price_id: "price_1T15gVRap0JkQNsm59vukMuR" },
-  Premium: { monthly: "$99", stripe_price_id: "price_1T15jDRap0JkQNsmQRvEkpcm" },
+  Starter: { monthly: "$14", stripe_price_id: "price_1T8eHgRap0JkQNsmxXKjK3IH" },
+  Pro:     { monthly: "$29", stripe_price_id: "price_1T8eNZRap0JkQNsmeObpDc8j" },
+  Premium: { monthly: "$49", stripe_price_id: "price_1T8eRdRap0JkQNsmllSsPbVs" },
 };

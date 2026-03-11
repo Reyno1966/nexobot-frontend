@@ -17,7 +17,7 @@ const PLANS = [
     price: "$14",
     period: "/mes",
     priceId: "price_1T8eHgRap0JkQNsmxXKjK3IH",
-    color: "border-blue-200",
+    color: "border-[#2CC5C5]/40",
     badge: "",
     features: ["3 bots activos", "5.000 mensajes/mes", "Soporte por email", "Analíticas básicas"],
   },
@@ -26,7 +26,7 @@ const PLANS = [
     price: "$29",
     period: "/mes",
     priceId: "price_1T8eNZRap0JkQNsmeObpDc8j",
-    color: "border-blue-500",
+    color: "border-[#2CC5C5]",
     badge: "Más popular",
     features: ["10 bots activos", "20.000 mensajes/mes", "Soporte prioritario", "Analíticas avanzadas", "Integraciones"],
   },
@@ -82,7 +82,7 @@ export default function BillingPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+        <div className="w-10 h-10 border-4 border-[#2CC5C5] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -105,7 +105,7 @@ export default function BillingPage() {
         <h2 className="text-base font-semibold text-gray-900 mb-4">Plan actual</h2>
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${subscription ? "bg-blue-600" : "bg-gray-200"}`}>
+            <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${subscription ? "bg-gradient-to-br from-[#2CC5C5] to-[#F5A623]" : "bg-gray-200"}`}>
               <svg className={`w-6 h-6 ${subscription ? "text-white" : "text-gray-400"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                   d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
@@ -141,7 +141,7 @@ export default function BillingPage() {
           {!subscription && (
             <Link
               href="#planes"
-              className="bg-blue-600 text-white px-5 py-2 rounded-xl text-sm font-semibold hover:bg-blue-700 transition"
+              className="bg-gradient-to-r from-[#2CC5C5] to-[#F5A623] text-white px-5 py-2 rounded-xl text-sm font-semibold hover:opacity-90 transition"
             >
               Mejorar plan
             </Link>
@@ -170,14 +170,14 @@ export default function BillingPage() {
                 key={plan.name}
                 className={`rounded-2xl border-2 p-6 flex flex-col transition-all ${
                   isPro
-                    ? "bg-gradient-to-b from-[#050816] to-[#0d1537] border-blue-500 shadow-xl shadow-blue-900/30 -translate-y-2"
+                    ? "bg-gradient-to-b from-[#041414] to-[#062828] border-[#2CC5C5] shadow-xl shadow-[#0A5555]/30 -translate-y-2"
                     : isCurrent
-                    ? "bg-white border-blue-500 ring-2 ring-blue-100 shadow-sm"
+                    ? "bg-white border-[#2CC5C5] ring-2 ring-[#D9F5F5] shadow-sm"
                     : "bg-white border-gray-200 shadow-sm hover:shadow-md hover:-translate-y-1"
                 }`}
               >
                 {plan.badge && !isCurrent && (
-                  <span className="self-start text-xs font-bold bg-gradient-to-r from-blue-500 to-violet-500 text-white px-3 py-1 rounded-full mb-3">
+                  <span className="self-start text-xs font-bold bg-gradient-to-r from-[#2CC5C5] to-[#F5A623] text-white px-3 py-1 rounded-full mb-3">
                     ⭐ {plan.badge}
                   </span>
                 )}
@@ -194,7 +194,7 @@ export default function BillingPage() {
                 <ul className="space-y-2 flex-1 mb-6">
                   {plan.features.map((f) => (
                     <li key={f} className={`flex items-center gap-2 text-sm ${isPro ? "text-white/70" : "text-gray-600"}`}>
-                      <svg className={`w-4 h-4 flex-shrink-0 ${isPro ? "text-blue-400" : "text-green-500"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className={`w-4 h-4 flex-shrink-0 ${isPro ? "text-[#2CC5C5]" : "text-green-500"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                       </svg>
                       {f}
@@ -208,8 +208,8 @@ export default function BillingPage() {
                     isCurrent
                       ? "bg-gray-100 text-gray-400 cursor-default"
                       : isPro
-                      ? "bg-gradient-to-r from-blue-500 to-violet-500 text-white hover:opacity-90 shadow-lg shadow-blue-900/30"
-                      : "bg-blue-600 text-white hover:bg-blue-700"
+                      ? "bg-gradient-to-r from-[#2CC5C5] to-[#F5A623] text-white hover:opacity-90 shadow-lg shadow-[#0A5555]/30"
+                      : "bg-gradient-to-r from-[#2CC5C5] to-[#F5A623] text-white hover:opacity-90"
                   }`}
                 >
                   {checkoutLoading === plan.priceId ? "Redirigiendo..." : isCurrent ? "Plan actual" : `Suscribirse a ${plan.name}`}
