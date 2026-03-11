@@ -2,42 +2,13 @@ import Link from "next/link";
 import Image from "next/image";
 import DemoChat from "@/components/landing/DemoChat";
 import PricingSection from "@/components/landing/PricingSection";
+import Navbar from "@/components/landing/Navbar";
 
 export default function Home() {
   return (
     <main className="min-h-screen bg-white text-gray-900 overflow-x-hidden">
 
-      {/* ── NAVBAR ── */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
-        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center">
-            <Image
-              src="/nexobot-logo.png"
-              alt="NexoBot"
-              width={130}
-              height={40}
-              className="h-10 w-auto object-contain"
-              priority
-            />
-          </Link>
-          <div className="hidden md:flex items-center gap-8">
-            <a href="#features" className="text-sm font-medium text-gray-500 hover:text-gray-900 transition">Características</a>
-            <a href="#pricing" className="text-sm font-medium text-gray-500 hover:text-gray-900 transition">Precios</a>
-            <a href="#faq" className="text-sm font-medium text-gray-500 hover:text-gray-900 transition">FAQ</a>
-          </div>
-          <div className="flex items-center gap-3">
-            <a href="/auth/login" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition px-4 py-2">
-              Iniciar sesión
-            </a>
-            <a
-              href="/auth/signup"
-              className="px-5 py-2.5 bg-gradient-to-r from-[#2CC5C5] to-[#F5A623] text-white text-sm font-semibold rounded-full hover:opacity-90 transition shadow-sm"
-            >
-              Empezar gratis →
-            </a>
-          </div>
-        </div>
-      </nav>
+      <Navbar />
 
       {/* ── HERO ── */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-[#041414] pt-20">
@@ -173,15 +144,26 @@ export default function Home() {
       </section>
 
       {/* ── TRUST BAR ── */}
-      <section className="py-10 bg-gray-50 border-y border-gray-100">
+      <section className="py-12 bg-white border-y border-gray-100 overflow-hidden">
         <div className="max-w-5xl mx-auto px-6 text-center">
-          <p className="text-xs text-gray-400 font-semibold uppercase tracking-widest mb-6">Compatible con tus herramientas favoritas</p>
-          <div className="flex flex-wrap justify-center gap-10 items-center opacity-30 grayscale">
-            <span className="text-xl font-black text-gray-800">WhatsApp</span>
-            <span className="text-xl font-black text-gray-800">Instagram</span>
-            <span className="text-xl font-black text-gray-800">Shopify</span>
-            <span className="text-xl font-black text-gray-800">HubSpot</span>
-            <span className="text-xl font-black text-gray-800">WooCommerce</span>
+          <p className="text-xs text-gray-400 font-semibold uppercase tracking-widest mb-8">
+            Se integra con las herramientas que ya usas
+          </p>
+          <div className="flex flex-wrap justify-center gap-4 items-center">
+            {[
+              { label: "WhatsApp",    bg: "bg-[#25D366]/10", color: "text-[#25D366]",  icon: "💬" },
+              { label: "Instagram",   bg: "bg-pink-50",       color: "text-pink-600",   icon: "📸" },
+              { label: "Shopify",     bg: "bg-[#95BF47]/10",  color: "text-[#5C8A1E]",  icon: "🛍️" },
+              { label: "HubSpot",     bg: "bg-orange-50",     color: "text-orange-600", icon: "🔶" },
+              { label: "WooCommerce", bg: "bg-purple-50",     color: "text-purple-600", icon: "🛒" },
+              { label: "Telegram",    bg: "bg-sky-50",        color: "text-sky-600",    icon: "✈️" },
+            ].map(({ label, bg, color, icon }) => (
+              <div key={label}
+                className={`flex items-center gap-2 ${bg} px-5 py-2.5 rounded-full border border-gray-100`}>
+                <span className="text-base">{icon}</span>
+                <span className={`text-sm font-bold ${color}`}>{label}</span>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -417,19 +399,88 @@ export default function Home() {
       </section>
 
       {/* ── FOOTER ── */}
-      <footer className="bg-[#020D0D] py-12 border-t border-white/5">
-        <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
-          <div>
-            <p className="text-xl font-black bg-gradient-to-r from-[#2CC5C5] to-[#F5A623] bg-clip-text text-transparent">NexoBot</p>
-            <p className="text-sm text-white/20 mt-1">© {new Date().getFullYear()} NexoBot — Todos los derechos reservados.</p>
+      <footer className="bg-[#020D0D] pt-16 pb-8 border-t border-white/5">
+        <div className="max-w-6xl mx-auto px-6">
+
+          {/* Top row */}
+          <div className="grid md:grid-cols-4 gap-10 mb-12">
+
+            {/* Brand */}
+            <div className="md:col-span-2">
+              <Image
+                src="/nexobot-logo.png"
+                alt="NexoBot"
+                width={120}
+                height={36}
+                className="h-8 w-auto object-contain brightness-0 invert mb-4"
+              />
+              <p className="text-white/40 text-sm leading-relaxed max-w-xs">
+                Tu asistente de IA que responde clientes, genera ventas y trabaja por ti las 24 horas, los 7 días de la semana.
+              </p>
+              {/* Redes sociales */}
+              <div className="flex gap-3 mt-5">
+                {[
+                  { label: "Instagram", icon: "📸", href: "#" },
+                  { label: "WhatsApp",  icon: "💬", href: "#" },
+                  { label: "Facebook",  icon: "👥", href: "#" },
+                ].map(({ label, icon, href }) => (
+                  <a key={label} href={href} aria-label={label}
+                    className="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-base hover:bg-[#2CC5C5]/20 hover:border-[#2CC5C5]/40 transition-all">
+                    {icon}
+                  </a>
+                ))}
+              </div>
+            </div>
+
+            {/* Links producto */}
+            <div>
+              <p className="text-white/60 text-xs font-bold uppercase tracking-widest mb-4">Producto</p>
+              <ul className="space-y-2.5">
+                {[
+                  { label: "Características", href: "#features" },
+                  { label: "Cómo funciona",   href: "#how-it-works" },
+                  { label: "Precios",          href: "#pricing" },
+                  { label: "Demo en vivo",     href: "#demo" },
+                  { label: "FAQ",              href: "#faq" },
+                ].map(({ label, href }) => (
+                  <li key={label}>
+                    <a href={href} className="text-sm text-white/35 hover:text-white/80 transition">{label}</a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Links cuenta */}
+            <div>
+              <p className="text-white/60 text-xs font-bold uppercase tracking-widest mb-4">Cuenta</p>
+              <ul className="space-y-2.5">
+                {[
+                  { label: "Iniciar sesión", href: "/auth/login" },
+                  { label: "Crear cuenta",   href: "/auth/signup" },
+                  { label: "Dashboard",      href: "/dashboard" },
+                  { label: "Privacidad",     href: "#" },
+                  { label: "Términos de uso",href: "#" },
+                ].map(({ label, href }) => (
+                  <li key={label}>
+                    <a href={href} className="text-sm text-white/35 hover:text-white/80 transition">{label}</a>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
-          <div className="flex flex-wrap gap-6 text-sm text-white/30">
-            <a href="#pricing" className="hover:text-white/70 transition">Precios</a>
-            <a href="#faq" className="hover:text-white/70 transition">FAQ</a>
-            <a href="#features" className="hover:text-white/70 transition">Características</a>
-            <a href="/auth/login" className="hover:text-white/70 transition">Iniciar sesión</a>
-            <a href="/privacy" className="hover:text-white/70 transition">Privacidad</a>
-            <a href="/terms" className="hover:text-white/70 transition">Términos</a>
+
+          {/* Divider */}
+          <div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent mb-6" />
+
+          {/* Bottom row */}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+            <p className="text-xs text-white/20">
+              © {new Date().getFullYear()} NexoBot — Todos los derechos reservados.
+            </p>
+            <div className="flex items-center gap-2 text-xs text-white/20">
+              <span className="w-1.5 h-1.5 bg-green-400 rounded-full inline-block" />
+              Todos los sistemas operativos
+            </div>
           </div>
         </div>
       </footer>
