@@ -42,7 +42,6 @@ const TIME_SLOTS = [
 ];
 
 // Extrae el nombre del visitante de la conversación
-// Detecta cuando el bot preguntó por el nombre y el usuario respondió
 function extractVisitorName(messages: Message[]): string {
   const nameQuestions = ["nombre", "cómo te llamas", "como te llamas", "tu nombre", "llamo", "name"];
   for (let i = 0; i < messages.length - 1; i++) {
@@ -57,7 +56,6 @@ function extractVisitorName(messages: Message[]): string {
       !/^\d/.test(next.content.trim())
     ) {
       const candidate = next.content.trim();
-      // Heurística: si es 2-4 palabras cortas, es un nombre
       const words = candidate.split(/\s+/);
       if (words.length >= 1 && words.length <= 4 && words.every((w) => w.length >= 2)) {
         return candidate;
@@ -67,23 +65,44 @@ function extractVisitorName(messages: Message[]): string {
   return "";
 }
 
+// Extrae email y teléfono de los mensajes del usuario en la conversación
+function extractContactData(messages: Message[]): { email: string; phone: string } {
+  let email = "";
+  let phone = "";
+  for (const msg of messages) {
+    if (msg.role !== "user") continue;
+    if (!email) {
+      const m = msg.content.match(/\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\b/);
+      if (m) email = m[0];
+    }
+    if (!phone) {
+      const m = msg.content.match(/(?:\+?\d[\d\s\-\(\)]{5,13}\d)/);
+      if (m && m[0].replace(/\D/g, "").length >= 7) phone = m[0].trim();
+    }
+    if (email && phone) break;
+  }
+  return { email, phone };
+}
+
 interface CalendarPickerProps {
   botId: string;
   widgetColor: string;
   prefillName?: string;
+  prefillEmail?: string;
+  prefillPhone?: string;
   onConfirm: (summary: string) => void;
   onClose: () => void;
 }
 
-function CalendarPicker({ botId, widgetColor, prefillName = "", onConfirm, onClose }: CalendarPickerProps) {
+function CalendarPicker({ botId, widgetColor, prefillName = "", prefillEmail = "", prefillPhone = "", onConfirm, onClose }: CalendarPickerProps) {
   const today = new Date();
   const [viewYear, setViewYear] = useState(today.getFullYear());
   const [viewMonth, setViewMonth] = useState(today.getMonth());
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [name, setName] = useState(prefillName);
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState(prefillEmail);
+  const [phone, setPhone] = useState(prefillPhone);
   const [step, setStep] = useState<"date" | "time" | "form">("date");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -311,6 +330,18 @@ function CalendarPicker({ botId, widgetColor, prefillName = "", onConfirm, onClo
               <strong className="text-gray-700">{selectedTime}</strong>
             </p>
           </div>
+          {/* Banner cuando el agente ya detectó los datos */}
+          {(prefillName || prefillEmail || prefillPhone) && (
+            <div
+              className="flex items-center gap-2 rounded-xl px-3 py-2 mb-3 text-xs font-medium"
+              style={{ backgroundColor: widgetColor + "18", color: widgetColor }}
+            >
+              <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Datos detectados de la conversación. Verifica y confirma.
+            </div>
+          )}
           <div className="space-y-2">
             <input
               type="text"
@@ -388,8 +419,10 @@ export default function WidgetPage() {
   const [sessionId, setSessionId]       = useState<string>("");
   const [logoError, setLogoError]       = useState(false);
   const [widgetColor, setWidgetColor]   = useState("#2CC5C5");
-  const [showCalendar, setShowCalendar] = useState(false);
-  const [visitorName, setVisitorName]   = useState("");
+  const [showCalendar, setShowCalendar]   = useState(false);
+  const [visitorName, setVisitorName]     = useState("");
+  const [visitorEmail, setVisitorEmail]   = useState("");
+  const [visitorPhone, setVisitorPhone]   = useState("");
   const endRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -432,8 +465,11 @@ export default function WidgetPage() {
       const updatedMessages: Message[] = [...newMessages, { role: "assistant" as const, content: reply }];
       setMessages(updatedMessages);
       if (hasAppointmentTrigger(reply)) {
-        const extracted = extractVisitorName(updatedMessages);
-        if (extracted) setVisitorName(extracted);
+        const name = extractVisitorName(updatedMessages);
+        const { email, phone } = extractContactData(updatedMessages);
+        if (name)  setVisitorName(name);
+        if (email) setVisitorEmail(email);
+        if (phone) setVisitorPhone(phone);
         setShowCalendar(true);
       }
     } catch {
@@ -566,6 +602,8 @@ export default function WidgetPage() {
             botId={botId}
             widgetColor={widgetColor}
             prefillName={visitorName}
+            prefillEmail={visitorEmail}
+            prefillPhone={visitorPhone}
             onConfirm={handleCalendarConfirm}
             onClose={() => setShowCalendar(false)}
           />

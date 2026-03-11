@@ -140,38 +140,65 @@ export default function AppointmentsPage() {
   };
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-[#f0fafa] via-white to-[#fdf6ee] p-6">
+    <div className="max-w-6xl mx-auto">
 
-      {/* Header */}
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Citas y Agenda</h1>
-          <p className="text-gray-500 mt-1">Gestiona las citas agendadas por tus bots</p>
+      {/* Header con degradado */}
+      <div className="relative overflow-hidden bg-gradient-to-r from-[#062828] to-[#0f4040] rounded-2xl p-6 mb-8 shadow-lg">
+        {/* Círculos decorativos */}
+        <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full opacity-10" style={{ background: "#2CC5C5" }} />
+        <div className="absolute -bottom-8 -left-8 w-32 h-32 rounded-full opacity-10" style={{ background: "#F5A623" }} />
+        <div className="relative flex items-center justify-between">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <div className="w-8 h-8 rounded-lg bg-[#2CC5C5]/20 flex items-center justify-center">
+                <svg className="w-4 h-4 text-[#2CC5C5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <h1 className="text-xl font-bold text-white">Citas y Agenda</h1>
+            </div>
+            <p className="text-[#7ee8e8] text-sm ml-10">Gestiona las citas agendadas por tus bots</p>
+          </div>
+          <button
+            onClick={() => { setShowForm(true); setSaveError(""); }}
+            className="flex items-center gap-2 bg-gradient-to-r from-[#2CC5C5] to-[#F5A623] text-white px-4 py-2.5 rounded-xl text-sm font-semibold hover:opacity-90 transition shadow-md"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+            Nueva cita
+          </button>
         </div>
-        <button
-          onClick={() => { setShowForm(true); setSaveError(""); }}
-          className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-blue-700 transition"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
-          Nueva cita
-        </button>
+        {/* Stats rápidas */}
+        <div className="relative grid grid-cols-3 gap-3 mt-5">
+          {[
+            { label: "Pendientes", value: counts.pending, color: "text-yellow-300" },
+            { label: "Confirmadas", value: counts.confirmed, color: "text-green-300" },
+            { label: "Total", value: counts.all, color: "text-[#2CC5C5]" },
+          ].map((s) => (
+            <div key={s.label} className="bg-white/10 rounded-xl px-4 py-3 text-center backdrop-blur-sm">
+              <p className={`text-2xl font-black ${s.color}`}>{s.value}</p>
+              <p className="text-white/60 text-xs mt-0.5">{s.label}</p>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Filter tabs */}
-      <div className="flex gap-2 mb-6 bg-gray-100 p-1 rounded-xl w-fit">
+      <div className="flex gap-2 mb-6 bg-white/80 backdrop-blur-sm border border-gray-100 p-1 rounded-xl w-fit shadow-sm">
         {(["all", "pending", "confirmed", "cancelled"] as const).map((s) => (
           <button
             key={s}
             onClick={() => setFilter(s)}
             className={`px-4 py-1.5 rounded-lg text-sm font-medium transition ${
-              filter === s ? "bg-white shadow-sm text-gray-900" : "text-gray-500 hover:text-gray-700"
+              filter === s ? "bg-gradient-to-r from-[#2CC5C5] to-[#1AAFAF] text-white shadow-sm" : "text-gray-500 hover:text-gray-700"
             }`}
           >
             {s === "all" ? "Todas" : STATUS_LABELS[s].label}
             <span className={`ml-1.5 text-xs px-1.5 py-0.5 rounded-full ${
-              filter === s ? "bg-blue-100 text-blue-700" : "bg-gray-200 text-gray-500"
+              filter === s ? "bg-white/20 text-white" : "bg-gray-100 text-gray-500"
             }`}>
               {counts[s]}
             </span>
@@ -181,9 +208,18 @@ export default function AppointmentsPage() {
 
       {/* Modal crear cita */}
       {showForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto">
-            <h2 className="text-lg font-bold text-gray-900 mb-5">Nueva cita</h2>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+            <div className="bg-gradient-to-r from-[#062828] to-[#0f4040] px-6 py-4 rounded-t-2xl">
+              <h2 className="text-base font-bold text-white flex items-center gap-2">
+                <svg className="w-4 h-4 text-[#2CC5C5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                Nueva cita
+              </h2>
+            </div>
+            <div className="p-6">
             <div className="space-y-4">
 
               <div>
@@ -191,7 +227,7 @@ export default function AppointmentsPage() {
                 <select
                   value={form.bot_id}
                   onChange={(e) => setForm((f) => ({ ...f, bot_id: e.target.value }))}
-                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#2CC5C5] bg-white"
                 >
                   <option value="">Selecciona un bot...</option>
                   {bots.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
@@ -204,7 +240,7 @@ export default function AppointmentsPage() {
                   <input type="text" value={form.visitor_name}
                     onChange={(e) => setForm((f) => ({ ...f, visitor_name: e.target.value }))}
                     placeholder="Nombre del cliente"
-                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#2CC5C5]"
                   />
                 </div>
                 <div>
@@ -212,7 +248,7 @@ export default function AppointmentsPage() {
                   <input type="text" value={form.service}
                     onChange={(e) => setForm((f) => ({ ...f, service: e.target.value }))}
                     placeholder="Ej: Consulta, Corte..."
-                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#2CC5C5]"
                   />
                 </div>
               </div>
@@ -223,7 +259,7 @@ export default function AppointmentsPage() {
                   <input type="email" value={form.visitor_email}
                     onChange={(e) => setForm((f) => ({ ...f, visitor_email: e.target.value }))}
                     placeholder="cliente@email.com"
-                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#2CC5C5]"
                   />
                 </div>
                 <div>
@@ -231,7 +267,7 @@ export default function AppointmentsPage() {
                   <input type="tel" value={form.visitor_phone}
                     onChange={(e) => setForm((f) => ({ ...f, visitor_phone: e.target.value }))}
                     placeholder="+1 555 0000"
-                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#2CC5C5]"
                   />
                 </div>
               </div>
@@ -241,14 +277,14 @@ export default function AppointmentsPage() {
                   <label className="block text-sm font-medium text-gray-700 mb-1">Fecha *</label>
                   <input type="date" value={form.appointment_date}
                     onChange={(e) => setForm((f) => ({ ...f, appointment_date: e.target.value }))}
-                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#2CC5C5]"
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Hora *</label>
                   <input type="time" value={form.appointment_time}
                     onChange={(e) => setForm((f) => ({ ...f, appointment_time: e.target.value }))}
-                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#2CC5C5]"
                   />
                 </div>
               </div>
@@ -259,7 +295,7 @@ export default function AppointmentsPage() {
                   onChange={(e) => setForm((f) => ({ ...f, notes: e.target.value }))}
                   placeholder="Detalles adicionales..."
                   rows={2}
-                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#2CC5C5] resize-none"
                 />
               </div>
             </div>
@@ -276,10 +312,11 @@ export default function AppointmentsPage() {
                 Cancelar
               </button>
               <button onClick={handleSave} disabled={saving}
-                className="flex-1 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-blue-700 transition disabled:opacity-50">
+                className="flex-1 py-2.5 bg-gradient-to-r from-[#2CC5C5] to-[#F5A623] text-white rounded-xl text-sm font-semibold hover:opacity-90 transition disabled:opacity-50">
                 {saving ? "Guardando..." : "Crear cita"}
               </button>
             </div>
+          </div>
           </div>
         </div>
       )}
@@ -287,32 +324,52 @@ export default function AppointmentsPage() {
       {/* Content */}
       {loading ? (
         <div className="flex items-center justify-center py-20">
-          <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+          <div className="w-8 h-8 border-4 border-[#2CC5C5] border-t-transparent rounded-full animate-spin" />
         </div>
       ) : filtered.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm py-20 text-center">
-          <div className="text-5xl mb-4">📅</div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">
-            {filter === "all" ? "Sin citas todavía" : `Sin citas ${STATUS_LABELS[filter]?.label.toLowerCase()}`}
-          </h3>
-          <p className="text-gray-500 text-sm">
-            {filter === "all"
-              ? "Las citas aparecerán aquí cuando los clientes agenden a través de tus bots"
-              : "No hay citas con este estado actualmente"}
-          </p>
+        <div className="relative overflow-hidden bg-white rounded-2xl border border-[#2CC5C5]/20 shadow-sm py-16 text-center">
+          <div className="absolute inset-0 bg-gradient-to-br from-[#f0fafa] to-white" />
+          <div className="absolute top-0 right-0 w-64 h-64 rounded-full opacity-5" style={{ background: "#2CC5C5", transform: "translate(30%, -30%)" }} />
+          <div className="relative">
+            <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-[#2CC5C5]/20 to-[#F5A623]/20 mb-4 shadow-inner">
+              <svg className="w-10 h-10 text-[#2CC5C5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
+                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-bold text-gray-900 mb-2">
+              {filter === "all" ? "Sin citas todavía" : `Sin citas ${STATUS_LABELS[filter]?.label.toLowerCase()}`}
+            </h3>
+            <p className="text-gray-400 text-sm max-w-xs mx-auto">
+              {filter === "all"
+                ? "Las citas aparecerán aquí cuando los clientes agenden a través de tus bots"
+                : "No hay citas con este estado actualmente"}
+            </p>
+            {filter === "all" && (
+              <button
+                onClick={() => { setShowForm(true); setSaveError(""); }}
+                className="mt-5 inline-flex items-center gap-2 bg-gradient-to-r from-[#2CC5C5] to-[#F5A623] text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:opacity-90 transition shadow-md"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+                Crear primera cita
+              </button>
+            )}
+          </div>
         </div>
       ) : (
         <div className="space-y-3">
           {filtered.map((appt) => (
             <div key={appt.id}
-              className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex flex-col sm:flex-row sm:items-center gap-4">
+              className="bg-white/80 backdrop-blur-sm rounded-2xl border border-[#2CC5C5]/10 shadow-sm hover:shadow-md transition p-5 flex flex-col sm:flex-row sm:items-center gap-4">
 
               {/* Date block */}
-              <div className="flex-shrink-0 w-16 text-center bg-blue-50 rounded-xl py-2 px-1">
-                <p className="text-2xl font-black text-blue-700 leading-none">
+              <div className="flex-shrink-0 w-16 text-center bg-gradient-to-br from-[#2CC5C5]/15 to-[#F5A623]/10 rounded-xl py-2 px-1 border border-[#2CC5C5]/20">
+                <p className="text-2xl font-black text-[#0f4040] leading-none">
                   {appt.appointment_date.split("-")[2]}
                 </p>
-                <p className="text-xs text-blue-500 font-medium uppercase mt-0.5">
+                <p className="text-xs text-[#2CC5C5] font-medium uppercase mt-0.5">
                   {new Date(appt.appointment_date + "T12:00:00").toLocaleDateString("es", { month: "short" })}
                 </p>
               </div>
@@ -384,6 +441,7 @@ export default function AppointmentsPage() {
           ))}
         </div>
       )}
+    </div>
     </div>
   );
 }
