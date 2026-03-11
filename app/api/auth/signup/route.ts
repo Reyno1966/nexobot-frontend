@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { sendWelcomeEmail } from "@/lib/email";
 
 export async function POST(req: Request) {
   try {
@@ -32,6 +33,9 @@ export async function POST(req: Request) {
         { status: 400 }
       );
     }
+
+    // Email de bienvenida (fire & forget)
+    sendWelcomeEmail({ to: email }).catch(() => {});
 
     return NextResponse.json(
       {

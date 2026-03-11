@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
+import { createClient } from "@supabase/supabase-js";
 import { getAuth } from "@/lib/auth";
 import { callOpenAI, AI_MODEL, MAX_OUTPUT_TOKENS, MAX_HISTORY_MESSAGES, MAX_SYSTEM_PROMPT_CHARS, needsMonthlyReset } from "@/lib/openai";
+import { tryExtractAppointment } from "@/lib/appointments";
 import { PLAN_LIMITS } from "@/lib/plans";
+import { sendLimitAlertEmail, sendLimitReachedEmail } from "@/lib/email";
 
 interface Message {
   role: "user" | "assistant";
@@ -86,18 +89,43 @@ export async function POST(req: Request) {
     const reply = completion.choices[0]?.message?.content ?? "Lo siento, no pude procesar tu mensaje.";
     const tokensUsed = completion.usage?.total_tokens ?? 0;
 
+    // ── 7b. Extracción automática de citas (fire & forget) ──
+    const adminSupabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+    tryExtractAppointment(recentHistory, userMessage, reply, botId, adminSupabase).catch(() => {});
+
     // ── 8. Actualizar contadores (con reset si aplica) ──
+    const newCount = currentCount + 1;
     await supabase
       .from("bots")
       .update({
         messages_count: (bot.messages_count ?? 0) + 1,
-        messages_this_month: currentCount + 1,
+        messages_this_month: newCount,
         last_reset_at: resetNeeded ? new Date().toISOString() : bot.last_reset_at,
         updated_at: new Date().toISOString(),
       })
       .eq("id", botId);
 
-    // ── 9. Guardar mensajes en historial ──
+    // ── 9. Alertas de límite de mensajes (80% y 100%) ──
+    if (limits.messages !== -1) {
+      const prevPct = Math.round((currentCount / limits.messages) * 100);
+      const newPct  = Math.round((newCount     / limits.messages) * 100);
+      if (prevPct < 80 && newPct >= 80 || newCount >= limits.messages) {
+        const { data: authData } = await supabase.auth.getUser();
+        const userEmail = authData?.user?.email;
+        if (userEmail) {
+          if (newCount >= limits.messages) {
+            sendLimitReachedEmail({ to: userEmail, botName: bot.name, planName, messagesLimit: limits.messages });
+          } else {
+            sendLimitAlertEmail({ to: userEmail, botName: bot.name, planName, messagesUsed: newCount, messagesLimit: limits.messages });
+          }
+        }
+      }
+    }
+
+    // ── 10. Guardar mensajes en historial ──
     try {
       // Buscar o crear conversación de prueba (dashboard)
       const sessionId = `dashboard-${userId}-${botId}`;
@@ -105,7 +133,7 @@ export async function POST(req: Request) {
 
       const { data: existingConv } = await supabase
         .from("conversations")
-        .select("id")
+        .select("id, message_count")
         .eq("bot_id", botId)
         .eq("session_id", sessionId)
         .single();

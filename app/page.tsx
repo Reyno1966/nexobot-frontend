@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import DemoChat from "@/components/landing/DemoChat";
+import PricingSection from "@/components/landing/PricingSection";
 
 export default function Home() {
   return (
@@ -299,82 +300,7 @@ export default function Home() {
       </section>
 
       {/* ── PRICING ── */}
-      <section id="pricing" className="py-24 bg-white">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="text-center mb-16">
-            <span className="text-sm font-bold text-[#2CC5C5] uppercase tracking-widest">Precios</span>
-            <h2 className="mt-3 text-4xl font-black">Planes diseñados para crecer contigo</h2>
-            <p className="mt-4 text-gray-500 max-w-xl mx-auto">Elige el plan ideal para tu negocio y empieza a automatizar ventas y atención al cliente.</p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8 items-start">
-
-            {/* Starter */}
-            <div className="rounded-2xl border border-gray-200 p-8 hover:shadow-lg transition-all hover:-translate-y-1 duration-300">
-              <h3 className="text-xl font-bold">Starter</h3>
-              <p className="text-gray-500 text-sm mt-1">Ideal para emprendedores comenzando</p>
-              <div className="mt-6 flex items-end gap-1">
-                <span className="text-5xl font-black">$14</span>
-                <span className="text-gray-400 text-sm mb-2">/mes</span>
-              </div>
-              <ul className="mt-8 space-y-3 text-sm">
-                {["Respuestas automáticas con IA", "Chat embebido para tu web", "Plantillas de mensajes", "Atención 24/7 sin esfuerzo", "Captura básica de leads", "Panel de control intuitivo"].map(f => (
-                  <li key={f} className="flex items-center gap-2 text-gray-600"><span className="text-[#2CC5C5] font-bold">✓</span>{f}</li>
-                ))}
-                {["WhatsApp no incluido", "Sin automatizaciones avanzadas"].map(f => (
-                  <li key={f} className="flex items-center gap-2 text-gray-300"><span>✗</span>{f}</li>
-                ))}
-              </ul>
-              <a href="/checkout?priceId=price_1T8eHgRap0JkQNsmxXKjK3IH"
-                className="mt-8 block text-center px-6 py-3 border-2 border-[#2CC5C5] text-[#2CC5C5] rounded-xl font-semibold hover:bg-[#2CC5C5] hover:text-white transition-all">
-                Elegir Starter
-              </a>
-            </div>
-
-            {/* Pro - Featured */}
-            <div className="rounded-2xl p-8 relative bg-gradient-to-b from-[#041414] to-[#062828] text-white shadow-2xl shadow-[#0A5555]/40 -translate-y-4">
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-[#2CC5C5] to-[#F5A623] text-white text-xs font-bold px-5 py-1.5 rounded-full shadow-lg">
-                ⭐ MÁS POPULAR
-              </div>
-              <h3 className="text-xl font-bold text-white">Pro</h3>
-              <p className="text-white/50 text-sm mt-1">Para negocios que quieren escalar</p>
-              <div className="mt-6 flex items-end gap-1">
-                <span className="text-5xl font-black text-white">$29</span>
-                <span className="text-white/40 text-sm mb-2">/mes</span>
-              </div>
-              <ul className="mt-8 space-y-3 text-sm">
-                {["Todo lo del Starter", "Integración con WhatsApp", "Flujos inteligentes de ventas", "Segmentación avanzada de clientes", "Captura avanzada de leads", "Integración con redes sociales", "Respuestas basadas en intención", "Automatizaciones personalizadas"].map(f => (
-                  <li key={f} className="flex items-center gap-2 text-white/80"><span className="text-[#2CC5C5] font-bold">✓</span>{f}</li>
-                ))}
-              </ul>
-              <a href="/checkout?priceId=price_1T8eNZRap0JkQNsmeObpDc8j"
-                className="mt-8 block text-center px-6 py-3 bg-gradient-to-r from-[#2CC5C5] to-[#F5A623] text-white rounded-xl font-semibold hover:opacity-90 transition-all shadow-lg shadow-[#0A5555]/40">
-                Elegir Pro
-              </a>
-            </div>
-
-            {/* Premium */}
-            <div className="rounded-2xl border border-gray-200 p-8 hover:shadow-lg transition-all hover:-translate-y-1 duration-300">
-              <h3 className="text-xl font-bold">Premium</h3>
-              <p className="text-gray-500 text-sm mt-1">Para empresas que necesitan máxima potencia</p>
-              <div className="mt-6 flex items-end gap-1">
-                <span className="text-5xl font-black">$49</span>
-                <span className="text-gray-400 text-sm mb-2">/mes</span>
-              </div>
-              <ul className="mt-8 space-y-3 text-sm">
-                {["Todo lo del Pro", "Mensajes ilimitados", "Embudo de ventas automático", "Integraciones avanzadas", "Soporte prioritario", "Configuración asistida", "Automatizaciones premium"].map(f => (
-                  <li key={f} className="flex items-center gap-2 text-gray-600"><span className="text-[#2CC5C5] font-bold">✓</span>{f}</li>
-                ))}
-              </ul>
-              <a href="/checkout?priceId=price_1T8eRdRap0JkQNsmllSsPbVs"
-                className="mt-8 block text-center px-6 py-3 border-2 border-[#2CC5C5] text-[#2CC5C5] rounded-xl font-semibold hover:bg-[#2CC5C5] hover:text-white transition-all">
-                Elegir Premium
-              </a>
-            </div>
-
-          </div>
-        </div>
-      </section>
+      <PricingSection />
 
       {/* ── ADDITIONAL SERVICES ── */}
       <section id="services" className="py-24 bg-gray-50">

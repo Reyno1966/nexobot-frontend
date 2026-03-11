@@ -11,6 +11,7 @@ import {
 } from "@/lib/openai";
 import { PLAN_LIMITS } from "@/lib/plans";
 import { sendLimitAlertEmail, sendNewLeadEmail, sendLimitReachedEmail } from "@/lib/email";
+import { tryExtractAppointment } from "@/lib/appointments";
 
 interface Message {
   role: "user" | "assistant";
@@ -56,7 +57,7 @@ export async function POST(
     // ── 1. Obtener bot ──
     const { data: bot, error: botError } = await supabase
       .from("bots")
-      .select("*")
+      .select("id, name, status, user_id, system_prompt, messages_count, messages_this_month, last_reset_at, widget_color, welcome_message")
       .eq("id", botId)
       .single();
 
@@ -178,6 +179,9 @@ export async function POST(
 
     const reply = completion.choices[0]?.message?.content ?? "Lo siento, no pude procesar tu mensaje.";
     const tokensUsed = completion.usage?.total_tokens ?? 0;
+
+    // ── 8b. Extracción automática de citas (fire & forget) ──
+    tryExtractAppointment(recentHistory, userMessage, reply, botId, supabase).catch(() => {});
 
     // ── 8. Actualizar contadores del bot ──
     await supabase

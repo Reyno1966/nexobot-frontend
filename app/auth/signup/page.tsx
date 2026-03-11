@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+import { trackSignUp } from "@/lib/gtag";
 
 export default function SignupPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -22,8 +23,8 @@ export default function SignupPage() {
       setError("Las contraseñas no coinciden");
       return;
     }
-    if (password.length < 6) {
-      setError("La contraseña debe tener al menos 6 caracteres");
+    if (password.length < 8) {
+      setError("La contraseña debe tener al menos 8 caracteres");
       return;
     }
 
@@ -39,6 +40,9 @@ export default function SignupPage() {
       setError(data.error || "Error al crear la cuenta");
       return;
     }
+
+    // Conversión: nuevo usuario registrado
+    trackSignUp();
 
     const email = (form.elements.namedItem("email") as HTMLInputElement).value;
     const loginRes = await fetch("/api/auth/login", {

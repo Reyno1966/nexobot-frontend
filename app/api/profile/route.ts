@@ -1,11 +1,20 @@
 import { NextResponse } from "next/server";
+import { createClient } from "@supabase/supabase-js";
 import { getAuth } from "@/lib/auth";
+
+function getAdminClient() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+}
 
 export async function GET() {
   const auth = await getAuth();
   if (!auth) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
 
-  const { supabase, userId } = auth;
+  const { userId } = auth;
+  const supabase = getAdminClient();
 
   const { data: profile } = await supabase
     .from("profiles")
@@ -20,7 +29,8 @@ export async function PUT(req: Request) {
   const auth = await getAuth();
   if (!auth) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
 
-  const { supabase, userId } = auth;
+  const { userId } = auth;
+  const supabase = getAdminClient();
   const body = await req.json();
 
   const allowed = [
@@ -39,7 +49,10 @@ export async function PUT(req: Request) {
     .select()
     .single();
 
-  if (error) return NextResponse.json({ error: "Error al guardar perfil" }, { status: 500 });
+  if (error) {
+    console.error("Profile upsert error:", error);
+    return NextResponse.json({ error: "Error al guardar perfil", detail: error.message }, { status: 500 });
+  }
 
   return NextResponse.json({ profile });
 }
