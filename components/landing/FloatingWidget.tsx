@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 
 interface Message {
   role: "user" | "assistant";
@@ -19,8 +20,12 @@ export default function FloatingWidget() {
   const [showCTA, setShowCTA]         = useState(false);
   const [showPulse, setShowPulse]     = useState(true);
   const [unread, setUnread]           = useState(1); // badge de notificación
+  const [mounted, setMounted]         = useState(false);
   const endRef   = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Portal: montar en cliente para escapar del overflow-x-hidden del <main>
+  useEffect(() => { setMounted(true); }, []);
 
   // auto-scroll
   useEffect(() => {
@@ -61,7 +66,9 @@ export default function FloatingWidget() {
     }
   }
 
-  return (
+  if (!mounted) return null;
+
+  return createPortal(
     <div className="fixed bottom-6 right-6 z-[9999] flex flex-col items-end gap-3">
 
       {/* ── Panel de chat ── */}
@@ -220,5 +227,5 @@ export default function FloatingWidget() {
         </button>
       </div>
     </div>
-  );
+  , document.body);
 }
