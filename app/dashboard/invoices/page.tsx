@@ -46,6 +46,101 @@ function formatDate(d: string) {
   return new Date(d).toLocaleDateString("es", { day: "2-digit", month: "short", year: "numeric" });
 }
 
+function downloadInvoicePDF(inv: Invoice) {
+  const statusLabel = STATUS_LABELS[inv.status]?.label ?? inv.status;
+  const itemsRows = inv.items.map((item) => `
+    <tr>
+      <td style="padding:10px 0;border-bottom:1px solid #f3f4f6;font-size:13px;color:#374151;">${item.description}</td>
+      <td style="padding:10px 0;border-bottom:1px solid #f3f4f6;text-align:center;font-size:13px;color:#6b7280;">${item.quantity}</td>
+      <td style="padding:10px 0;border-bottom:1px solid #f3f4f6;text-align:right;font-size:13px;color:#374151;">${formatMoney(item.unit_price, inv.currency)}</td>
+      <td style="padding:10px 0;border-bottom:1px solid #f3f4f6;text-align:right;font-size:13px;font-weight:600;color:#111827;">${formatMoney(item.quantity * item.unit_price, inv.currency)}</td>
+    </tr>`).join("");
+
+  const html = `<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>${inv.invoice_number}</title>
+  <style>
+    @page { size: A4; margin: 2cm; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #111827; background: #fff; }
+    .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; padding-bottom: 24px; border-bottom: 2px solid #f3f4f6; }
+    .brand h1 { font-size: 28px; font-weight: 900; background: linear-gradient(to right, #2CC5C5, #F5A623); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .brand p { color: #9ca3af; font-size: 13px; margin-top: 4px; }
+    .meta { text-align: right; }
+    .meta .inv-num { font-size: 22px; font-weight: 900; color: #111827; }
+    .meta .status { display: inline-block; font-size: 11px; padding: 3px 10px; border-radius: 999px; font-weight: 600; background: #f3f4f6; color: #374151; margin-top: 4px; }
+    .meta .date { font-size: 12px; color: #9ca3af; margin-top: 8px; }
+    .client-box { background: #f9fafb; border-radius: 12px; padding: 20px; margin-bottom: 32px; }
+    .client-box .label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #9ca3af; margin-bottom: 8px; }
+    .client-box .name { font-weight: 700; font-size: 15px; color: #111827; }
+    .client-box .info { font-size: 13px; color: #6b7280; margin-top: 3px; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
+    thead th { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #9ca3af; padding-bottom: 10px; border-bottom: 2px solid #e5e7eb; }
+    thead th:first-child { text-align: left; }
+    thead th:nth-child(2) { text-align: center; width: 60px; }
+    thead th:nth-child(3), thead th:nth-child(4) { text-align: right; width: 100px; }
+    .totals { display: flex; justify-content: flex-end; margin-bottom: 32px; }
+    .totals table { width: 240px; }
+    .totals td { padding: 6px 0; font-size: 13px; color: #6b7280; }
+    .totals td:last-child { text-align: right; }
+    .totals .grand-total td { font-size: 18px; font-weight: 900; color: #111827; border-top: 2px solid #e5e7eb; padding-top: 10px; }
+    .notes { background: #eff6ff; border-radius: 10px; padding: 16px; margin-bottom: 32px; font-size: 13px; color: #374151; }
+    .notes strong { display: block; margin-bottom: 4px; color: #1e40af; }
+    .footer { text-align: center; font-size: 11px; color: #d1d5db; border-top: 1px solid #f3f4f6; padding-top: 20px; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="brand">
+      <h1>NexoBot</h1>
+      <p>nexobot.net</p>
+    </div>
+    <div class="meta">
+      <div class="inv-num">${inv.invoice_number}</div>
+      <div class="status">${statusLabel}</div>
+      <div class="date">Creada: ${formatDate(inv.created_at)}${inv.due_date ? `<br>Vence: ${formatDate(inv.due_date)}` : ""}</div>
+    </div>
+  </div>
+  <div class="client-box">
+    <div class="label">Facturar a:</div>
+    <div class="name">${inv.client_name}</div>
+    ${inv.client_address ? `<div class="info">${inv.client_address}</div>` : ""}
+    ${inv.client_email ? `<div class="info">${inv.client_email}</div>` : ""}
+    ${inv.client_phone ? `<div class="info">${inv.client_phone}</div>` : ""}
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>Descripción</th>
+        <th>Cant.</th>
+        <th>Precio</th>
+        <th>Total</th>
+      </tr>
+    </thead>
+    <tbody>${itemsRows}</tbody>
+  </table>
+  <div class="totals">
+    <table>
+      <tr><td>Subtotal</td><td>${formatMoney(inv.subtotal, inv.currency)}</td></tr>
+      ${inv.tax_rate > 0 ? `<tr><td>Impuesto (${inv.tax_rate}%)</td><td>${formatMoney(inv.tax_amount, inv.currency)}</td></tr>` : ""}
+      <tr class="grand-total"><td>Total</td><td>${formatMoney(inv.total, inv.currency)}</td></tr>
+    </table>
+  </div>
+  ${inv.notes ? `<div class="notes"><strong>Notas:</strong>${inv.notes}</div>` : ""}
+  <div class="footer">Generado con NexoBot · nexobot.net</div>
+  <script>window.onload = function() { window.print(); };<\/script>
+</body>
+</html>`;
+
+  const w = window.open("", "_blank");
+  if (w) {
+    w.document.write(html);
+    w.document.close();
+  }
+}
+
 export default function InvoicesPage() {
   const [invoices, setInvoices]       = useState<Invoice[]>([]);
   const [loading, setLoading]         = useState(true);
@@ -347,9 +442,9 @@ export default function InvoicesPage() {
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 no-print">
               <p className="font-bold text-gray-900">{preview.invoice_number}</p>
               <div className="flex items-center gap-2">
-                <button onClick={() => window.print()}
+                <button onClick={() => downloadInvoicePDF(preview)}
                   className="px-3 py-1.5 bg-gray-900 text-white text-xs font-semibold rounded-lg hover:bg-gray-700 transition">
-                  🖨️ Imprimir / PDF
+                  ⬇️ Descargar PDF
                 </button>
                 {preview.status === "draft" && (
                   <button onClick={() => handleStatusChange(preview.id, "sent")}

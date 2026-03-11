@@ -72,13 +72,36 @@ export default function BotDetailPage() {
   const [notifySaving, setNotifySaving]             = useState(false);
 
   // Tab
-  const [activeTab, setActiveTab] = useState<"config" | "appearance" | "test" | "embed" | "notifications">("config");
+  const [activeTab, setActiveTab] = useState<"config" | "appearance" | "test" | "embed" | "notifications" | "analytics">("config");
   const [copiedLink, setCopiedLink] = useState(false);
+
+  // Analytics
+  interface BotAnalytics {
+    totalMessages: number;
+    messagesThisMonth: number;
+    totalConversations: number;
+    convsThisWeek: number;
+    convsToday: number;
+    lastActivity: string | null;
+    dailyData: { date: string; count: number }[];
+  }
+  const [analytics, setAnalytics] = useState<BotAnalytics | null>(null);
+  const [analyticsLoading, setAnalyticsLoading] = useState(false);
 
   function copyLink() {
     navigator.clipboard.writeText(`${APP_URL}/widget/${id}`);
     setCopiedLink(true);
     setTimeout(() => setCopiedLink(false), 2000);
+  }
+
+  async function loadAnalytics() {
+    if (analytics || analyticsLoading) return;
+    setAnalyticsLoading(true);
+    try {
+      const res = await fetch(`/api/bots/${id}/analytics`, { credentials: "include" });
+      if (res.ok) setAnalytics(await res.json());
+    } catch { /* silencioso */ }
+    setAnalyticsLoading(false);
   }
 
   useEffect(() => {
@@ -258,10 +281,14 @@ export default function BotDetailPage() {
           { key: "test", label: "💬 Probar bot" },
           { key: "embed", label: "🔗 Instalar" },
           { key: "notifications", label: "🔔 Notificaciones" },
+          { key: "analytics", label: "📊 Analytics" },
         ] as const).map((tab) => (
           <button
             key={tab.key}
-            onClick={() => setActiveTab(tab.key)}
+            onClick={() => {
+              setActiveTab(tab.key);
+              if (tab.key === "analytics") loadAnalytics();
+            }}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
               activeTab === tab.key
                 ? "bg-white text-gray-900 shadow-sm"
@@ -671,6 +698,31 @@ export default function BotDetailPage() {
             </div>
           </div>
 
+          {/* Booking page link */}
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+            <h2 className="font-semibold text-gray-900 mb-1">📅 Página de reservas pública</h2>
+            <p className="text-sm text-gray-500 mb-4">Link directo para que los clientes agenden citas sin pasar por el chat</p>
+            <div className="flex items-center gap-2 bg-gray-50 rounded-xl px-4 py-3 border border-gray-200 mb-3">
+              <span className="text-[#2CC5C5] text-sm font-mono flex-1 break-all">{APP_URL}/book/{id}</span>
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => { navigator.clipboard.writeText(`${APP_URL}/book/${id}`); }}
+                className="flex-1 py-2 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 transition"
+              >
+                Copiar link
+              </button>
+              <a
+                href={`${APP_URL}/book/${id}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1 py-2 bg-gradient-to-r from-[#2CC5C5] to-[#F5A623] text-white rounded-xl text-sm font-semibold text-center hover:opacity-90 transition"
+              >
+                Abrir →
+              </a>
+            </div>
+          </div>
+
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
             <h2 className="font-semibold text-gray-900 mb-1">Opción 1 — Widget flotante (recomendado)</h2>
             <p className="text-sm text-gray-500 mb-4">Pega este código antes de cerrar la etiqueta <code className="text-[#2CC5C5]">&lt;/body&gt;</code> en tu sitio web</p>
@@ -831,6 +883,99 @@ export default function BotDetailPage() {
               </span>
             )}
           </div>
+        </div>
+      )}
+
+      {/* ── TAB: ANALYTICS ── */}
+      {activeTab === "analytics" && (
+        <div className="space-y-6">
+          {analyticsLoading || !analytics ? (
+            <div className="flex items-center justify-center py-20">
+              <div className="w-8 h-8 border-4 border-[#2CC5C5] border-t-transparent rounded-full animate-spin" />
+            </div>
+          ) : (
+            <>
+              {/* Stats grid */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                {[
+                  { label: "Mensajes totales", value: analytics.totalMessages.toLocaleString(), icon: "💬", color: "text-[#2CC5C5]" },
+                  { label: "Mensajes este mes", value: analytics.messagesThisMonth.toLocaleString(), icon: "📅", color: "text-[#F5A623]" },
+                  { label: "Conversaciones", value: analytics.totalConversations.toLocaleString(), icon: "🗨️", color: "text-violet-600" },
+                  { label: "Esta semana", value: analytics.convsThisWeek.toLocaleString(), icon: "📈", color: "text-green-600" },
+                  { label: "Hoy", value: analytics.convsToday.toLocaleString(), icon: "⚡", color: "text-blue-600" },
+                  {
+                    label: "Última actividad",
+                    value: analytics.lastActivity
+                      ? new Date(analytics.lastActivity).toLocaleDateString("es", { day: "2-digit", month: "short" })
+                      : "—",
+                    icon: "🕐",
+                    color: "text-gray-600",
+                  },
+                ].map((s) => (
+                  <div key={s.label} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+                    <p className="text-2xl mb-2">{s.icon}</p>
+                    <p className={`text-2xl font-black ${s.color}`}>{s.value}</p>
+                    <p className="text-xs text-gray-400 mt-1">{s.label}</p>
+                  </div>
+                ))}
+              </div>
+
+              {/* 14-day bar chart */}
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+                <h3 className="font-semibold text-gray-900 mb-1">Mensajes — últimos 14 días</h3>
+                <p className="text-xs text-gray-400 mb-5">Mensajes de visitantes por día</p>
+                {analytics.dailyData.every((d) => d.count === 0) ? (
+                  <p className="text-center text-gray-400 text-sm py-8">Sin actividad en los últimos 14 días</p>
+                ) : (() => {
+                  const maxVal = Math.max(...analytics.dailyData.map((d) => d.count), 1);
+                  return (
+                    <div className="flex items-end gap-1.5 h-32">
+                      {analytics.dailyData.map((d) => {
+                        const heightPct = Math.max((d.count / maxVal) * 100, d.count > 0 ? 4 : 0);
+                        const isToday = d.date === new Date().toISOString().split("T")[0];
+                        const label = new Date(d.date + "T12:00:00").toLocaleDateString("es", { day: "2-digit", month: "short" });
+                        return (
+                          <div key={d.date} className="flex-1 flex flex-col items-center gap-1" title={`${label}: ${d.count} msgs`}>
+                            <div
+                              className="w-full rounded-t-md transition-all"
+                              style={{
+                                height: `${heightPct}%`,
+                                backgroundColor: isToday ? "#F5A623" : "#2CC5C5",
+                                opacity: d.count === 0 ? 0.15 : 1,
+                                minHeight: d.count > 0 ? "4px" : "2px",
+                              }}
+                            />
+                            {d.count > 0 && <span className="text-[9px] text-gray-400">{d.count}</span>}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  );
+                })()}
+                <div className="flex justify-between mt-2 text-[9px] text-gray-300">
+                  <span>{new Date(analytics.dailyData[0].date + "T12:00:00").toLocaleDateString("es", { day: "2-digit", month: "short" })}</span>
+                  <span>Hoy</span>
+                </div>
+              </div>
+
+              {/* Link to public booking page */}
+              <div className="bg-gradient-to-r from-[#2CC5C5]/10 to-[#F5A623]/10 border border-[#2CC5C5]/20 rounded-2xl p-5 flex items-center justify-between gap-4 flex-wrap">
+                <div>
+                  <p className="font-semibold text-gray-900 text-sm">Página de reservas pública</p>
+                  <p className="text-xs text-gray-500 mt-0.5">Comparte este link con tus clientes para que agenden directamente</p>
+                  <code className="text-xs text-[#2CC5C5] mt-1 block">{APP_URL}/book/{id}</code>
+                </div>
+                <a
+                  href={`${APP_URL}/book/${id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-shrink-0 px-4 py-2 bg-gradient-to-r from-[#2CC5C5] to-[#F5A623] text-white text-sm font-semibold rounded-xl hover:opacity-90 transition"
+                >
+                  Abrir →
+                </a>
+              </div>
+            </>
+          )}
         </div>
       )}
     </div>
