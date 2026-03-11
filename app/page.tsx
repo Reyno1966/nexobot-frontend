@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import DemoChat from "@/components/landing/DemoChat";
 import PricingSection from "@/components/landing/PricingSection";
+import FloatingWidget from "@/components/landing/FloatingWidget";
 
 export default function Home() {
   return (
@@ -415,6 +416,9 @@ export default function Home() {
           <p className="mt-4 text-white/30 text-sm">Sin tarjeta de crédito · Cancela cuando quieras</p>
         </div>
       </section>
+
+      {/* ── WIDGET FLOTANTE (demo en vivo) ── */}
+      <FloatingWidget />
 
       {/* ── FOOTER ── */}
       <footer className="bg-[#020D0D] py-12 border-t border-white/5">
