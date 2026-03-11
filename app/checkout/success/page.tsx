@@ -59,7 +59,6 @@ function SuccessContent() {
           if (res.ok) {
             const data = await res.json();
             setSession(data);
-            // Conversión: pago completado
             if (data.status === "paid") {
               trackPurchase({
                 transactionId: sessionId,
@@ -112,7 +111,6 @@ function SuccessContent() {
 
           {/* Animated check */}
           <div className={`relative w-24 h-24 mx-auto mb-8 transition-all duration-700 ${checkVisible ? "scale-100 opacity-100" : "scale-50 opacity-0"}`}>
-            {/* Outer ring animation */}
             <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#2CC5C5] to-[#F5A623] animate-pulse opacity-20" />
             <div className="absolute inset-1 rounded-full bg-gradient-to-br from-[#2CC5C5] to-[#F5A623] opacity-10" />
             <div className="w-24 h-24 rounded-full bg-gradient-to-br from-[#2CC5C5] to-[#F5A623] flex items-center justify-center shadow-2xl shadow-[#2CC5C5]/30">
