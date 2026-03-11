@@ -168,6 +168,63 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ── VIDEO DEMO ── */}
+      {/* 🎬 PENDIENTE: reemplazar VIDEO_URL con el enlace real del video */}
+      {/* Acepta: YouTube (https://youtu.be/...), Vimeo, o video directo .mp4 */}
+      <section id="video" className="py-24 bg-[#041414] relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-[#2CC5C5]/8 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-72 h-72 bg-[#F5A623]/8 rounded-full blur-3xl pointer-events-none" />
+        <div className="relative z-10 max-w-5xl mx-auto px-6 text-center">
+          <span className="text-sm font-bold text-[#2CC5C5] uppercase tracking-widest">Video demo</span>
+          <h2 className="mt-3 text-4xl font-black text-white">
+            Mira cómo funciona{" "}
+            <span className="bg-gradient-to-r from-[#2CC5C5] to-[#F5A623] bg-clip-text text-transparent">
+              en 60 segundos
+            </span>
+          </h2>
+          <p className="mt-4 text-white/50 max-w-xl mx-auto">
+            Desde crear tu bot hasta recibir tu primera venta automatizada — todo en menos de un minuto.
+          </p>
+
+          {/* Placeholder del video — reemplazar con el video real */}
+          <div className="mt-12 relative rounded-2xl overflow-hidden border border-white/10 shadow-2xl shadow-black/50 aspect-video bg-[#062828] flex items-center justify-center group cursor-pointer">
+            {/* Orb decorativo de fondo */}
+            <div className="absolute inset-0 bg-gradient-to-br from-[#2CC5C5]/10 via-transparent to-[#F5A623]/10" />
+            {/* Botón de play */}
+            <div className="relative flex flex-col items-center gap-5">
+              <div className="w-20 h-20 rounded-full bg-gradient-to-r from-[#2CC5C5] to-[#F5A623] flex items-center justify-center shadow-lg shadow-[#0A5555]/50 group-hover:scale-110 transition-transform duration-300">
+                <svg className="w-8 h-8 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M8 5v14l11-7z" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-white font-semibold text-lg">Video disponible próximamente</p>
+                <p className="text-white/40 text-sm mt-1">Tu demo en video estará aquí muy pronto</p>
+              </div>
+            </div>
+            {/* Esquinas decorativas */}
+            <div className="absolute top-4 left-4 w-8 h-8 border-t-2 border-l-2 border-[#2CC5C5]/40 rounded-tl-lg" />
+            <div className="absolute top-4 right-4 w-8 h-8 border-t-2 border-r-2 border-[#2CC5C5]/40 rounded-tr-lg" />
+            <div className="absolute bottom-4 left-4 w-8 h-8 border-b-2 border-l-2 border-[#F5A623]/40 rounded-bl-lg" />
+            <div className="absolute bottom-4 right-4 w-8 h-8 border-b-2 border-r-2 border-[#F5A623]/40 rounded-br-lg" />
+          </div>
+
+          {/* Stats bajo el video */}
+          <div className="mt-10 grid grid-cols-3 gap-6 max-w-lg mx-auto">
+            {[
+              { value: "< 5 min", label: "Para configurar tu bot" },
+              { value: "24/7",    label: "Respondiendo clientes" },
+              { value: "+40%",    label: "Ventas en promedio" },
+            ].map(({ value, label }) => (
+              <div key={label} className="text-center">
+                <p className="text-2xl font-black bg-gradient-to-r from-[#2CC5C5] to-[#F5A623] bg-clip-text text-transparent">{value}</p>
+                <p className="text-white/40 text-xs mt-1">{label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ── FEATURES ── */}
       <section id="features" className="py-24 bg-white">
         <div className="max-w-6xl mx-auto px-6">
