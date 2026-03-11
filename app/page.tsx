@@ -8,8 +8,10 @@ export default function Home() {
     <main className="min-h-screen bg-white text-gray-900 overflow-x-hidden">
 
       {/* ── NAVBAR ── */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
-        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-[#041414]/90 backdrop-blur-md border-b border-white/5">
+        {/* Línea de acento teal en la parte superior */}
+        <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#2CC5C5] to-transparent opacity-60" />
+        <div className="max-w-6xl mx-auto px-6 py-3.5 flex items-center justify-between">
           <Link href="/" className="flex items-center">
             <Image
               src="/nexobot-logo.png"
@@ -20,18 +22,33 @@ export default function Home() {
               priority
             />
           </Link>
-          <div className="hidden md:flex items-center gap-8">
-            <a href="#features" className="text-sm font-medium text-gray-500 hover:text-gray-900 transition">Características</a>
-            <a href="#pricing" className="text-sm font-medium text-gray-500 hover:text-gray-900 transition">Precios</a>
-            <a href="#faq" className="text-sm font-medium text-gray-500 hover:text-gray-900 transition">FAQ</a>
+          <div className="hidden md:flex items-center gap-1">
+            {[
+              { href: "#features", label: "Características" },
+              { href: "#pricing",  label: "Precios" },
+              { href: "#faq",      label: "FAQ" },
+            ].map(({ href, label }) => (
+              <a
+                key={label}
+                href={href}
+                className="relative px-4 py-2 text-sm font-semibold text-white/70 hover:text-white transition-colors group"
+              >
+                {label}
+                {/* underline animado */}
+                <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 group-hover:w-4/5 h-[2px] rounded-full bg-gradient-to-r from-[#2CC5C5] to-[#F5A623] transition-all duration-300" />
+              </a>
+            ))}
           </div>
           <div className="flex items-center gap-3">
-            <a href="/auth/login" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition px-4 py-2">
+            <a
+              href="/auth/login"
+              className="text-sm font-semibold text-white/60 hover:text-white border border-white/10 hover:border-white/30 px-4 py-2 rounded-lg transition-all"
+            >
               Iniciar sesión
             </a>
             <a
               href="/auth/signup"
-              className="px-5 py-2.5 bg-gradient-to-r from-[#2CC5C5] to-[#F5A623] text-white text-sm font-semibold rounded-full hover:opacity-90 transition shadow-sm"
+              className="relative px-5 py-2.5 bg-gradient-to-r from-[#2CC5C5] to-[#F5A623] text-white text-sm font-bold rounded-full hover:opacity-90 hover:scale-105 transition-all shadow-lg shadow-[#2CC5C5]/25"
             >
               Empezar gratis →
             </a>
