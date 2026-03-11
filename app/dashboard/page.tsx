@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import AlertsPanel from "@/components/dashboard/AlertsPanel";
 
 interface User { id: string; email: string; created_at?: string }
 interface Bot  { id: string; name: string; channel: string; status: string; messages_count: number; messages_this_month: number; system_prompt?: string; created_at: string }
@@ -255,6 +256,9 @@ export default function DashboardPage() {
         </h1>
         <p className="text-gray-500 mt-1">Aquí tienes un resumen de tu cuenta NexoBot.</p>
       </div>
+
+      {/* Monitor de salud de bots */}
+      <AlertsPanel />
 
       {/* Onboarding */}
       {showOnboarding && (

@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { PLAN_PRICES } from "@/lib/plans";
+import { trackBeginCheckout } from "@/lib/gtag";
 
 interface Subscription {
   plan_name: string;
@@ -14,27 +16,24 @@ interface Subscription {
 const PLANS = [
   {
     name: "Starter",
-    price: "$14",
-    period: "/mes",
-    priceId: "price_1T8eHgRap0JkQNsmxXKjK3IH",
+    monthly:  { price: "$14",  priceId: PLAN_PRICES.Starter.monthly.stripe_price_id },
+    annual:   { price: "$134", monthlyEquiv: "$11", priceId: PLAN_PRICES.Starter.annual.stripe_price_id },
     color: "border-blue-200",
     badge: "",
     features: ["3 bots activos", "5.000 mensajes/mes", "Soporte por email", "Analíticas básicas"],
   },
   {
     name: "Pro",
-    price: "$29",
-    period: "/mes",
-    priceId: "price_1T8eNZRap0JkQNsmeObpDc8j",
+    monthly:  { price: "$29",  priceId: PLAN_PRICES.Pro.monthly.stripe_price_id },
+    annual:   { price: "$278", monthlyEquiv: "$23", priceId: PLAN_PRICES.Pro.annual.stripe_price_id },
     color: "border-blue-500",
     badge: "Más popular",
     features: ["10 bots activos", "20.000 mensajes/mes", "Soporte prioritario", "Analíticas avanzadas", "Integraciones"],
   },
   {
     name: "Premium",
-    price: "$49",
-    period: "/mes",
-    priceId: "price_1T8eRdRap0JkQNsmllSsPbVs",
+    monthly:  { price: "$49",  priceId: PLAN_PRICES.Premium.monthly.stripe_price_id },
+    annual:   { price: "$470", monthlyEquiv: "$39", priceId: PLAN_PRICES.Premium.annual.stripe_price_id },
     color: "border-purple-400",
     badge: "",
     features: ["Bots ilimitados", "Mensajes ilimitados", "Soporte 24/7", "Panel personalizado", "API acceso completo"],
@@ -46,6 +45,7 @@ export default function BillingPage() {
   const [loading, setLoading] = useState(true);
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
+  const [isAnnual, setIsAnnual] = useState(false);
 
   useEffect(() => {
     async function load() {
@@ -56,9 +56,11 @@ export default function BillingPage() {
     load();
   }, []);
 
-  async function handleCheckout(priceId: string) {
+  async function handleCheckout(priceId: string, planName?: string, value?: number) {
     setCheckoutLoading(priceId);
     setCheckoutError(null);
+    // Conversión: inicio de checkout
+    if (planName && value) trackBeginCheckout(planName, value);
     try {
       const res = await fetch("/api/stripe/create-checkout-session", {
         method: "POST",
@@ -158,13 +160,32 @@ export default function BillingPage() {
 
       {/* Plans */}
       <div id="planes">
-        <h2 className="text-base font-semibold text-gray-900 mb-4">
-          {subscription ? "Cambiar plan" : "Elegir un plan"}
-        </h2>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+          <h2 className="text-base font-semibold text-gray-900">
+            {subscription ? "Cambiar plan" : "Elegir un plan"}
+          </h2>
+          {/* Toggle mensual / anual */}
+          <div className="flex items-center gap-3">
+            <span className={`text-sm font-medium ${!isAnnual ? "text-gray-900" : "text-gray-400"}`}>Mensual</span>
+            <button
+              onClick={() => setIsAnnual(!isAnnual)}
+              className={`relative w-12 h-6 rounded-full transition-colors ${isAnnual ? "bg-blue-600" : "bg-gray-200"}`}
+            >
+              <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${isAnnual ? "translate-x-6" : "translate-x-0"}`} />
+            </button>
+            <span className={`text-sm font-medium ${isAnnual ? "text-gray-900" : "text-gray-400"}`}>
+              Anual
+              <span className="ml-1.5 text-xs font-bold bg-green-100 text-green-700 px-1.5 py-0.5 rounded-full">20% dto.</span>
+            </span>
+          </div>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
           {PLANS.map((plan) => {
+            const pricing = isAnnual ? plan.annual : plan.monthly;
+            const priceId = pricing.priceId;
             const isCurrent = subscription?.plan_name === plan.name;
             const isPro = plan.name === "Pro";
+            const annualDisabled = isAnnual && !priceId;
             return (
               <div
                 key={plan.name}
@@ -187,10 +208,27 @@ export default function BillingPage() {
                   </span>
                 )}
                 <p className={`font-bold text-xl ${isPro ? "text-white" : "text-gray-900"}`}>{plan.name}</p>
-                <div className="flex items-end gap-1 mt-1 mb-4">
-                  <span className={`text-3xl font-extrabold ${isPro ? "text-white" : "text-gray-900"}`}>{plan.price}</span>
-                  <span className={`text-sm mb-1 ${isPro ? "text-white/40" : "text-gray-400"}`}>{plan.period}</span>
+                <div className="flex items-end gap-1 mt-1 mb-1">
+                  {isAnnual ? (
+                    <>
+                      <span className={`text-3xl font-extrabold ${isPro ? "text-white" : "text-gray-900"}`}>
+                        {plan.annual.monthlyEquiv}
+                      </span>
+                      <span className={`text-sm mb-1 ${isPro ? "text-white/40" : "text-gray-400"}`}>/mes</span>
+                    </>
+                  ) : (
+                    <>
+                      <span className={`text-3xl font-extrabold ${isPro ? "text-white" : "text-gray-900"}`}>{plan.monthly.price}</span>
+                      <span className={`text-sm mb-1 ${isPro ? "text-white/40" : "text-gray-400"}`}>/mes</span>
+                    </>
+                  )}
                 </div>
+                {isAnnual && (
+                  <p className={`text-xs mb-4 ${isPro ? "text-white/50" : "text-gray-400"}`}>
+                    {plan.annual.price}/año · 2 meses gratis
+                  </p>
+                )}
+                {!isAnnual && <div className="mb-4" />}
                 <ul className="space-y-2 flex-1 mb-6">
                   {plan.features.map((f) => (
                     <li key={f} className={`flex items-center gap-2 text-sm ${isPro ? "text-white/70" : "text-gray-600"}`}>
@@ -201,19 +239,25 @@ export default function BillingPage() {
                     </li>
                   ))}
                 </ul>
-                <button
-                  onClick={() => !isCurrent && handleCheckout(plan.priceId)}
-                  disabled={isCurrent || checkoutLoading === plan.priceId}
-                  className={`w-full py-2.5 rounded-xl text-sm font-semibold transition disabled:opacity-60 ${
-                    isCurrent
-                      ? "bg-gray-100 text-gray-400 cursor-default"
-                      : isPro
-                      ? "bg-gradient-to-r from-blue-500 to-violet-500 text-white hover:opacity-90 shadow-lg shadow-blue-900/30"
-                      : "bg-blue-600 text-white hover:bg-blue-700"
-                  }`}
-                >
-                  {checkoutLoading === plan.priceId ? "Redirigiendo..." : isCurrent ? "Plan actual" : `Suscribirse a ${plan.name}`}
-                </button>
+                {annualDisabled ? (
+                  <p className={`text-xs text-center ${isPro ? "text-white/40" : "text-gray-400"}`}>
+                    Plan anual próximamente
+                  </p>
+                ) : (
+                  <button
+                    onClick={() => !isCurrent && handleCheckout(priceId, plan.name, isAnnual ? parseInt(plan.annual.price.replace("$","")) : parseInt(plan.monthly.price.replace("$","")))}
+                    disabled={isCurrent || checkoutLoading === priceId}
+                    className={`w-full py-2.5 rounded-xl text-sm font-semibold transition disabled:opacity-60 ${
+                      isCurrent
+                        ? "bg-gray-100 text-gray-400 cursor-default"
+                        : isPro
+                        ? "bg-gradient-to-r from-blue-500 to-violet-500 text-white hover:opacity-90 shadow-lg shadow-blue-900/30"
+                        : "bg-blue-600 text-white hover:bg-blue-700"
+                    }`}
+                  >
+                    {checkoutLoading === priceId ? "Redirigiendo..." : isCurrent ? "Plan actual" : `Suscribirse a ${plan.name}`}
+                  </button>
+                )}
               </div>
             );
           })}

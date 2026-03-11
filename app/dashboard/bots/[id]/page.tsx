@@ -15,6 +15,10 @@ interface Bot {
   messages_this_month: number;
   widget_color: string;
   welcome_message: string;
+  notify_email: string | null;
+  notify_whatsapp: string | null;
+  notify_telegram_token: string | null;
+  notify_telegram_chat_id: string | null;
 }
 
 interface ChatMessage {
@@ -59,8 +63,16 @@ export default function BotDetailPage() {
   const [chatError, setChatError] = useState("");
   const chatEndRef = useRef<HTMLDivElement>(null);
 
+  // Notificaciones
+  const [notifyEmail, setNotifyEmail]               = useState("");
+  const [notifyWhatsapp, setNotifyWhatsapp]         = useState("");
+  const [notifyTelegramToken, setNotifyTelegramToken]   = useState("");
+  const [notifyTelegramChatId, setNotifyTelegramChatId] = useState("");
+  const [notifySaved, setNotifySaved]               = useState(false);
+  const [notifySaving, setNotifySaving]             = useState(false);
+
   // Tab
-  const [activeTab, setActiveTab] = useState<"config" | "appearance" | "test" | "embed">("config");
+  const [activeTab, setActiveTab] = useState<"config" | "appearance" | "test" | "embed" | "notifications">("config");
   const [copiedLink, setCopiedLink] = useState(false);
 
   function copyLink() {
@@ -84,6 +96,10 @@ export default function BotDetailPage() {
       setWidgetColor(color);
       setHexInput(color);
       setWelcomeMessage(found.welcome_message ?? "¡Hola! 👋 ¿En qué puedo ayudarte hoy?");
+      setNotifyEmail(found.notify_email ?? "");
+      setNotifyWhatsapp(found.notify_whatsapp ?? "");
+      setNotifyTelegramToken(found.notify_telegram_token ?? "");
+      setNotifyTelegramChatId(found.notify_telegram_chat_id ?? "");
       setLoading(false);
     }
     load();
@@ -120,6 +136,10 @@ export default function BotDetailPage() {
         system_prompt: systemPrompt,
         widget_color: widgetColor,
         welcome_message: welcomeMessage,
+        notify_email: notifyEmail || null,
+        notify_whatsapp: notifyWhatsapp || null,
+        notify_telegram_token: notifyTelegramToken || null,
+        notify_telegram_chat_id: notifyTelegramChatId || null,
       }),
     });
     if (res.ok) {
@@ -129,6 +149,34 @@ export default function BotDetailPage() {
       setTimeout(() => setSaved(false), 2500);
     }
     setSaving(false);
+  }
+
+  async function handleSaveNotifications() {
+    if (!bot) return;
+    setNotifySaving(true);
+    const res = await fetch(`/api/bots/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({
+        name: botName,
+        description,
+        channel: bot.channel,
+        status: bot.status,
+        system_prompt: systemPrompt,
+        widget_color: widgetColor,
+        welcome_message: welcomeMessage,
+        notify_email: notifyEmail || null,
+        notify_whatsapp: notifyWhatsapp || null,
+        notify_telegram_token: notifyTelegramToken || null,
+        notify_telegram_chat_id: notifyTelegramChatId || null,
+      }),
+    });
+    if (res.ok) {
+      setNotifySaved(true);
+      setTimeout(() => setNotifySaved(false), 2500);
+    }
+    setNotifySaving(false);
   }
 
   async function handleChat(e: React.FormEvent) {
@@ -209,6 +257,7 @@ export default function BotDetailPage() {
           { key: "appearance", label: "🎨 Apariencia" },
           { key: "test", label: "💬 Probar bot" },
           { key: "embed", label: "🔗 Instalar" },
+          { key: "notifications", label: "🔔 Notificaciones" },
         ] as const).map((tab) => (
           <button
             key={tab.key}
@@ -258,19 +307,19 @@ export default function BotDetailPage() {
                 <h2 className="font-semibold text-gray-900">Personalidad del agente</h2>
                 <p className="text-sm text-gray-500 mt-0.5">Define cómo debe comportarse tu bot con los clientes</p>
               </div>
-              <span className={`text-xs font-medium px-2 py-1 rounded-full ${systemPrompt.length > 700 ? "bg-red-100 text-red-600" : "bg-gray-100 text-gray-500"}`}>
-                {systemPrompt.length}/800
+              <span className={`text-xs font-medium px-2 py-1 rounded-full ${systemPrompt.length > 1300 ? "bg-red-100 text-red-600" : "bg-gray-100 text-gray-500"}`}>
+                {systemPrompt.length}/1500
               </span>
             </div>
             <textarea
               value={systemPrompt}
-              onChange={(e) => setSystemPrompt(e.target.value.substring(0, 800))}
-              rows={7}
-              placeholder={`Ejemplo:\nEres un asistente de ventas amable de [Tu Empresa]. Tu objetivo es ayudar a los clientes a encontrar el producto ideal, responder preguntas sobre precios y disponibilidad, y guiarlos hacia la compra. Responde siempre en español, de forma profesional y concisa. Si no sabes algo, ofrece contactar a un asesor humano.`}
+              onChange={(e) => setSystemPrompt(e.target.value.substring(0, 1500))}
+              rows={10}
+              placeholder={`Ejemplo para bot de citas:\nEres el asistente de [Tu Empresa]. Tu objetivo es agendar citas.\n\nFLUJO (una pregunta por vez):\n1. Saluda y pregunta en qué puedes ayudar.\n2. Pide el NOMBRE COMPLETO.\n3. Pregunta el SERVICIO deseado.\n4. Pide la FECHA (formato DD/MM/YYYY).\n5. Pide la HORA (ej: 10:00 AM).\n6. Pide el TELÉFONO.\n7. Confirma: "¡Cita confirmada! Te esperamos el [fecha] a las [hora]."`}
               className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#2CC5C5] resize-none mt-3 leading-relaxed"
             />
             <p className="text-xs text-gray-400 mt-2">
-              💡 Un buen prompt define el tono, objetivo y limitaciones del bot. Máximo 800 caracteres.
+              💡 Para bots de citas: incluye un flujo paso a paso y termina confirmando con la fecha y hora. Máximo 1500 caracteres.
             </p>
           </div>
 
@@ -657,6 +706,130 @@ export default function BotDetailPage() {
           <div className="bg-gray-50 rounded-2xl border border-gray-200 p-5">
             <p className="text-xs font-semibold text-gray-500 mb-1">ID único del bot</p>
             <code className="text-[#2CC5C5] text-sm font-mono break-all">{id}</code>
+          </div>
+        </div>
+      )}
+
+      {/* ── TAB: NOTIFICACIONES ── */}
+      {activeTab === "notifications" && (
+        <div className="space-y-6">
+
+          <div className="bg-blue-50 border border-blue-100 rounded-2xl p-4 text-sm text-blue-700">
+            <strong>¿Cómo funciona?</strong> Cuando un visitante agende una cita a través de tu bot,
+            recibirás una notificación automática en los canales que configures aquí.
+          </div>
+
+          {/* Email */}
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center flex-shrink-0">
+                <svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <div>
+                <h2 className="font-semibold text-gray-900">Email</h2>
+                <p className="text-xs text-gray-400">Recibirás un email detallado con los datos de la cita</p>
+              </div>
+              <span className="ml-auto text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">Disponible</span>
+            </div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">Email de notificación</label>
+            <input
+              type="email"
+              value={notifyEmail}
+              onChange={(e) => setNotifyEmail(e.target.value)}
+              placeholder="tu@empresa.com"
+              className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#2CC5C5]"
+            />
+            <p className="text-xs text-gray-400 mt-1.5">Si lo dejas vacío, se enviará al email de tu cuenta.</p>
+          </div>
+
+          {/* WhatsApp */}
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 bg-green-50 rounded-xl flex items-center justify-center flex-shrink-0">
+                <svg className="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+                  <path d="M12 0C5.373 0 0 5.373 0 12c0 2.124.555 4.118 1.529 5.845L.077 23.487a.5.5 0 00.617.613l5.747-1.505A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.882a9.867 9.867 0 01-5.021-1.373l-.36-.214-3.733.978.999-3.645-.235-.375A9.867 9.867 0 012.118 12C2.118 6.53 6.53 2.118 12 2.118S21.882 6.53 21.882 12 17.47 21.882 12 21.882z"/>
+                </svg>
+              </div>
+              <div>
+                <h2 className="font-semibold text-gray-900">WhatsApp</h2>
+                <p className="text-xs text-gray-400">Mensaje automático vía WhatsApp Business API</p>
+              </div>
+              <span className="ml-auto text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full font-medium">Requiere API</span>
+            </div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">Tu número de WhatsApp</label>
+            <input
+              type="tel"
+              value={notifyWhatsapp}
+              onChange={(e) => setNotifyWhatsapp(e.target.value)}
+              placeholder="+5491123456789"
+              className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#2CC5C5]"
+            />
+            <p className="text-xs text-gray-400 mt-1.5">
+              Incluye el código de país. Requiere que NexoBot tenga configurado el acceso a la API de WhatsApp Business.
+            </p>
+          </div>
+
+          {/* Telegram */}
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 bg-sky-50 rounded-xl flex items-center justify-center flex-shrink-0">
+                <svg className="w-5 h-5 text-sky-500" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+                </svg>
+              </div>
+              <div>
+                <h2 className="font-semibold text-gray-900">Telegram</h2>
+                <p className="text-xs text-gray-400">Recibe mensajes en tu canal o chat de Telegram</p>
+              </div>
+              <span className="ml-auto text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">Disponible</span>
+            </div>
+            <div className="space-y-3">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Token del bot de Telegram</label>
+                <input
+                  type="text"
+                  value={notifyTelegramToken}
+                  onChange={(e) => setNotifyTelegramToken(e.target.value)}
+                  placeholder="123456789:AABBccDD..."
+                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-[#2CC5C5]"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Chat ID o ID del canal</label>
+                <input
+                  type="text"
+                  value={notifyTelegramChatId}
+                  onChange={(e) => setNotifyTelegramChatId(e.target.value)}
+                  placeholder="-1001234567890"
+                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-[#2CC5C5]"
+                />
+              </div>
+            </div>
+            <div className="mt-3 bg-gray-50 rounded-xl p-3 text-xs text-gray-500 space-y-1">
+              <p><strong>Cómo configurarlo:</strong></p>
+              <p>1. Abre Telegram y habla con <strong>@BotFather</strong></p>
+              <p>2. Escribe <code>/newbot</code> y sigue los pasos para crear tu bot</p>
+              <p>3. Copia el token que te da BotFather y pégalo arriba</p>
+              <p>4. Para obtener tu Chat ID, habla con <strong>@userinfobot</strong></p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handleSaveNotifications}
+              disabled={notifySaving}
+              className="px-6 py-2.5 bg-gradient-to-r from-[#2CC5C5] to-[#F5A623] text-white rounded-xl font-semibold hover:opacity-90 transition disabled:opacity-50 text-sm"
+            >
+              {notifySaving ? "Guardando..." : "Guardar notificaciones"}
+            </button>
+            {notifySaved && (
+              <span className="text-green-600 text-sm font-medium flex items-center gap-1">
+                ✓ Configuración guardada
+              </span>
+            )}
           </div>
         </div>
       )}

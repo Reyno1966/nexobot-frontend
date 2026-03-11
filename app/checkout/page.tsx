@@ -50,6 +50,49 @@ const PLANS: Record<string, { name: string; price: string; description: string; 
       "Configuración asistida",
     ],
   },
+  // ── Suscripciones anuales ──
+  price_1T8qkPRap0JkQNsm1MI5XoYm: {
+    name: "Starter",
+    price: "$134/año",
+    description: "Ideal para emprendedores que están comenzando · 2 meses gratis",
+    type: "subscription",
+    features: [
+      "Respuestas automáticas con IA",
+      "Chat embebido para tu web",
+      "Plantillas de mensajes",
+      "Atención 24/7 sin esfuerzo",
+      "Captura básica de leads",
+      "Panel de control intuitivo",
+    ],
+  },
+  price_1T8qndRap0JkQNsmswIpSK3M: {
+    name: "Pro",
+    price: "$278/año",
+    description: "Perfecto para negocios que quieren escalar · 2 meses gratis",
+    type: "subscription",
+    features: [
+      "Todo lo del Starter",
+      "Integración con WhatsApp",
+      "Flujos inteligentes de ventas",
+      "Segmentación avanzada de clientes",
+      "Automatizaciones personalizadas",
+      "Integración con redes sociales",
+    ],
+  },
+  price_1T8qr5Rap0JkQNsm8wzRX02G: {
+    name: "Premium",
+    price: "$470/año",
+    description: "Para empresas que necesitan máxima potencia · 2 meses gratis",
+    type: "subscription",
+    features: [
+      "Todo lo del Pro",
+      "Mensajes ilimitados",
+      "Embudo de ventas automático",
+      "Integraciones avanzadas",
+      "Soporte prioritario",
+      "Configuración asistida",
+    ],
+  },
   // ── Servicios adicionales (pago único) ──
   price_1T8ehkRap0JkQNsmtky7j7ZL: {
     name: "Personalización avanzada",

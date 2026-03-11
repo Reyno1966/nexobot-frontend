@@ -1,28 +1,16 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
-import { createClient } from "@supabase/supabase-js";
+import { getAuth } from "@/lib/auth";
 import { stripe } from "@/lib/stripe";
 
 export async function POST(req: Request) {
   try {
-    // 1) Verificar sesión del usuario
-    const cookieStore = await cookies();
-    const accessToken = cookieStore.get("sb-access-token")?.value;
+    // 1) Verificar sesión del usuario (con auto-refresh)
+    const auth = await getAuth();
+    if (!auth) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
 
-    if (!accessToken) {
-      return NextResponse.json({ error: "No autorizado" }, { status: 401 });
-    }
-
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      { global: { headers: { Authorization: `Bearer ${accessToken}` } } }
-    );
-
-    const { data: userData, error: userError } = await supabase.auth.getUser();
-    if (userError || !userData?.user) {
-      return NextResponse.json({ error: "No autorizado" }, { status: 401 });
-    }
+    const { supabase } = auth;
+    const { data: userData } = await supabase.auth.getUser();
+    if (!userData?.user) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
 
     // 2) Obtener priceId del body
     const { priceId } = await req.json();
@@ -30,11 +18,14 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "priceId requerido" }, { status: 400 });
     }
 
-    // Suscripciones mensuales (modo: subscription)
+    // Suscripciones (modo: subscription) — mensuales y anuales
     const SUBSCRIPTION_PRICE_IDS = [
       "price_1T8eHgRap0JkQNsmxXKjK3IH", // Starter $14/mes
       "price_1T8eNZRap0JkQNsmeObpDc8j", // Pro $29/mes
       "price_1T8eRdRap0JkQNsmllSsPbVs", // Premium $49/mes
+      "price_1T8qkPRap0JkQNsm1MI5XoYm", // Starter $134/año
+      "price_1T8qndRap0JkQNsmswIpSK3M", // Pro $278/año
+      "price_1T8qr5Rap0JkQNsm8wzRX02G", // Premium $470/año
     ];
 
     // Pagos únicos (modo: payment)

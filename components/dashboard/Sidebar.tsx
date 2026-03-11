@@ -91,9 +91,10 @@ const NAV = [
 
 interface SidebarProps {
   userEmail?: string;
+  newConversations?: number;
 }
 
-export default function Sidebar({ userEmail }: SidebarProps) {
+export default function Sidebar({ userEmail, newConversations = 0 }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const [loggingOut, setLoggingOut] = useState(false);
@@ -142,7 +143,12 @@ export default function Sidebar({ userEmail }: SidebarProps) {
               <span className={isActive ? "text-[#2CC5C5]" : "text-gray-400"}>
                 {item.icon}
               </span>
-              {item.label}
+              <span className="flex-1">{item.label}</span>
+              {item.href === "/dashboard/conversations" && newConversations > 0 && (
+                <span className="ml-auto flex-shrink-0 min-w-[20px] h-5 px-1.5 bg-[#F5A623] text-white text-[10px] font-black rounded-full flex items-center justify-center leading-none">
+                  {newConversations > 99 ? "99+" : newConversations}
+                </span>
+              )}
             </Link>
           );
         })}

@@ -52,12 +52,15 @@ export async function POST(req: Request) {
           { onConflict: "stripe_subscription_id" }
         );
       } else if (session.mode === "payment") {
+        // Pagos únicos (servicios adicionales) — se guardan con stripe_subscription_id
+        // prefijado con "onetime_" para distinguirlos de suscripciones reales.
+        // La API de suscripción los ignora al filtrar por plan_name.
         await supabase.from("subscriptions").insert({
           user_id: userId,
           stripe_customer_id: session.customer as string,
           stripe_subscription_id: `onetime_${session.id}`,
           stripe_price_id: priceId ?? "",
-          plan_name: planName,
+          plan_name: planName,  // ej: "Personalización Avanzada"
           status: "active",
           updated_at: new Date().toISOString(),
         });
@@ -89,12 +92,23 @@ export async function POST(req: Request) {
 
     case "invoice.payment_failed": {
       const invoice = event.data.object as Stripe.Invoice;
-      // Usar customer ID para encontrar la suscripción
       if (invoice.customer) {
         await supabase
           .from("subscriptions")
           .update({ status: "past_due", updated_at: new Date().toISOString() })
           .eq("stripe_customer_id", invoice.customer as string);
+      }
+      break;
+    }
+
+    // Pago recuperado luego de un fallo → reactivar suscripción
+    case "invoice.payment_succeeded": {
+      const invoice = event.data.object as Stripe.Invoice & { subscription?: string; billing_reason?: string };
+      if (invoice.subscription && invoice.billing_reason !== "subscription_create") {
+        await supabase
+          .from("subscriptions")
+          .update({ status: "active", updated_at: new Date().toISOString() })
+          .eq("stripe_subscription_id", invoice.subscription);
       }
       break;
     }
