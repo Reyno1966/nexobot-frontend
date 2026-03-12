@@ -208,7 +208,17 @@ export async function POST(
       }
     } catch { /* silencioso */ }
 
-    const systemPrompt = basePrompt + productsContext;
+    // ── Instrucción estándar de captura de datos de contacto ──
+    const leadCaptureInstruction = `
+
+INSTRUCCIÓN IMPORTANTE — captura de datos de contacto:
+Después de responder 2 o 3 preguntas del visitante, pídele amablemente sus datos para poder darle seguimiento personalizado. Di algo natural como: "Por cierto, para poder contactarte con más información o enviarte una propuesta, ¿me podrías compartir tu nombre y un email o WhatsApp?"
+- Si ya compartió su nombre, úsalo para personalizar la conversación.
+- Si ya dio email o teléfono, NO lo vuelvas a pedir.
+- Hazlo de forma conversacional, nunca como un formulario.
+- Siempre que captures un dato de contacto, confírmalo de vuelta al visitante.`;
+
+    const systemPrompt = basePrompt + productsContext + leadCaptureInstruction;
 
     const recentHistory: Message[] = (history as Message[])
       .slice(-MAX_HISTORY_MESSAGES)
@@ -286,34 +296,45 @@ export async function POST(
         }).catch(() => {});
       }
 
-      // ── Captura de datos de contacto: detectar email/teléfono en el mensaje ──
+      // ── Captura de datos de contacto: detectar nombre, email y teléfono ──
       const EMAIL_RE = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/;
       const PHONE_RE = /(?:\+?[\d][\d\s\-().]{6,}[\d])/;
+      // Detectar "me llamo X", "soy X", "mi nombre es X"
+      const NAME_RE  = /(?:me llamo|soy|mi nombre es|my name is)\s+([A-Za-zÀ-ÖØ-öø-ÿ]{2,}(?:\s+[A-Za-zÀ-ÖØ-öø-ÿ]{2,})?)/i;
+
       const detectedEmail = EMAIL_RE.exec(userMessage)?.[0] ?? null;
       const detectedPhone = PHONE_RE.exec(userMessage)?.[0] ?? null;
+      const detectedNameMatch = NAME_RE.exec(userMessage);
+      const detectedName = detectedNameMatch ? detectedNameMatch[1].trim() : null;
 
-      if ((detectedEmail || detectedPhone) && existingConv?.visitor_name === "Visitante") {
-        const extractedName = extractNameFromHistory([...recentHistory, { role: "user", content: userMessage }]);
-        const displayName = extractedName || null;
+      const hasNewContact = detectedEmail || detectedPhone || detectedName;
+      const visitorIsAnon  = !existingConv || existingConv.visitor_name === "Visitante";
 
-        // Actualizar visitor_name en la conversación si tenemos un nombre
-        if (conversationId && displayName) {
-          void supabase.from("conversations").update({ visitor_name: displayName }).eq("id", conversationId);
+      if (hasNewContact) {
+        // Extraer nombre del historial si no vino en este mensaje
+        const nameFromHistory = extractNameFromHistory([...recentHistory, { role: "user", content: userMessage }]);
+        const finalName = detectedName || nameFromHistory || null;
+
+        // Actualizar visitor_name si tenemos uno nuevo
+        if (conversationId && finalName && visitorIsAnon) {
+          void supabase.from("conversations").update({ visitor_name: finalName }).eq("id", conversationId);
         }
 
-        // Enviar email con los datos del lead al dueño del bot
-        supabase.auth.admin.getUserById(bot.user_id).then(({ data: ownerData }) => {
-          const ownerEmail = ownerData?.user?.email;
-          if (ownerEmail) {
-            sendLeadCaptureEmail({
-              to: ownerEmail,
-              botName: bot.name,
-              visitorName: displayName,
-              email: detectedEmail,
-              phone: detectedPhone,
-            }).catch(() => {});
-          }
-        }).catch(() => {});
+        // Enviar email con los datos del lead al dueño (solo la primera vez)
+        if (visitorIsAnon && (detectedEmail || detectedPhone)) {
+          supabase.auth.admin.getUserById(bot.user_id).then(({ data: ownerData }) => {
+            const ownerEmail = ownerData?.user?.email;
+            if (ownerEmail) {
+              sendLeadCaptureEmail({
+                to: ownerEmail,
+                botName: bot.name,
+                visitorName: finalName,
+                email: detectedEmail,
+                phone: detectedPhone,
+              }).catch(() => {});
+            }
+          }).catch(() => {});
+        }
       }
     } catch {
       // No interrumpir el flujo principal si falla el historial
