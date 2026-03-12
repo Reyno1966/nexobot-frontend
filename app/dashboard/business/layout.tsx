@@ -4,12 +4,12 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const BUSINESS_NAV = [
-  { href: "/dashboard/business",          label: "Resumen",   icon: "📊" },
-  { href: "/dashboard/business/expenses", label: "Gastos",    icon: "💸" },
-  { href: "/dashboard/business/sales",    label: "Ventas",    icon: "💰" },
-  { href: "/dashboard/products",          label: "Inventario", icon: "📦" },
-  { href: "/dashboard/invoices",          label: "Facturas",  icon: "🧾" },
-  { href: "/dashboard/business/notes",    label: "Notas",     icon: "📝" },
+  { href: "/dashboard/business",            label: "Resumen",    icon: "📊" },
+  { href: "/dashboard/business/expenses",   label: "Gastos",     icon: "💸" },
+  { href: "/dashboard/business/sales",      label: "Ventas",     icon: "💰" },
+  { href: "/dashboard/business/inventory",  label: "Inventario", icon: "📦" },
+  { href: "/dashboard/invoices",            label: "Facturas",   icon: "🧾" },
+  { href: "/dashboard/business/notes",      label: "Notas",      icon: "📝" },
 ];
 
 export default function BusinessLayout({ children }: { children: React.ReactNode }) {
