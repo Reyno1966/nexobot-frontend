@@ -1,53 +1,141 @@
 # NEXOBOT_BUSINESS — Skill de Referencia
 
 > Módulo de gestión de negocio integrado en el dashboard de NexoBot.
-> Última actualización: 2026-03-13
+> Última actualización: 2026-03-13 — sesión de construcción completa.
 
 ---
 
-## ¿Qué es?
+## ¿Qué se construyó hoy
 
-Un módulo completo dentro del dashboard de NexoBot que permite a cada cliente gestionar
-su negocio sin salir de la plataforma:
-
-- **Gastos**: registrar compras y gastos con categorías, proveedor y fecha
-- **Ventas**: caja diaria con método de pago (efectivo/tarjeta/transferencia/otro)
-- **Inventario**: vista de productos con margen de ganancia, stock y alertas
-- **Facturas**: reusa `/dashboard/invoices` (tabla `invoices`)
-- **Notas**: sticky notes con colores, pin y grid masonry
-
----
-
-## Rutas del dashboard
+Módulo completo de 6 pantallas funcionales con sus APIs, diseño coherente
+con el resto del dashboard y documentación actualizada.
 
 | Ruta | Estado | Descripción |
 |------|--------|-------------|
-| `/dashboard/business` | ✅ Funcional | Overview con KPIs (ingresos, gastos, ganancia) |
-| `/dashboard/business/expenses` | ✅ Funcional | CRUD completo de gastos |
-| `/dashboard/business/sales` | ✅ Funcional | CRUD completo de ventas / caja |
-| `/dashboard/business/inventory` | ✅ Funcional | Vista inventario con margen y alertas de stock |
-| `/dashboard/business/notes` | ✅ Funcional | Sticky notes con colores, pin, grid masonry |
-| `/dashboard/invoices` | ✅ Existente | Facturas (tabla `invoices`, tab en layout) |
+| `/dashboard/business` | ✅ Funcional | Overview con KPIs: ingresos, gastos, ganancia neta del mes |
+| `/dashboard/business/expenses` | ✅ Funcional | CRUD completo de gastos — 8 categorías, selector mes, modal |
+| `/dashboard/business/sales` | ✅ Funcional | CRUD completo de ventas — 4 métodos de pago, selector mes, modal |
+| `/dashboard/business/inventory` | ✅ Funcional | Vista inventario: margen %, stock badges, buscador, filtros |
+| `/dashboard/business/notes` | ✅ Funcional | Sticky notes: 5 colores, pin, grid masonry, contador chars |
+| `/dashboard/invoices` | ✅ Reutilizado | Tab en la navegación — apunta a ruta existente sin cambios |
 
 ---
 
-## API Routes
+## Decisiones técnicas tomadas
 
-| Método | Ruta | Descripción |
-|--------|------|-------------|
-| GET | `/api/business/expenses?year=YYYY&month=MM` | Lista gastos del mes |
-| POST | `/api/business/expenses` | Crea gasto |
-| PUT | `/api/business/expenses/[id]` | Actualiza gasto (campos parciales) |
-| DELETE | `/api/business/expenses/[id]` | Elimina gasto |
-| GET | `/api/business/sales?year=YYYY&month=MM` | Lista ventas del mes |
-| POST | `/api/business/sales` | Registra venta |
-| PUT | `/api/business/sales/[id]` | Actualiza venta |
-| DELETE | `/api/business/sales/[id]` | Elimina venta |
-| GET | `/api/business/notes` | Lista todas las notas (pinned primero) |
-| POST | `/api/business/notes` | Crea nota |
-| PUT | `/api/business/notes/[id]` | Actualiza nota (content/color/is_pinned) |
-| DELETE | `/api/business/notes/[id]` | Elimina nota |
-| GET | `/api/products` | Usado por inventory/page.tsx (API existente) |
+### 1. Reutilizar tablas existentes
+`products` e `invoices` ya existían. En lugar de duplicar, el módulo
+reutiliza `/dashboard/products` y `/dashboard/invoices` directamente.
+Solo se crearon 3 tablas nuevas: `business_expenses`, `business_sales`, `business_notes`.
+
+### 2. API Routes (no Server Actions)
+Toda mutación pasa por rutas en `app/api/business/`. Mantiene coherencia
+con el resto del proyecto donde **no se usan Server Actions**.
+
+### 3. Planes existentes — sin plan nuevo esta sesión
+- `free` / `Starter`: acceso básico (gastos, ventas, inventario, notas)
+- `Pro` / `Premium`: acceso completo (reportes PDF, exportación — a implementar)
+- No se creó el plan Business $79 — queda para sesión futura.
+
+### 4. Inventario propio en el módulo
+Se creó `business/inventory/page.tsx` con vista de margen de ganancia y
+alertas de stock. El botón "Gestionar productos" enlaza a `/dashboard/products`
+para la edición real. Esto permite mostrar métricas sin duplicar el CRUD de productos.
+
+### 5. `cost_price` en `products` — pendiente
+La columna `cost_price NUMERIC(10,2)` que habilita el cálculo de margen
+**no se añadió todavía** porque la tabla `products` no existía en Supabase
+en el momento de la sesión. La página `inventory/page.tsx` ya la consume
+y muestra "Sin costo" cuando vale 0.
+
+---
+
+## ⚠️ Pendiente obligatorio antes de usar en producción
+
+### Ejecutar en Supabase → SQL Editor
+
+```sql
+-- Pegar el contenido completo de: business-module-schema.sql
+-- Crea: business_expenses, business_sales, business_notes + RLS + triggers
+```
+
+Archivo: **`business-module-schema.sql`** (en la raíz del proyecto).
+
+El schema es idempotente (`IF NOT EXISTS`, `DROP TRIGGER IF EXISTS`,
+`CREATE OR REPLACE FUNCTION`): se puede ejecutar varias veces sin error.
+
+### Cuando `products` exista en Supabase, ejecutar además:
+
+```sql
+ALTER TABLE products
+  ADD COLUMN IF NOT EXISTS cost_price NUMERIC(10,2) NOT NULL DEFAULT 0;
+```
+
+---
+
+## Archivos tocados — análisis de riesgo para deploy
+
+### 🟢 Archivos nuevos (riesgo cero — no rompen nada existente)
+
+```
+CLAUDE.md                                        ← nuevo (documentación)
+NEXOBOT_BUSINESS.skill.md                        ← nuevo (este archivo)
+business-module-schema.sql                       ← nuevo (ejecutar en Supabase manualmente)
+
+app/api/business/expenses/route.ts               ← nueva ruta API
+app/api/business/expenses/[id]/route.ts          ← nueva ruta API
+app/api/business/sales/route.ts                  ← nueva ruta API
+app/api/business/sales/[id]/route.ts             ← nueva ruta API
+app/api/business/notes/route.ts                  ← nueva ruta API
+app/api/business/notes/[id]/route.ts             ← nueva ruta API
+
+app/dashboard/business/layout.tsx                ← nuevo layout
+app/dashboard/business/page.tsx                  ← nueva página
+app/dashboard/business/expenses/page.tsx         ← nueva página
+app/dashboard/business/sales/page.tsx            ← nueva página
+app/dashboard/business/inventory/page.tsx        ← nueva página
+app/dashboard/business/notes/page.tsx            ← nueva página
+```
+
+### 🟡 Archivos existentes modificados (revisar antes del deploy)
+
+| Archivo | Cambio | Riesgo |
+|---------|--------|--------|
+| `components/dashboard/Sidebar.tsx` | +10 líneas: nuevo ítem "Mi Negocio" añadido al array `NAV[]` | **Bajo** — el array es aditivo, no se tocó ningún ítem existente |
+
+**Eso es todo.** Solo un archivo existente fue modificado en todo el módulo.
+
+### 🔴 Archivos NO tocados (sin riesgo)
+
+Estos archivos **no se modificaron** y funcionan exactamente igual que antes:
+
+```
+lib/auth.ts              middleware.ts           lib/plans.ts
+app/api/products/*       app/api/invoices/*      app/dashboard/products/*
+app/dashboard/invoices/* app/dashboard/bots/*    app/dashboard/billing/*
+app/dashboard/settings/* app/layout.tsx          app/dashboard/layout.tsx
+```
+
+---
+
+## API Routes — referencia completa
+
+Todas usan `getAuth()` + doble verificación RLS + validación en servidor.
+
+| Método | Ruta | Body / Query | Respuesta |
+|--------|------|-------------|-----------|
+| GET | `/api/business/expenses` | `?year=YYYY&month=MM` | `{ expenses: [...] }` |
+| POST | `/api/business/expenses` | `{ description, amount, category, supplier?, date, notes? }` | `{ expense: {...} }` 201 |
+| PUT | `/api/business/expenses/[id]` | campos parciales | `{ expense: {...} }` |
+| DELETE | `/api/business/expenses/[id]` | — | `{ success: true }` |
+| GET | `/api/business/sales` | `?year=YYYY&month=MM` | `{ sales: [...] }` |
+| POST | `/api/business/sales` | `{ description, amount, payment_method, category?, date, notes? }` | `{ sale: {...} }` 201 |
+| PUT | `/api/business/sales/[id]` | campos parciales | `{ sale: {...} }` |
+| DELETE | `/api/business/sales/[id]` | — | `{ success: true }` |
+| GET | `/api/business/notes` | — | `{ notes: [...] }` (pinned primero) |
+| POST | `/api/business/notes` | `{ content, color?, is_pinned? }` | `{ note: {...} }` 201 |
+| PUT | `/api/business/notes/[id]` | campos parciales | `{ note: {...} }` |
+| DELETE | `/api/business/notes/[id]` | — | `{ success: true }` |
 
 ---
 
@@ -55,178 +143,91 @@ su negocio sin salir de la plataforma:
 
 ### `business_expenses`
 ```sql
-id          UUID        PK
-user_id     UUID        FK → auth.users
+id          UUID        PK DEFAULT gen_random_uuid()
+user_id     UUID        NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE
 description TEXT        NOT NULL
-amount      NUMERIC(10,2) NOT NULL CHECK (>= 0)
+amount      NUMERIC(10,2) NOT NULL CHECK (amount >= 0)
 category    TEXT        NOT NULL DEFAULT 'Otros'
+            -- Compras | Servicios | Nómina | Marketing | Alquiler | Transporte | Equipamiento | Otros
 supplier    TEXT        NULLABLE
 date        DATE        NOT NULL DEFAULT CURRENT_DATE
 receipt_url TEXT        NULLABLE
 notes       TEXT        NULLABLE
-created_at  TIMESTAMPTZ
-updated_at  TIMESTAMPTZ  -- auto-updated via trigger
+created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+updated_at  TIMESTAMPTZ NOT NULL DEFAULT now()  -- trigger automático
 ```
 
 ### `business_sales`
 ```sql
 id             UUID          PK
-user_id        UUID          FK → auth.users
+user_id        UUID          NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE
 date           DATE          NOT NULL DEFAULT CURRENT_DATE
 description    TEXT          NOT NULL
-amount         NUMERIC(10,2) NOT NULL CHECK (>= 0)
+amount         NUMERIC(10,2) NOT NULL CHECK (amount >= 0)
 payment_method TEXT          NOT NULL DEFAULT 'efectivo'
-               -- valores: efectivo | tarjeta | transferencia | otro
+               -- efectivo | tarjeta | transferencia | otro
 category       TEXT          NULLABLE
 notes          TEXT          NULLABLE
-created_at     TIMESTAMPTZ
-updated_at     TIMESTAMPTZ
+created_at     TIMESTAMPTZ   NOT NULL DEFAULT now()
+updated_at     TIMESTAMPTZ   NOT NULL DEFAULT now()
 ```
 
 ### `business_notes`
 ```sql
 id         UUID        PK
-user_id    UUID        FK → auth.users
-content    TEXT        NOT NULL (max 2000 chars)
+user_id    UUID        NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE
+content    TEXT        NOT NULL  -- max 2000 caracteres (validado en API)
 color      TEXT        NOT NULL DEFAULT 'yellow'
-           -- valores: yellow | blue | green | red | purple
+           -- yellow | blue | green | red | purple
 is_pinned  BOOLEAN     NOT NULL DEFAULT false
-created_at TIMESTAMPTZ
-updated_at TIMESTAMPTZ
+created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 ```
 
-### Pendiente — `products.cost_price`
-```sql
--- Ejecutar cuando la tabla products exista:
-ALTER TABLE products ADD COLUMN IF NOT EXISTS cost_price NUMERIC(10,2) NOT NULL DEFAULT 0;
--- Permite calcular margen: ((price - cost_price) / price) * 100
-```
-> La página `inventory/page.tsx` ya consume `cost_price` si existe,
-> y muestra "Sin costo" en los productos donde vale 0.
+RLS habilitada en las 3 tablas con política `FOR ALL USING (auth.uid() = user_id)`.
 
 ---
 
-## Acceso por plan
+## UX por pantalla
 
-| Plan | Acceso |
-|------|--------|
-| free | Gastos, inventario básico, ventas del día, notas (limitado a 10 notas) |
-| Starter | Igual que free |
-| Pro | Acceso completo: + reportes PDF, exportación de datos |
-| Premium | Igual que Pro |
+### `expenses/page.tsx`
+- 3 stats: total mes (rojo), categoría mayor, top 3 categorías
+- Selector mes ← → | Filtro por categoría (9 tabs: "Todas" + 8 cats)
+- Tabla: descripción + proveedor + monto (rojo) + badge categoría + fecha
+- Acciones editar/eliminar con `opacity-0 group-hover:opacity-100`
+- Modal: slide-up móvil / centrado desktop, validación client + server
 
-> ⚠️ Los límites de plan se verifican **en servidor**, nunca solo en cliente.
+### `sales/page.tsx`
+- 3 stats: total mes (teal), método top (con emoji + count), desglose por método
+- Selector mes ← → | Filtro por método de pago (5 tabs: 💵💳🏦🔄)
+- Tabla: descripción + monto (teal) + badge método + fecha
+- Modal igual que expenses, con select de método de pago
 
----
+### `inventory/page.tsx`
+- 4 stats: productos activos, valor de stock total, stock bajo (≤5), sin stock (0)
+- Buscador por nombre/categoría | Filtro activos/inactivos/todos
+- Tabla: nombre, precio venta, costo, margen % (verde/naranja/rojo), stock badge, estado
+- CTA "Gestionar productos" → `/dashboard/products`
+- Banner ámbar si algún producto tiene `cost_price = 0`
 
-## Archivos del módulo (estado final 2026-03-13)
-
-```
-business-module-schema.sql               ← Schema SQL completo (ejecutado en Supabase)
-CLAUDE.md                                ← Documentación del proyecto
-NEXOBOT_BUSINESS.skill.md               ← Este archivo
-
-app/
-  dashboard/
-    business/
-      layout.tsx                         ← Sub-navegación: 6 tabs (actualizado)
-      page.tsx                           ← Overview con KPIs
-      expenses/
-        page.tsx                         ← CRUD completo (gastos)
-      sales/
-        page.tsx                         ← CRUD completo (ventas / caja)
-      inventory/
-        page.tsx                         ← Vista productos + margen + alertas stock
-      notes/
-        page.tsx                         ← Sticky notes grid (colores + pin)
-
-app/api/business/
-  expenses/
-    route.ts                             ← GET + POST
-    [id]/route.ts                        ← PUT + DELETE
-  sales/
-    route.ts                             ← GET + POST
-    [id]/route.ts                        ← PUT + DELETE
-  notes/
-    route.ts                             ← GET + POST
-    [id]/route.ts                        ← PUT + DELETE
-
-components/dashboard/
-  Sidebar.tsx                            ← "Mi Negocio" con ícono de edificio
-```
+### `notes/page.tsx`
+- 2-4 stats: total notas, fijadas, top 2 colores con dot
+- Filtro por color (6 tabs: "Todas" + 5 colores con dot)
+- Grid masonry (`columns-1 sm:columns-2 lg:columns-3`)
+- Pin toggle directo en tarjeta (sin modal) — optimistic update
+- Modal: textarea + selector dots + toggle pin + contador chars
 
 ---
 
-## Detalles de UX por pantalla
+## Próximos pasos sugeridos
 
-### expenses/page.tsx
-- Stats: total mes (rojo), categoría mayor, top 3 por categoría
-- Filtros: por categoría (8 opciones) + selector mes ← →
-- Tabla con hover-reveal acciones (editar/eliminar)
-- Modal slide-up en móvil / centrado en desktop
-- Categorías: Compras, Servicios, Nómina, Marketing, Alquiler, Transporte, Equipamiento, Otros
-
-### sales/page.tsx
-- Stats: total mes (teal), método más usado, desglose por método
-- Filtros: por método de pago (💵💳🏦🔄) + selector mes ← →
-- Misma tabla + modal que expenses
-- Métodos: efectivo, tarjeta, transferencia, otro
-
-### inventory/page.tsx
-- Stats: productos activos, valor de stock, stock bajo (≤5), sin stock (0)
-- Buscar por nombre/categoría + filtro activos/inactivos/todos
-- Tabla: nombre, precio venta, costo, margen %, stock badge, estado
-- Margen: verde ≥50%, naranja ≥20%, rojo <20%, "Sin costo" si cost_price=0
-- CTA "Gestionar productos" → /dashboard/products
-- Banner aviso si hay productos sin cost_price registrado
-
-### notes/page.tsx
-- Stats: total notas, fijadas, top 2 colores
-- Filtro por color (5 opciones)
-- Grid masonry (columns-1 → 2 → 3)
-- Toggle pin directo desde la tarjeta (sin abrir modal)
-- Modal con textarea + selector de color (dots) + toggle pin
-- Contador de caracteres en tiempo real (max 2000)
-
----
-
-## Patrones usados
-
-### API Routes — estructura estándar
-```typescript
-import { getAuth } from "@/lib/auth";
-
-export async function GET(req: Request) {
-  const auth = await getAuth();
-  if (!auth) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
-  const { supabase, userId } = auth;
-  // ...
-}
-```
-
-### Page — patrón de estado
-```typescript
-"use client";
-const [items, setItems]     = useState<T[]>([]);
-const [loading, setLoading] = useState(true);
-const [saving, setSaving]   = useState(false);
-const [deleting, setDeleting] = useState<string | null>(null);
-const [saveError, setSaveError] = useState("");
-```
-
-### Seguridad en todas las APIs
-- `getAuth()` en cada handler
-- `eq("user_id", userId)` + RLS como doble verificación
-- Validación de tipos antes de tocar BD
-- Campos parciales en PUT (solo se actualiza lo enviado)
-
----
-
-## Próximas sesiones
-
-1. **Reportes mensuales** — PDF con resumen gastos/ventas/margen (Pro/Premium)
-2. **Dashboard overview mejorado** — gráficas de tendencia (últimos 6 meses)
-3. **`products.cost_price`** — ejecutar ALTER TABLE cuando la tabla products exista
-4. **Plan Business $79** — si se decide un plan dedicado para el módulo
-5. **Bot conectado al inventario** — chatbot consulta stock en tiempo real
-6. **Export CSV** — exportar gastos/ventas como CSV (Pro/Premium)
+| Prioridad | Tarea | Notas |
+|-----------|-------|-------|
+| 🔴 Obligatorio | Ejecutar `business-module-schema.sql` en Supabase | Sin esto, las APIs fallan con 500 |
+| 🟠 Próxima sesión | `ALTER TABLE products ADD COLUMN cost_price` | Cuando crees la tabla products |
+| 🟡 Sesión futura | Reportes mensuales en PDF | Pro/Premium — usa lib/pdf o similar |
+| 🟡 Sesión futura | Export CSV de gastos/ventas | Pro/Premium |
+| 🟡 Sesión futura | Gráficas de tendencia en overview | Últimos 6 meses (SVG inline o canvas) |
+| 🟢 Sesión futura | Bot conectado al inventario | Chatbot consulta stock en tiempo real |
+| 🟢 Sesión futura | Plan Business $79 | Si se decide crear plan dedicado |
+| 🟢 Sesión futura | Límites de plan aplicados | Ej. max 10 notas en free |
