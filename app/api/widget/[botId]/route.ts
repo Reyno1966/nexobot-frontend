@@ -12,6 +12,7 @@ import {
 import { PLAN_LIMITS } from "@/lib/plans";
 import { sendLimitAlertEmail, sendNewLeadEmail, sendLimitReachedEmail, sendLeadCaptureEmail } from "@/lib/email";
 import { tryExtractAppointment } from "@/lib/appointments";
+import { getInventoryContext } from "@/lib/getInventoryContext";
 
 interface Message {
   role: "user" | "assistant";
@@ -186,27 +187,8 @@ export async function POST(
       ? bot.system_prompt.substring(0, MAX_SYSTEM_PROMPT_CHARS)
       : `Eres ${bot.name}, un asistente de IA amable y útil. Responde siempre de forma concisa y profesional.`;
 
-    // Incluir catálogo de productos si el usuario tiene productos activos
-    let productsContext = "";
-    try {
-      const { data: products } = await supabase
-        .from("products")
-        .select("name, description, price, currency, stock, unit")
-        .eq("user_id", bot.user_id)
-        .neq("status", "inactive")
-        .order("name")
-        .limit(30);
-      if (products && products.length > 0) {
-        const lines = products.map((p) => {
-          const stockInfo = p.stock !== null && p.stock !== undefined
-            ? ` (${p.stock} ${p.unit || "unidades"} disponibles)`
-            : "";
-          const desc = p.description ? ` — ${p.description}` : "";
-          return `- ${p.name}: ${p.price} ${p.currency}${stockInfo}${desc}`;
-        });
-        productsContext = `\n\nProductos y servicios disponibles:\n${lines.join("\n")}`;
-      }
-    } catch { /* silencioso */ }
+    // Incluir inventario disponible (solo productos con stock > 0)
+    const productsContext = await getInventoryContext(bot.user_id, supabase);
 
     // ── Instrucción estándar de captura de datos de contacto ──
     const leadCaptureInstruction = `
