@@ -11,9 +11,15 @@ interface Product {
   cost_price: number;
   stock: number | null;
   category: string | null;
-  active: boolean;
+  status: "active" | "inactive" | "out_of_stock";
   created_at: string;
 }
+
+const STATUS_MAP: Record<string, { label: string; cls: string }> = {
+  active:       { label: "Activo",    cls: "bg-green-100 text-green-700" },
+  inactive:     { label: "Inactivo",  cls: "bg-gray-100 text-gray-500" },
+  out_of_stock: { label: "Sin stock", cls: "bg-red-100 text-red-600" },
+};
 
 function formatMoney(amount: number) {
   return new Intl.NumberFormat("es", {
@@ -58,8 +64,8 @@ export default function InventoryPage() {
   // ── Derived ─────────────────────────────────────────────────────────────────
   const filtered = products
     .filter((p) => {
-      if (filterActive === "activos")   return p.active;
-      if (filterActive === "inactivos") return !p.active;
+      if (filterActive === "activos")   return p.status === "active";
+      if (filterActive === "inactivos") return p.status !== "active";
       return true;
     })
     .filter((p) =>
@@ -68,7 +74,7 @@ export default function InventoryPage() {
       (p.category ?? "").toLowerCase().includes(search.toLowerCase())
     );
 
-  const activeProducts  = products.filter((p) => p.active);
+  const activeProducts  = products.filter((p) => p.status === "active");
   const lowStock        = products.filter((p) => p.stock !== null && p.stock <= 5);
   const outOfStock      = products.filter((p) => p.stock === 0);
   const totalStockValue = activeProducts.reduce((sum, p) => sum + (p.price * (p.stock ?? 0)), 0);
@@ -234,12 +240,8 @@ export default function InventoryPage() {
 
                       {/* Estado */}
                       <td className="px-4 py-4 text-center">
-                        <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${
-                          product.active
-                            ? "bg-green-100 text-green-700"
-                            : "bg-gray-100 text-gray-500"
-                        }`}>
-                          {product.active ? "Activo" : "Inactivo"}
+                        <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${STATUS_MAP[product.status]?.cls ?? "bg-gray-100 text-gray-500"}`}>
+                          {STATUS_MAP[product.status]?.label ?? product.status}
                         </span>
                       </td>
                     </tr>

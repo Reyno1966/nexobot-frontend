@@ -1,7 +1,7 @@
 # NEXOBOT_BUSINESS — Skill de Referencia
 
 > Módulo de gestión de negocio integrado en el dashboard de NexoBot.
-> Última actualización: 2026-03-13 — Fase 2A: bot conectado al inventario en tiempo real.
+> Última actualización: 2026-03-13 — Fase 2A completa + tablas products/invoices creadas en Supabase.
 
 ---
 
@@ -256,15 +256,60 @@ Si preguntan por algo que no está en la lista, di que no está disponible.
 
 ---
 
+## Estado de tablas en Supabase (2026-03-13)
+
+| Tabla | Estado | Notas |
+|-------|--------|-------|
+| `business_expenses` | ✅ Creada | Schema + RLS + trigger |
+| `business_sales` | ✅ Creada | Schema + RLS + trigger |
+| `business_notes` | ✅ Creada | Schema + RLS + trigger |
+| `products` | ✅ Creada | Incluye `cost_price`, `status` CHECK, RLS, índices, trigger |
+| `invoices` | ✅ Creada | JSONB items, totales auto-calculados, RLS, índice único `(user_id, invoice_number)` |
+
+### Schema `products` (columnas clave)
+```sql
+price       NUMERIC(10,2)  -- precio de venta
+cost_price  NUMERIC(10,2)  -- para calcular margen de ganancia
+stock       INTEGER        -- unidades disponibles
+status      TEXT           -- 'active' | 'inactive' | 'out_of_stock'
+```
+
+### Schema `invoices` (columnas clave)
+```sql
+invoice_number  TEXT    -- auto-generado: INV-YYYY-NNNN
+items           JSONB   -- [{ quantity, unit_price, description }]
+subtotal / tax_amount / total  NUMERIC  -- calculados en API
+status  TEXT  -- 'draft' | 'sent' | 'paid' | 'cancelled'
+```
+
+---
+
+## Fix: mismatch p.active → p.status (2026-03-13)
+
+**Archivo:** `app/dashboard/business/inventory/page.tsx`
+
+La interfaz usaba `active: boolean` pero la API de products devuelve
+`status: "active" | "inactive" | "out_of_stock"`. Corregido:
+
+| Antes | Después |
+|-------|---------|
+| `active: boolean` | `status: "active" \| "inactive" \| "out_of_stock"` |
+| `p.active` | `p.status === "active"` |
+| `!p.active` | `p.status !== "active"` |
+| Badge hardcoded Activo/Inactivo | `STATUS_MAP` con 3 estados + colores |
+
+---
+
 ## Próximos pasos sugeridos
 
 | Prioridad | Tarea | Notas |
 |-----------|-------|-------|
-| 🔴 Obligatorio | Ejecutar `business-module-schema.sql` en Supabase | Sin esto, las APIs fallan con 500 |
-| 🟠 Próxima sesión | `ALTER TABLE products ADD COLUMN cost_price` | Cuando crees la tabla products |
+| ✅ Completado | Ejecutar schema en Supabase | `business_expenses`, `business_sales`, `business_notes`, `products`, `invoices` |
+| ✅ Completado | `cost_price` en `products` | Incluido desde creación de la tabla |
+| ✅ Completado | Bot conectado al inventario | `lib/getInventoryContext.ts` — stock en tiempo real |
+| 🟡 Fase 2B | WhatsApp Business API | Bot responde en WhatsApp con el mismo inventario |
 | 🟡 Sesión futura | Reportes mensuales en PDF | Pro/Premium — usa lib/pdf o similar |
 | 🟡 Sesión futura | Export CSV de gastos/ventas | Pro/Premium |
 | 🟡 Sesión futura | Gráficas de tendencia en overview | Últimos 6 meses (SVG inline o canvas) |
-| ✅ Completado | Bot conectado al inventario | `lib/getInventoryContext.ts` — consulta stock en tiempo real |
 | 🟢 Sesión futura | Plan Business $79 | Si se decide crear plan dedicado |
 | 🟢 Sesión futura | Límites de plan aplicados | Ej. max 10 notas en free |
