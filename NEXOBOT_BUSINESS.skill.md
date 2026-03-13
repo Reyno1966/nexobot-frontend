@@ -1,7 +1,7 @@
 # NEXOBOT_BUSINESS — Skill de Referencia
 
 > Módulo de gestión de negocio integrado en el dashboard de NexoBot.
-> Última actualización: 2026-03-13 — Fase 2A completa + tablas products/invoices creadas en Supabase.
+> Última actualización: 2026-03-13 — Fase 2A completa + i18n landing (en/it).
 
 ---
 
@@ -300,6 +300,25 @@ La interfaz usaba `active: boolean` pero la API de products devuelve
 
 ---
 
+## Landing i18n — Sesión 2026-03-13
+
+### Arquitectura
+- `components/landing/LandingPage.tsx` — diseño único parametrizable con `t: LandingT`
+- `lib/i18n/landing.ts` — tipo `LandingT` + traducciones `es`, `en`, `it`
+- Cada `app/[locale]/page.tsx` = 4 líneas: importa `LandingPage` + traducción
+
+### Sesión 1 completada
+| Idioma | Archivo | Estado |
+|--------|---------|--------|
+| `en` | `app/en/page.tsx` | ✅ — diseño oscuro correcto |
+| `it` | `app/it/page.tsx` | ✅ — reemplaza versión vieja (bg-white, $29/$59/$99) |
+
+### Sesión 2 pendiente — 11 idiomas restantes
+Añadir a `lib/i18n/landing.ts` y crear `app/[locale]/page.tsx`:
+`fr`, `de`, `pt`, `ar`, `zh`, `ja`, `ru`, `ko`, `nl`, `tr`, `id`
+
+---
+
 ## Próximos pasos sugeridos
 
 | Prioridad | Tarea | Notas |
@@ -307,6 +326,8 @@ La interfaz usaba `active: boolean` pero la API de products devuelve
 | ✅ Completado | Ejecutar schema en Supabase | `business_expenses`, `business_sales`, `business_notes`, `products`, `invoices` |
 | ✅ Completado | `cost_price` en `products` | Incluido desde creación de la tabla |
 | ✅ Completado | Bot conectado al inventario | `lib/getInventoryContext.ts` — stock en tiempo real |
+| ✅ Completado | Landing en/it | `LandingPage.tsx` + `lib/i18n/landing.ts` |
+| 🟡 Sesión próxima | Landing 11 idiomas restantes | fr, de, pt, ar, zh, ja, ru, ko, nl, tr, id |
 | 🟡 Fase 2B | WhatsApp Business API | Bot responde en WhatsApp con el mismo inventario |
 | 🟡 Sesión futura | Reportes mensuales en PDF | Pro/Premium — usa lib/pdf o similar |
 | 🟡 Sesión futura | Export CSV de gastos/ventas | Pro/Premium |
