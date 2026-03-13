@@ -34,9 +34,10 @@ export default function LandingPage({ t, locale }: Props) {
   const logoHref = locale === "es" ? "/" : `/${locale}`;
   const year = new Date().getFullYear();
   const copyright = t.footer.copyright.replace("{year}", String(year));
+  const isRTL = locale === "ar";
 
   return (
-    <main className="min-h-screen bg-white text-gray-900 overflow-x-hidden">
+    <main className="min-h-screen bg-white text-gray-900 overflow-x-hidden" dir={isRTL ? "rtl" : "ltr"}>
 
       {/* ── NAVBAR ── */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">

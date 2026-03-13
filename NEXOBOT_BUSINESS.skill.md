@@ -313,9 +313,26 @@ La interfaz usaba `active: boolean` pero la API de products devuelve
 | `en` | `app/en/page.tsx` | ✅ — diseño oscuro correcto |
 | `it` | `app/it/page.tsx` | ✅ — reemplaza versión vieja (bg-white, $29/$59/$99) |
 
-### Sesión 2 pendiente — 11 idiomas restantes
-Añadir a `lib/i18n/landing.ts` y crear `app/[locale]/page.tsx`:
-`fr`, `de`, `pt`, `ar`, `zh`, `ja`, `ru`, `ko`, `nl`, `tr`, `id`
+### Sesión 2 — Grupo 1 completado
+| Idioma | Archivo | Nota |
+|--------|---------|------|
+| `fr` | `app/fr/page.tsx` | ✅ — francés completo |
+| `de` | `app/de/page.tsx` | ✅ — alemán completo |
+| `pt` | `app/pt/page.tsx` | ✅ — portugués completo |
+| `ar` | `app/ar/page.tsx` | ✅ — árabe + `dir="rtl"` en LandingPage |
+| `zh` | `app/zh/page.tsx` | ✅ — chino simplificado completo |
+
+### Sesión 2 — Grupo 2 completado
+| Idioma | Archivo | Nota |
+|--------|---------|------|
+| `ja` | `app/ja/page.tsx` | ✅ — japonés completo |
+| `ru` | `app/ru/page.tsx` | ✅ — ruso completo |
+| `ko` | `app/ko/page.tsx` | ✅ — coreano completo |
+| `nl` | `app/nl/page.tsx` | ✅ — neerlandés completo |
+| `tr` | `app/tr/page.tsx` | ✅ — turco completo |
+| `id` | `app/id/page.tsx` | ✅ — indonesio completo |
+
+**Estado final i18n: 13/13 idiomas completos** — `es, en, it, fr, de, pt, ar, zh, ja, ru, ko, nl, tr, id`
 
 ---
 
@@ -327,7 +344,8 @@ Añadir a `lib/i18n/landing.ts` y crear `app/[locale]/page.tsx`:
 | ✅ Completado | `cost_price` en `products` | Incluido desde creación de la tabla |
 | ✅ Completado | Bot conectado al inventario | `lib/getInventoryContext.ts` — stock en tiempo real |
 | ✅ Completado | Landing en/it | `LandingPage.tsx` + `lib/i18n/landing.ts` |
-| 🟡 Sesión próxima | Landing 11 idiomas restantes | fr, de, pt, ar, zh, ja, ru, ko, nl, tr, id |
+| ✅ Completado | Landing fr/de/pt/ar/zh | Grupo 1 — árabe con RTL |
+| ✅ Completado | Landing ja/ru/ko/nl/tr/id | Grupo 2 — i18n 13/13 completo |
 | 🟡 Fase 2B | WhatsApp Business API | Bot responde en WhatsApp con el mismo inventario |
 | 🟡 Sesión futura | Reportes mensuales en PDF | Pro/Premium — usa lib/pdf o similar |
 | 🟡 Sesión futura | Export CSV de gastos/ventas | Pro/Premium |
