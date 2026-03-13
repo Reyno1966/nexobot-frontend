@@ -692,3 +692,489 @@ export const zh: LandingT = {
   },
   footer: { copyright: "© {year} NexoBot — 保留所有权利。", pricing: "价格", faq: "常见问题", features: "功能", login: "登录", privacy: "隐私政策", terms: "服务条款" },
 };
+
+// ── 日本語 ────────────────────────────────────────────────────────────────────
+export const ja: LandingT = {
+  nav: { features: "機能", pricing: "料金", faq: "よくある質問", login: "ログイン", cta: "無料で始める →" },
+  hero: {
+    badge: "500社以上がNexoBotを信頼",
+    h1: "NexoBotで販売とカスタマーサポートを自動化",
+    subtitle: "顧客に返信し、販売を生み出し、24時間365日あなたのために働くAIアシスタント。時間を節約し、収益を増やし、手間なくスケールアップ。",
+    cta1: "無料で始める →", cta2: "仕組みを見る", noCard: "クレジットカード不要 · いつでもキャンセル可",
+    stats: [
+      { value: "500+", label: "稼働中の企業" },
+      { value: "24/7", label: "稼働時間" },
+      { value: "40%",  label: "平均売上増加" },
+    ],
+    chatOnline: "オンライン中",
+    chatMsg1: "こんにちは！今日はどのようにお役に立てますか？👋",
+    chatMsg2: "プランについて知りたいです",
+    chatMsg3: "もちろんです！月$14からの3つのプランをご用意しています。あなたのビジネスに合うのはどれですか？🚀",
+    chatPlaceholder: "メッセージを入力...",
+    chatBadge1: "✓ 1秒以内に返信", chatBadge2: "🔥 +40%の売上",
+  },
+  trust: "お気に入りのツールと連携",
+  features: {
+    label: "機能", title: "自動化に必要なすべて",
+    subtitle: "NexoBotはAI、自動化、マルチチャネルを組み合わせ、より多くの顧客にサービスを提供し、売上を増加させます。",
+    items: [
+      { title: "数秒で返信",         desc: "ボットが24時間365日自動的に顧客対応。遅延も待ち時間もありません。" },
+      { title: "チャネルを接続",     desc: "WhatsApp、ウェブ、SNS、CRM。NexoBotはエコシステムに簡単に統合できます。" },
+      { title: "売上を増やす",       desc: "スマートフロー、自動ファネル、セグメンテーションでより多くの顧客をコンバージョン。" },
+    ],
+  },
+  howItWorks: {
+    label: "プロセス", title: "3ステップで準備完了", subtitle: "数分でインテリジェントアシスタントをセットアップして販売を開始。",
+    steps: [
+      { title: "ボットを設定",         desc: "レスポンスをカスタマイズし、ブランドのトーンを定義し、ニーズに合わせてアシスタントを設定。" },
+      { title: "チャネルを接続",       desc: "WhatsApp、ウェブ、SNS、CRM。NexoBotがすべてのコミュニケーションを一元管理。" },
+      { title: "自動化してスケール",   desc: "ボットが自動的に顧客対応、リード獲得、売上生成を担当。" },
+    ],
+  },
+  demo: {
+    label: "ライブデモ", title: "NexoBotと話す", titleHighlight: "今すぐ",
+    subtitle: "アカウント不要。ボットが顧客にどう応答するかリアルタイムでテスト。",
+    bullets: ["2秒以内に返信", "本物のAI — スクリプト応答ではない", "ブランドトーンでカスタマイズ可能", "ウェブ、WhatsApp、Instagramで動作"],
+    cta1: "無料ボットを作成 →", cta2: "料金を見る", noCard: "クレジットカード不要 · いつでもキャンセル可",
+  },
+  services: {
+    label: "アドオン", title: "NexoBotを次のレベルへ",
+    subtitle: "プロによるセットアップ、高度なカスタマイズ、カスタム統合。一回払い。",
+    badge: "一回払い", cta: "今すぐ購入",
+    items: [
+      { title: "高度なカスタマイズ",     desc: "ボットをあなたのブランドの声に",     features: ["カスタム調整", "ビジネスに合わせた応答", "会話フローの最適化"] },
+      { title: "高度な自動化",           desc: "ボットを販売マシンに変える",         features: ["カスタムスマートフロー", "高度なセグメンテーション", "自動化ファネル"] },
+      { title: "外部システム統合",       desc: "ボットをエコシステムに接続",         features: ["CRM統合", "外部API接続", "データ同期"] },
+    ],
+  },
+  testimonials: {
+    label: "お客様の声", title: "お客様からの評価", subtitle: "実際のビジネス、実際の結果。",
+    items: [
+      { name: "Maria Lopez",      role: "オンラインアクセサリーショップ", quote: "NexoBotは私が寝ている間も顧客に返信してくれます。最初の月に40%の売上増加を達成しました。" },
+      { name: "Carlos Fernandez", role: "プロフェッショナルサービス",     quote: "WhatsApp統合はあっという間でした。今では自動化された営業フローがすべての見込み客を管理しています。" },
+      { name: "Ana Rodriguez",    role: "デジタル起業家",                 quote: "サポートは素晴らしいです。ボットをカスタマイズするのを助けてもらい、今では1日300件以上の問い合わせを処理しています。" },
+    ],
+  },
+  faq: {
+    label: "よくある質問", title: "よくある質問", subtitle: "安心してスタートするために必要なすべて。",
+    items: [
+      { q: "NexoBotを使うのに技術的な知識は必要ですか？",   a: "不要です。NexoBotは誰でも数分でセットアップできるよう設計されています。" },
+      { q: "WhatsAppでNexoBotを使えますか？",               a: "はい。ProとPremiumプランにはWhatsApp統合が含まれています。" },
+      { q: "メッセージ制限を超えるとどうなりますか？",       a: "制限に達する前にお知らせします。いつでもプランをアップグレードできます。" },
+      { q: "いつでもキャンセルできますか？",                 a: "はい。契約や縛りはありません。ダッシュボードからいつでもキャンセル可能です。" },
+      { q: "サポートはありますか？",                         a: "すべてのプランにサポートが含まれています。Premiumプランは優先サポートです。" },
+      { q: "NexoBotをウェブサイトに統合できますか？",        a: "はい。すべてのプランに簡単に設置できるウィジェットが含まれています。" },
+    ],
+  },
+  cta: {
+    title: "今日からビジネスを自動化", titleHighlight: "NexoBotで",
+    subtitle: "24時間365日、顧客への返信、売上創出、スケールアップをインテリジェントアシスタントで実現。",
+    button: "無料で始める →", noCard: "クレジットカード不要 · いつでもキャンセル可",
+  },
+  footer: { copyright: "© {year} NexoBot — 全著作権所有。", pricing: "料金", faq: "よくある質問", features: "機能", login: "ログイン", privacy: "プライバシーポリシー", terms: "利用規約" },
+};
+
+// ── РУССКИЙ ───────────────────────────────────────────────────────────────────
+export const ru: LandingT = {
+  nav: { features: "Возможности", pricing: "Цены", faq: "FAQ", login: "Войти", cta: "Начать бесплатно →" },
+  hero: {
+    badge: "Более 500 компаний доверяют NexoBot",
+    h1: "Автоматизируйте продажи и поддержку клиентов с NexoBot",
+    subtitle: "Ваш AI-ассистент, который отвечает клиентам, генерирует продажи и работает за вас 24/7. Экономьте время, увеличивайте доход и масштабируйтесь без усилий.",
+    cta1: "Начать бесплатно →", cta2: "Узнать как это работает", noCard: "Без кредитной карты · Отмена в любое время",
+    stats: [
+      { value: "500+", label: "Активных компаний" },
+      { value: "24/7", label: "Доступность" },
+      { value: "40%",  label: "Рост продаж" },
+    ],
+    chatOnline: "Онлайн сейчас",
+    chatMsg1: "Привет! Как я могу помочь вам сегодня? 👋",
+    chatMsg2: "Хочу узнать о ваших тарифах",
+    chatMsg3: "Конечно! У нас есть 3 тарифа от $14/мес. Какой подходит вашему бизнесу? 🚀",
+    chatPlaceholder: "Написать сообщение...",
+    chatBadge1: "✓ Ответ за 1 сек", chatBadge2: "🔥 +40% продаж",
+  },
+  trust: "Совместимость с вашими любимыми инструментами",
+  features: {
+    label: "Возможности", title: "Всё необходимое для автоматизации",
+    subtitle: "NexoBot сочетает AI, автоматизацию и многоканальность для обслуживания большего числа клиентов и увеличения продаж.",
+    items: [
+      { title: "Отвечает за секунды",      desc: "Ваш бот автоматически обслуживает клиентов 24/7 без задержек и ожидания." },
+      { title: "Подключайте каналы",       desc: "WhatsApp, веб, соцсети или CRM. NexoBot легко интегрируется в вашу экосистему." },
+      { title: "Генерируйте больше продаж", desc: "Умные сценарии, автоматические воронки и сегментация для конверсии большего числа клиентов." },
+    ],
+  },
+  howItWorks: {
+    label: "Процесс", title: "Готово за 3 шага", subtitle: "Настройте интеллектуального ассистента за несколько минут и начните продавать.",
+    steps: [
+      { title: "Настройте бота",         desc: "Настройте ответы, определите тон бренда и адаптируйте ассистента под ваши потребности." },
+      { title: "Подключите каналы",      desc: "WhatsApp, веб, соцсети или CRM. NexoBot централизует все ваши коммуникации." },
+      { title: "Автоматизируйте и расти", desc: "Ваш бот обслуживает клиентов, захватывает лиды и генерирует продажи автоматически." },
+    ],
+  },
+  demo: {
+    label: "Живое демо", title: "Поговорите с NexoBot", titleHighlight: "прямо сейчас",
+    subtitle: "Аккаунт не нужен. Протестируйте в реальном времени, как ваш бот будет отвечать клиентам.",
+    bullets: ["Ответы менее чем за 2 секунды", "Настоящий AI — не заскриптованные ответы", "Настраивается под тон вашего бренда", "Работает в веб, WhatsApp и Instagram"],
+    cta1: "Создать бесплатного бота →", cta2: "Посмотреть цены", noCard: "Без кредитной карты · Отмена в любое время",
+  },
+  services: {
+    label: "Дополнения", title: "Выведите NexoBot на новый уровень",
+    subtitle: "Профессиональная настройка, расширенная кастомизация и пользовательские интеграции. Единовременная оплата.",
+    badge: "Единовременная оплата", cta: "Купить сейчас",
+    items: [
+      { title: "Расширенная кастомизация", desc: "Сделайте бота голосом вашего бренда",    features: ["Индивидуальные настройки", "Ответы под ваш бизнес", "Оптимизация сценариев"] },
+      { title: "Расширенная автоматизация", desc: "Превратите бота в машину продаж",        features: ["Пользовательские умные сценарии", "Расширенная сегментация", "Автоматические воронки"] },
+      { title: "Интеграция с системами",    desc: "Подключите бота к вашей экосистеме",     features: ["Интеграция с CRM", "Подключение к внешним API", "Синхронизация данных"] },
+    ],
+  },
+  testimonials: {
+    label: "Отзывы", title: "Что говорят наши клиенты", subtitle: "Реальный бизнес, реальные результаты.",
+    items: [
+      { name: "Maria Lopez",      role: "Интернет-магазин аксессуаров", quote: "NexoBot отвечает моим клиентам даже пока я сплю. Продажи выросли на 40% в первый месяц без лишних усилий." },
+      { name: "Carlos Fernandez", role: "Профессиональные услуги",      quote: "Интеграция с WhatsApp была молниеносной. Теперь автоматизированная воронка продаж ведёт всех моих клиентов без моего участия." },
+      { name: "Ana Rodriguez",    role: "Цифровой предприниматель",     quote: "Поддержка отличная. Помогли настроить бота, и теперь он обрабатывает более 300 запросов в день без потери качества." },
+    ],
+  },
+  faq: {
+    label: "FAQ", title: "Часто задаваемые вопросы", subtitle: "Всё, что нужно для уверенного старта.",
+    items: [
+      { q: "Нужны ли технические знания для использования NexoBot?", a: "Нет. NexoBot разработан так, чтобы любой мог настроить его за несколько минут без технических знаний." },
+      { q: "Могу ли я использовать NexoBot в WhatsApp?",              a: "Да. Тарифы Pro и Premium включают интеграцию с WhatsApp для автоматизации диалогов и продаж." },
+      { q: "Что будет, если я превышу лимит сообщений?",             a: "Мы уведомим вас до достижения лимита. Вы можете обновить тариф в любое время без перебоев." },
+      { q: "Могу ли я отменить в любое время?",                      a: "Да. Без договоров и обязательств. Отмените подписку в любое время из панели управления." },
+      { q: "Предоставляется ли поддержка?",                          a: "Все тарифы включают поддержку. Тариф Premium предоставляет приоритетную поддержку." },
+      { q: "Могу ли я интегрировать NexoBot на свой сайт?",          a: "Да. Все тарифы включают простой в установке виджет для подключения NexoBot к вашему сайту за несколько минут." },
+    ],
+  },
+  cta: {
+    title: "Автоматизируйте бизнес сегодня", titleHighlight: "с NexoBot",
+    subtitle: "Отвечайте клиентам, генерируйте продажи и масштабируйтесь 24/7 с вашим интеллектуальным ассистентом.",
+    button: "Начать бесплатно →", noCard: "Без кредитной карты · Отмена в любое время",
+  },
+  footer: { copyright: "© {year} NexoBot — Все права защищены.", pricing: "Цены", faq: "FAQ", features: "Возможности", login: "Войти", privacy: "Конфиденциальность", terms: "Условия" },
+};
+
+// ── 한국어 ────────────────────────────────────────────────────────────────────
+export const ko: LandingT = {
+  nav: { features: "기능", pricing: "요금", faq: "자주 묻는 질문", login: "로그인", cta: "무료로 시작 →" },
+  hero: {
+    badge: "500개 이상의 기업이 NexoBot을 신뢰합니다",
+    h1: "NexoBot으로 판매 및 고객 지원 자동화",
+    subtitle: "고객에게 응답하고, 판매를 창출하며, 24/7 당신을 위해 일하는 AI 어시스턴트. 시간을 절약하고, 수익을 늘리고, 손쉽게 확장하세요.",
+    cta1: "무료로 시작 →", cta2: "작동 방식 보기", noCard: "신용카드 불필요 · 언제든지 취소 가능",
+    stats: [
+      { value: "500+", label: "활성 기업" },
+      { value: "24/7", label: "가동 시간" },
+      { value: "40%",  label: "평균 매출 증가" },
+    ],
+    chatOnline: "지금 온라인",
+    chatMsg1: "안녕하세요! 오늘 어떻게 도와드릴까요? 👋",
+    chatMsg2: "요금제에 대해 알고 싶어요",
+    chatMsg3: "물론이죠! 월 $14부터 시작하는 3가지 요금제가 있습니다. 어떤 것이 귀하의 비즈니스에 맞나요? 🚀",
+    chatPlaceholder: "메시지를 입력하세요...",
+    chatBadge1: "✓ 1초 내 응답", chatBadge2: "🔥 +40% 매출",
+  },
+  trust: "좋아하는 도구와 호환 가능",
+  features: {
+    label: "기능", title: "자동화에 필요한 모든 것",
+    subtitle: "NexoBot은 AI, 자동화, 멀티채널을 결합하여 더 많은 고객을 서비스하고 더 많이 판매합니다.",
+    items: [
+      { title: "몇 초 만에 응답",     desc: "봇이 24/7 자동으로 고객을 처리합니다. 지연이나 대기 없이." },
+      { title: "채널 연결",           desc: "WhatsApp, 웹, 소셜 미디어 또는 CRM. NexoBot은 에코시스템과 쉽게 통합됩니다." },
+      { title: "더 많은 매출 창출",   desc: "스마트 플로우, 자동화된 퍼널, 세분화로 더 많은 고객을 전환하세요." },
+    ],
+  },
+  howItWorks: {
+    label: "프로세스", title: "3단계로 준비 완료", subtitle: "몇 분 안에 지능형 어시스턴트를 설정하고 판매를 시작하세요.",
+    steps: [
+      { title: "봇 설정",           desc: "응답을 맞춤화하고, 브랜드 톤을 정의하고, 어시스턴트를 필요에 맞게 구성하세요." },
+      { title: "채널 연결",         desc: "WhatsApp, 웹, 소셜 미디어 또는 CRM. NexoBot이 모든 커뮤니케이션을 중앙화합니다." },
+      { title: "자동화 및 확장",    desc: "봇이 자동으로 고객을 처리하고, 리드를 포착하고, 판매를 생성합니다." },
+    ],
+  },
+  demo: {
+    label: "라이브 데모", title: "NexoBot과 대화하기", titleHighlight: "지금 바로",
+    subtitle: "계정 불필요. 봇이 고객에게 어떻게 응답하는지 실시간으로 테스트하세요.",
+    bullets: ["2초 이내 응답", "진짜 AI — 스크립트 답변이 아님", "브랜드 톤으로 맞춤화 가능", "웹, WhatsApp 및 Instagram에서 작동"],
+    cta1: "무료 봇 만들기 →", cta2: "요금 보기", noCard: "신용카드 불필요 · 언제든지 취소 가능",
+  },
+  services: {
+    label: "애드온", title: "NexoBot을 다음 단계로",
+    subtitle: "전문 설정, 고급 맞춤화, 커스텀 통합. 일회성 결제.",
+    badge: "일회성 결제", cta: "지금 구매",
+    items: [
+      { title: "고급 맞춤화",     desc: "봇을 브랜드의 목소리로",         features: ["맞춤 조정", "비즈니스에 맞는 응답", "대화 플로우 최적화"] },
+      { title: "고급 자동화",     desc: "봇을 판매 기계로 변환",           features: ["커스텀 스마트 플로우", "고급 세분화", "자동화된 퍼널"] },
+      { title: "외부 시스템 통합", desc: "봇을 에코시스템과 연결",         features: ["CRM 통합", "외부 API 연결", "데이터 동기화"] },
+    ],
+  },
+  testimonials: {
+    label: "후기", title: "고객들의 이야기", subtitle: "실제 비즈니스, 실제 결과.",
+    items: [
+      { name: "Maria Lopez",      role: "온라인 액세서리 스토어", quote: "NexoBot은 제가 자는 동안에도 고객에게 응답합니다. 첫 달에 추가 노력 없이 40% 매출 증가를 달성했어요." },
+      { name: "Carlos Fernandez", role: "전문 서비스",            quote: "WhatsApp 통합은 순식간이었습니다. 이제 자동화된 영업 플로우가 제 모든 잠재 고객을 관리합니다." },
+      { name: "Ana Rodriguez",    role: "디지털 기업가",          quote: "지원이 훌륭합니다. 봇을 맞춤화하도록 도와줬고, 이제 하루 300건 이상의 문의를 처리합니다." },
+    ],
+  },
+  faq: {
+    label: "자주 묻는 질문", title: "자주 묻는 질문", subtitle: "완전한 자신감으로 시작하는 데 필요한 모든 것.",
+    items: [
+      { q: "NexoBot을 사용하는 데 기술적인 지식이 필요한가요?", a: "아니요. NexoBot은 누구나 기술적 지식 없이 몇 분 안에 설정할 수 있도록 설계되었습니다." },
+      { q: "WhatsApp에서 NexoBot을 사용할 수 있나요?",          a: "예. Pro 및 Premium 플랜에는 대화와 판매를 자동화하는 WhatsApp 통합이 포함됩니다." },
+      { q: "메시지 한도를 초과하면 어떻게 되나요?",             a: "한도에 도달하기 전에 알려드립니다. 중단 없이 언제든지 플랜을 업그레이드할 수 있습니다." },
+      { q: "언제든지 취소할 수 있나요?",                        a: "예. 계약이나 약정이 없습니다. 대시보드에서 언제든지 구독을 취소하세요." },
+      { q: "지원이 제공되나요?",                                a: "모든 플랜에 지원이 포함됩니다. Premium 플랜은 우선 지원을 제공합니다." },
+      { q: "NexoBot을 웹사이트에 통합할 수 있나요?",            a: "예. 모든 플랜에는 몇 분 안에 NexoBot을 웹사이트에 연결하는 설치하기 쉬운 위젯이 포함됩니다." },
+    ],
+  },
+  cta: {
+    title: "오늘 비즈니스를 자동화하세요", titleHighlight: "NexoBot으로",
+    subtitle: "인텔리전트 어시스턴트로 24/7 고객 응답, 판매 창출, 확장을 실현하세요.",
+    button: "무료로 시작 →", noCard: "신용카드 불필요 · 언제든지 취소 가능",
+  },
+  footer: { copyright: "© {year} NexoBot — 모든 권리 보유.", pricing: "요금", faq: "자주 묻는 질문", features: "기능", login: "로그인", privacy: "개인정보처리방침", terms: "이용약관" },
+};
+
+// ── NEDERLANDS ────────────────────────────────────────────────────────────────
+export const nl: LandingT = {
+  nav: { features: "Functies", pricing: "Prijzen", faq: "FAQ", login: "Inloggen", cta: "Gratis starten →" },
+  hero: {
+    badge: "Meer dan 500 bedrijven vertrouwen NexoBot",
+    h1: "Automatiseer verkoop en klantenservice met NexoBot",
+    subtitle: "Uw AI-assistent die klanten beantwoordt, verkoop genereert en 24/7 voor u werkt. Bespaar tijd, verhoog inkomsten en schaal moeiteloos op.",
+    cta1: "Gratis starten →", cta2: "Bekijk hoe het werkt", noCard: "Geen creditcard vereist · Altijd opzegbaar",
+    stats: [
+      { value: "500+", label: "Actieve bedrijven" },
+      { value: "24/7", label: "Beschikbaarheid" },
+      { value: "40%",  label: "Gem. omzetgroei" },
+    ],
+    chatOnline: "Nu online",
+    chatMsg1: "Hallo! Hoe kan ik u vandaag helpen? 👋",
+    chatMsg2: "Ik wil informatie over uw plannen",
+    chatMsg3: "Zeker! We hebben 3 plannen vanaf $14/maand. Welk past bij uw bedrijf? 🚀",
+    chatPlaceholder: "Schrijf een bericht...",
+    chatBadge1: "✓ Beantwoord in 1s", chatBadge2: "🔥 +40% omzet",
+  },
+  trust: "Compatibel met uw favoriete tools",
+  features: {
+    label: "Functies", title: "Alles wat u nodig heeft om te automatiseren",
+    subtitle: "NexoBot combineert AI, automatisering en meerdere kanalen om meer klanten te bedienen en meer te verkopen.",
+    items: [
+      { title: "Antwoordt in seconden",      desc: "Uw bot bedient klanten automatisch 24/7 zonder vertragingen of wachttijden." },
+      { title: "Verbind uw kanalen",         desc: "WhatsApp, web, social media of CRM. NexoBot integreert eenvoudig in uw ecosysteem." },
+      { title: "Genereer meer verkopen",     desc: "Slimme flows, geautomatiseerde funnels en segmentatie om meer klanten te converteren." },
+    ],
+  },
+  howItWorks: {
+    label: "Proces", title: "Klaar in 3 stappen", subtitle: "Stel uw intelligente assistent in minuten in en begin met verkopen.",
+    steps: [
+      { title: "Stel uw bot in",         desc: "Pas antwoorden aan, definieer uw merktoon en configureer de assistent naar uw behoeften." },
+      { title: "Verbind uw kanalen",     desc: "WhatsApp, web, social media of CRM. NexoBot centraliseert al uw communicatie." },
+      { title: "Automatiseer en schaal", desc: "Uw bot bedient klanten, legt leads vast en genereert automatisch verkopen." },
+    ],
+  },
+  demo: {
+    label: "Live demo", title: "Praat met NexoBot", titleHighlight: "nu meteen",
+    subtitle: "Geen account nodig. Test in realtime hoe uw bot uw klanten zal beantwoorden.",
+    bullets: ["Antwoorden in minder dan 2 seconden", "Echte AI — geen gescripte antwoorden", "Aanpasbaar met uw merktoon", "Werkt op web, WhatsApp en Instagram"],
+    cta1: "Maak mijn gratis bot →", cta2: "Bekijk prijzen", noCard: "Geen creditcard vereist · Altijd opzegbaar",
+  },
+  services: {
+    label: "Add-ons", title: "Breng uw NexoBot naar het volgende niveau",
+    subtitle: "Professionele installatie, geavanceerde aanpassing en maatwerkintegraties. Eenmalige betaling.",
+    badge: "Eenmalige betaling", cta: "Nu kopen",
+    items: [
+      { title: "Geavanceerde aanpassing", desc: "Laat uw bot spreken in uw merkstem",    features: ["Aangepaste aanpassingen", "Antwoorden afgestemd op uw bedrijf", "Optimalisatie van conversatieflow"] },
+      { title: "Geavanceerde automatisering", desc: "Maak van uw bot een verkoopkracht", features: ["Aangepaste slimme flows", "Geavanceerde segmentatie", "Geautomatiseerde funnels"] },
+      { title: "Externe systeemintegratie", desc: "Verbind uw bot met uw ecosysteem",    features: ["CRM-integratie", "Verbindingen met externe API's", "Datasynchronisatie"] },
+    ],
+  },
+  testimonials: {
+    label: "Getuigenissen", title: "Wat onze klanten zeggen", subtitle: "Echte bedrijven, echte resultaten.",
+    items: [
+      { name: "Maria Lopez",      role: "Online accessoirewinkel", quote: "NexoBot beantwoordt mijn klanten zelfs terwijl ik slaap. Mijn verkoop steeg 40% in de eerste maand zonder extra moeite." },
+      { name: "Carlos Fernandez", role: "Professionele diensten",  quote: "WhatsApp-integratie was bliksemsnel. Nu heb ik een geautomatiseerde verkoopflow die al mijn prospects beheert." },
+      { name: "Ana Rodriguez",    role: "Digitale ondernemer",     quote: "De ondersteuning is uitstekend. Ze hielpen mij mijn bot aan te passen en nu verwerkt het meer dan 300 vragen per dag." },
+    ],
+  },
+  faq: {
+    label: "FAQ", title: "Veelgestelde vragen", subtitle: "Alles wat u nodig heeft om vol vertrouwen te starten.",
+    items: [
+      { q: "Heb ik technische kennis nodig om NexoBot te gebruiken?", a: "Nee. NexoBot is ontworpen zodat iedereen het in minuten kan instellen zonder technische kennis." },
+      { q: "Kan ik NexoBot op WhatsApp gebruiken?",                   a: "Ja. Pro- en Premium-plannen bevatten WhatsApp-integratie om uw gesprekken en verkoop te automatiseren." },
+      { q: "Wat gebeurt er als ik de berichtenlimiet overschrijd?",   a: "We stellen u op de hoogte voordat u de limiet bereikt. U kunt uw plan op elk moment upgraden." },
+      { q: "Kan ik op elk moment opzeggen?",                         a: "Ja. Geen contracten of verplichtingen. Zeg uw abonnement op elk moment op via uw dashboard." },
+      { q: "Biedt u ondersteuning?",                                 a: "Alle plannen omvatten ondersteuning. Het Premium-plan heeft prioriteitsondersteuning." },
+      { q: "Kan ik NexoBot integreren met mijn website?",            a: "Ja. Alle plannen omvatten een eenvoudig te installeren widget om NexoBot in minuten met uw website te verbinden." },
+    ],
+  },
+  cta: {
+    title: "Automatiseer uw bedrijf vandaag", titleHighlight: "met NexoBot",
+    subtitle: "Beantwoord klanten, genereer verkopen en schaal 24/7 op met uw intelligente assistent.",
+    button: "Gratis starten →", noCard: "Geen creditcard vereist · Altijd opzegbaar",
+  },
+  footer: { copyright: "© {year} NexoBot — Alle rechten voorbehouden.", pricing: "Prijzen", faq: "FAQ", features: "Functies", login: "Inloggen", privacy: "Privacy", terms: "Voorwaarden" },
+};
+
+// ── TÜRKÇE ────────────────────────────────────────────────────────────────────
+export const tr: LandingT = {
+  nav: { features: "Özellikler", pricing: "Fiyatlar", faq: "SSS", login: "Giriş yap", cta: "Ücretsiz başla →" },
+  hero: {
+    badge: "500'den fazla şirket NexoBot'a güveniyor",
+    h1: "NexoBot ile satışlarınızı ve müşteri desteğinizi otomatikleştirin",
+    subtitle: "Müşterilere yanıt veren, satış üreten ve 7/24 sizin için çalışan yapay zeka asistanınız. Zaman kazanın, gelir artırın ve zahmetsizce büyüyün.",
+    cta1: "Ücretsiz başla →", cta2: "Nasıl çalıştığını gör", noCard: "Kredi kartı gerekmez · İstediğiniz zaman iptal",
+    stats: [
+      { value: "500+", label: "Aktif şirket" },
+      { value: "24/7", label: "Erişilebilirlik" },
+      { value: "40%",  label: "Ortalama satış artışı" },
+    ],
+    chatOnline: "Şu an çevrimiçi",
+    chatMsg1: "Merhaba! Bugün size nasıl yardımcı olabilirim? 👋",
+    chatMsg2: "Planlarınız hakkında bilgi almak istiyorum",
+    chatMsg3: "Tabii ki! Ayda $14'dan başlayan 3 planımız var. İşletmenize hangisi uygun? 🚀",
+    chatPlaceholder: "Mesaj yazın...",
+    chatBadge1: "✓ 1 saniyede yanıt", chatBadge2: "🔥 +40% satış",
+  },
+  trust: "Favori araçlarınızla uyumlu",
+  features: {
+    label: "Özellikler", title: "Otomatikleştirmek için ihtiyacınız olan her şey",
+    subtitle: "NexoBot, daha fazla müşteriye hizmet vermek ve daha fazla satmak için yapay zeka, otomasyon ve çok kanallılığı birleştirir.",
+    items: [
+      { title: "Saniyeler içinde yanıt",    desc: "Botunuz müşterileri 7/24 otomatik olarak karşılar. Gecikme veya bekleme yok." },
+      { title: "Kanallarınızı bağlayın",   desc: "WhatsApp, web, sosyal medya veya CRM. NexoBot ekosisteминizle kolayca entegre olur." },
+      { title: "Daha fazla satış üretin",  desc: "Akıllı akışlar, otomatik huniler ve segmentasyon ile daha fazla müşteriyi dönüştürün." },
+    ],
+  },
+  howItWorks: {
+    label: "Süreç", title: "3 adımda hazır", subtitle: "Dakikalar içinde akıllı asistanınızı kurun ve satışa başlayın.",
+    steps: [
+      { title: "Botunuzu kurun",           desc: "Yanıtları özelleştirin, marka tonunuzu tanımlayın ve asistanı ihtiyaçlarınıza göre yapılandırın." },
+      { title: "Kanallarınızı bağlayın",   desc: "WhatsApp, web, sosyal medya veya CRM. NexoBot tüm iletişiminizi merkezileştirir." },
+      { title: "Otomatikleştir ve büyü",   desc: "Botunuz otomatik olarak müşterileri karşılar, lead yakalar ve satış üretir." },
+    ],
+  },
+  demo: {
+    label: "Canlı demo", title: "NexoBot ile konuş", titleHighlight: "hemen şimdi",
+    subtitle: "Hesap gerekmez. Botunuzun müşterilere nasıl yanıt vereceğini gerçek zamanlı test edin.",
+    bullets: ["2 saniyeden az yanıt süresi", "Gerçek yapay zeka — komut dosyası yanıtları değil", "Marka tonunuzla özelleştirilebilir", "Web, WhatsApp ve Instagram'da çalışır"],
+    cta1: "Ücretsiz botumu oluştur →", cta2: "Fiyatları gör", noCard: "Kredi kartı gerekmez · İstediğiniz zaman iptal",
+  },
+  services: {
+    label: "Eklentiler", title: "NexoBot'unuzu bir üst seviyeye taşıyın",
+    subtitle: "Profesyonel kurulum, gelişmiş özelleştirme ve özel entegrasyonlar. Tek seferlik ödeme.",
+    badge: "Tek seferlik ödeme", cta: "Şimdi satın al",
+    items: [
+      { title: "Gelişmiş özelleştirme",   desc: "Botunuzu markanızın sesi yapın",      features: ["Özel ayarlamalar", "İşletmenize uygun yanıtlar", "Konuşma akışı optimizasyonu"] },
+      { title: "Gelişmiş otomasyonlar",   desc: "Botunuzu satış makinesine dönüştürün", features: ["Özel akıllı akışlar", "Gelişmiş segmentasyon", "Otomatik huniler"] },
+      { title: "Harici sistem entegrasyonu", desc: "Botunuzu ekosisteминize bağlayın", features: ["CRM entegrasyonu", "Harici API bağlantıları", "Veri senkronizasyonu"] },
+    ],
+  },
+  testimonials: {
+    label: "Referanslar", title: "Müşterilerimiz ne diyor", subtitle: "Gerçek işletmeler, gerçek sonuçlar.",
+    items: [
+      { name: "Maria Lopez",      role: "Online aksesuar mağazası", quote: "NexoBot uyurken bile müşterilerime yanıt veriyor. İlk ayda ek çaba olmadan %40 satış artışı elde ettim." },
+      { name: "Carlos Fernandez", role: "Profesyonel hizmetler",    quote: "WhatsApp entegrasyonu çok hızlıydı. Artık otomatik satış akışım tüm potansiyel müşterilerimi yönetiyor." },
+      { name: "Ana Rodriguez",    role: "Dijital girişimci",        quote: "Destek mükemmel. Botumu özelleştirmeme yardım ettiler ve artık günde 300'den fazla soruyu kalite kaybetmeden işliyor." },
+    ],
+  },
+  faq: {
+    label: "SSS", title: "Sık sorulan sorular", subtitle: "Tam güvenle başlamak için ihtiyacınız olan her şey.",
+    items: [
+      { q: "NexoBot'u kullanmak için teknik bilgi gerekiyor mu?", a: "Hayır. NexoBot, herkesin teknik bilgi olmadan dakikalar içinde kurabilmesi için tasarlanmıştır." },
+      { q: "NexoBot'u WhatsApp'ta kullanabilir miyim?",           a: "Evet. Pro ve Premium planlar, konuşmalarınızı ve satışlarınızı otomatikleştirmek için WhatsApp entegrasyonu içerir." },
+      { q: "Mesaj limitini aşarsam ne olur?",                    a: "Limite ulaşmadan önce sizi bilgilendiririz. Kesinti olmadan istediğiniz zaman planınızı yükseltebilirsiniz." },
+      { q: "İstediğim zaman iptal edebilir miyim?",              a: "Evet. Sözleşme veya taahhüt yok. Aboneliğinizi panodan istediğiniz zaman iptal edin." },
+      { q: "Destek sunuyor musunuz?",                            a: "Tüm planlar destek içerir. Premium plan, daha hızlı yanıtlar için öncelikli destek sunar." },
+      { q: "NexoBot'u web siteme entegre edebilir miyim?",       a: "Evet. Tüm planlar, NexoBot'u dakikalar içinde web sitenize bağlamak için kolay kurulumlu bir widget içerir." },
+    ],
+  },
+  cta: {
+    title: "İşletmenizi bugün otomatikleştirin", titleHighlight: "NexoBot ile",
+    subtitle: "Akıllı asistanınızla 7/24 müşterilere yanıt verin, satış üretin ve büyüyün.",
+    button: "Ücretsiz başla →", noCard: "Kredi kartı gerekmez · İstediğiniz zaman iptal",
+  },
+  footer: { copyright: "© {year} NexoBot — Tüm hakları saklıdır.", pricing: "Fiyatlar", faq: "SSS", features: "Özellikler", login: "Giriş yap", privacy: "Gizlilik", terms: "Koşullar" },
+};
+
+// ── BAHASA INDONESIA ──────────────────────────────────────────────────────────
+export const id: LandingT = {
+  nav: { features: "Fitur", pricing: "Harga", faq: "FAQ", login: "Masuk", cta: "Mulai gratis →" },
+  hero: {
+    badge: "Lebih dari 500 bisnis mempercayai NexoBot",
+    h1: "Otomatiskan penjualan dan dukungan pelanggan dengan NexoBot",
+    subtitle: "Asisten AI Anda yang membalas pelanggan, menghasilkan penjualan, dan bekerja untuk Anda 24/7. Hemat waktu, tingkatkan pendapatan, dan skalakan tanpa kesulitan.",
+    cta1: "Mulai gratis →", cta2: "Lihat cara kerjanya", noCard: "Tanpa kartu kredit · Batalkan kapan saja",
+    stats: [
+      { value: "500+", label: "Bisnis aktif" },
+      { value: "24/7", label: "Ketersediaan" },
+      { value: "40%",  label: "Rata-rata peningkatan penjualan" },
+    ],
+    chatOnline: "Online sekarang",
+    chatMsg1: "Halo! Bagaimana saya bisa membantu Anda hari ini? 👋",
+    chatMsg2: "Saya ingin info tentang paket kalian",
+    chatMsg3: "Tentu! Kami punya 3 paket mulai dari $14/bulan. Mana yang cocok untuk bisnis Anda? 🚀",
+    chatPlaceholder: "Tulis pesan...",
+    chatBadge1: "✓ Dibalas dalam 1 detik", chatBadge2: "🔥 +40% penjualan",
+  },
+  trust: "Kompatibel dengan alat favorit Anda",
+  features: {
+    label: "Fitur", title: "Semua yang Anda butuhkan untuk otomatisasi",
+    subtitle: "NexoBot menggabungkan AI, otomasi, dan multisaluran untuk melayani lebih banyak pelanggan dan menjual lebih banyak.",
+    items: [
+      { title: "Membalas dalam hitungan detik", desc: "Bot Anda melayani pelanggan secara otomatis 24/7 tanpa penundaan atau menunggu." },
+      { title: "Hubungkan saluran Anda",        desc: "WhatsApp, web, media sosial, atau CRM. NexoBot terintegrasi dengan mudah ke ekosistem Anda." },
+      { title: "Hasilkan lebih banyak penjualan", desc: "Alur cerdas, corong otomatis, dan segmentasi untuk mengonversi lebih banyak pelanggan." },
+    ],
+  },
+  howItWorks: {
+    label: "Proses", title: "Siap dalam 3 langkah", subtitle: "Siapkan asisten cerdas Anda dalam hitungan menit dan mulai berjualan.",
+    steps: [
+      { title: "Atur bot Anda",              desc: "Sesuaikan respons, tentukan nada merek Anda, dan konfigurasikan asisten sesuai kebutuhan." },
+      { title: "Hubungkan saluran Anda",     desc: "WhatsApp, web, media sosial, atau CRM. NexoBot memusatkan semua komunikasi Anda." },
+      { title: "Otomatisasi dan skalakan",   desc: "Bot Anda secara otomatis melayani pelanggan, menangkap prospek, dan menghasilkan penjualan." },
+    ],
+  },
+  demo: {
+    label: "Demo langsung", title: "Bicara dengan NexoBot", titleHighlight: "sekarang juga",
+    subtitle: "Tidak perlu akun. Uji secara real-time bagaimana bot Anda akan membalas pelanggan.",
+    bullets: ["Respons dalam kurang dari 2 detik", "AI nyata — bukan balasan terskripsi", "Dapat disesuaikan dengan nada merek Anda", "Berfungsi di web, WhatsApp, dan Instagram"],
+    cta1: "Buat bot gratis saya →", cta2: "Lihat harga", noCard: "Tanpa kartu kredit · Batalkan kapan saja",
+  },
+  services: {
+    label: "Add-on", title: "Bawa NexoBot Anda ke level berikutnya",
+    subtitle: "Penyiapan profesional, kustomisasi lanjutan, dan integrasi kustom. Pembayaran satu kali.",
+    badge: "Pembayaran satu kali", cta: "Beli sekarang",
+    items: [
+      { title: "Kustomisasi lanjutan",      desc: "Buat bot berbicara dengan suara merek Anda",     features: ["Penyesuaian kustom", "Respons disesuaikan bisnis", "Optimasi alur percakapan"] },
+      { title: "Otomasi lanjutan",          desc: "Ubah bot Anda menjadi mesin penjualan",          features: ["Alur cerdas kustom", "Segmentasi lanjutan", "Corong otomatis"] },
+      { title: "Integrasi sistem eksternal", desc: "Hubungkan bot Anda dengan ekosistem Anda",      features: ["Integrasi CRM", "Koneksi API eksternal", "Sinkronisasi data"] },
+    ],
+  },
+  testimonials: {
+    label: "Testimoni", title: "Apa yang dikatakan pelanggan kami", subtitle: "Bisnis nyata, hasil nyata.",
+    items: [
+      { name: "Maria Lopez",      role: "Toko aksesori online",    quote: "NexoBot membalas pelanggan saya bahkan saat saya tidur. Penjualan saya naik 40% di bulan pertama tanpa usaha ekstra." },
+      { name: "Carlos Fernandez", role: "Layanan profesional",     quote: "Integrasi WhatsApp sangat cepat. Kini saya punya alur penjualan otomatis yang menangani semua prospek tanpa saya harus hadir." },
+      { name: "Ana Rodriguez",    role: "Pengusaha digital",       quote: "Dukungannya luar biasa. Mereka membantu saya menyesuaikan bot, dan sekarang menangani lebih dari 300 pertanyaan per hari tanpa kehilangan kualitas." },
+    ],
+  },
+  faq: {
+    label: "FAQ", title: "Pertanyaan yang sering diajukan", subtitle: "Semua yang Anda butuhkan untuk memulai dengan penuh keyakinan.",
+    items: [
+      { q: "Apakah saya perlu keahlian teknis untuk menggunakan NexoBot?", a: "Tidak. NexoBot dirancang agar siapa saja dapat mengaturnya dalam hitungan menit tanpa pengetahuan teknis." },
+      { q: "Bisakah saya menggunakan NexoBot di WhatsApp?",                a: "Ya. Paket Pro dan Premium mencakup integrasi WhatsApp untuk mengotomatiskan percakapan dan penjualan Anda." },
+      { q: "Apa yang terjadi jika saya melebihi batas pesan?",             a: "Kami akan memberi tahu Anda sebelum mencapai batas. Anda dapat meningkatkan paket kapan saja tanpa gangguan." },
+      { q: "Bisakah saya membatalkan kapan saja?",                         a: "Ya. Tidak ada kontrak atau komitmen. Batalkan langganan kapan saja dari dasbor Anda." },
+      { q: "Apakah Anda menyediakan dukungan?",                            a: "Semua paket mencakup dukungan. Paket Premium memiliki dukungan prioritas untuk respons lebih cepat." },
+      { q: "Bisakah saya mengintegrasikan NexoBot ke website saya?",       a: "Ya. Semua paket mencakup widget mudah dipasang untuk menghubungkan NexoBot ke website Anda dalam hitungan menit." },
+    ],
+  },
+  cta: {
+    title: "Otomatiskan bisnis Anda hari ini", titleHighlight: "dengan NexoBot",
+    subtitle: "Balas pelanggan, hasilkan penjualan, dan skalakan 24/7 dengan asisten cerdas Anda.",
+    button: "Mulai gratis →", noCard: "Tanpa kartu kredit · Batalkan kapan saja",
+  },
+  footer: { copyright: "© {year} NexoBot — Semua hak dilindungi.", pricing: "Harga", faq: "FAQ", features: "Fitur", login: "Masuk", privacy: "Privasi", terms: "Ketentuan" },
+};
