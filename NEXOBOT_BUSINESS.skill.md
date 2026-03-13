@@ -1,7 +1,7 @@
 # NEXOBOT_BUSINESS — Skill de Referencia
 
 > Módulo de gestión de negocio integrado en el dashboard de NexoBot.
-> Última actualización: 2026-03-13 — sesión de construcción completa.
+> Última actualización: 2026-03-13 — Fase 2A: bot conectado al inventario en tiempo real.
 
 ---
 
@@ -219,6 +219,43 @@ RLS habilitada en las 3 tablas con política `FOR ALL USING (auth.uid() = user_i
 
 ---
 
+## Fase 2A — Bot conectado al inventario (2026-03-13)
+
+### Qué se implementó
+El bot web (widget embed) ahora consulta el inventario del dueño en tiempo real
+antes de cada respuesta e inyecta los productos disponibles al system prompt.
+
+### Archivos
+| Archivo | Cambio |
+|---------|--------|
+| `lib/getInventoryContext.ts` | **Nuevo** — función reutilizable |
+| `app/api/widget/[botId]/route.ts` | Reemplazado bloque inline por llamada a la función |
+
+### `lib/getInventoryContext.ts`
+```typescript
+getInventoryContext(userId: string, supabase: SupabaseClient): Promise<string>
+```
+- Consulta `products` donde `status != inactive` AND `stock > 0`
+- Límite: 30 productos, ordenados por nombre
+- Devuelve `""` si no hay productos (bot funciona normal sin contexto)
+- Errores son silenciosos (no interrumpen el flujo del bot)
+
+### Formato inyectado al system prompt
+```
+Inventario disponible hoy:
+- Café (stock: 50 unidades, precio: $2.50)
+- Agua (stock: 30 unidades, precio: $1.00)
+Si preguntan por algo que no está en la lista, di que no está disponible.
+```
+
+### Comportamiento del bot
+- "¿tienen café?" → responde con stock real
+- "¿cuánto cuesta X?" → responde con precio real
+- "¿qué hay disponible?" → lista productos con stock > 0
+- Producto agotado (stock = 0) → no aparece, bot dice que no está disponible
+
+---
+
 ## Próximos pasos sugeridos
 
 | Prioridad | Tarea | Notas |
@@ -228,6 +265,6 @@ RLS habilitada en las 3 tablas con política `FOR ALL USING (auth.uid() = user_i
 | 🟡 Sesión futura | Reportes mensuales en PDF | Pro/Premium — usa lib/pdf o similar |
 | 🟡 Sesión futura | Export CSV de gastos/ventas | Pro/Premium |
 | 🟡 Sesión futura | Gráficas de tendencia en overview | Últimos 6 meses (SVG inline o canvas) |
-| 🟢 Sesión futura | Bot conectado al inventario | Chatbot consulta stock en tiempo real |
+| ✅ Completado | Bot conectado al inventario | `lib/getInventoryContext.ts` — consulta stock en tiempo real |
 | 🟢 Sesión futura | Plan Business $79 | Si se decide crear plan dedicado |
 | 🟢 Sesión futura | Límites de plan aplicados | Ej. max 10 notas en free |
