@@ -1,6 +1,6 @@
 # NEXOBOT_MASTER.skill.md
 > Memoria permanente del proyecto — actualizar al final de cada sesión.
-> Última actualización: 2026-03-13
+> Última actualización: 2026-03-15
 
 ---
 
@@ -83,6 +83,9 @@ nexobot-frontend/
 │   │   │   ├── sales/[id]/route.ts
 │   │   │   ├── notes/route.ts
 │   │   │   └── notes/[id]/route.ts
+│   │   ├── whatsapp/
+│   │   │   ├── webhook/route.ts    ← GET (challenge Meta) + POST (mensajes entrantes)
+│   │   │   └── connections/route.ts ← GET/POST/DELETE conexiones WA por bot
 │   │   └── stripe/
 │   │       ├── create-checkout-session/route.ts
 │   │       ├── verify-session/route.ts
@@ -114,6 +117,8 @@ nexobot-frontend/
 │   ├── notifications.ts            ← Sistema de notificaciones del dashboard
 │   ├── resend.ts                   ← Cliente Resend
 │   ├── supabaseClient.js           ← Cliente Supabase público (browser)
+│   ├── processBotMessage.ts        ← Motor central del bot (reutilizable, sin cookies)
+│   ├── whatsapp.ts                 ← sendWhatsAppMessage, verifyWebhookSignature
 │   └── i18n/
 │       └── landing.ts              ← LandingT interface + 13 traducciones
 │
@@ -229,6 +234,13 @@ if (limits.bots !== -1 && botCount >= limits.bots) {
 | `business_sales` | Ventas del día / caja | ✅ |
 | `business_notes` | Notas rápidas y recordatorios | ✅ |
 
+### WhatsApp Integration (nueva)
+| Tabla | Descripción | RLS |
+|---|---|---|
+| `whatsapp_connections` | Vincula bot ↔ phone_number_id de Meta | ✅ |
+
+**Schema**: `whatsapp-schema.sql` en raíz del proyecto.
+
 **Regla de oro**: RLS activo en TODAS las tablas. Siempre `.eq("user_id", userId)`.
 
 ### Columna extra en tabla existente
@@ -262,13 +274,58 @@ ALTER TABLE products ADD COLUMN cost_price NUMERIC(10,2);
 ## 7. Módulos construidos
 
 ### Core — Bot AI
-- `app/api/chat/route.ts` — Motor principal
+- `lib/processBotMessage.ts` — Motor central (extraído de chat/route, 2026-03-15)
+  - Reutilizable desde `chat/route.ts`, `whatsapp/webhook/route.ts`, y futuras integraciones
   - Verifica límites de mensajes del plan
   - Inyecta contexto de inventario vía `getInventoryContext()`
   - Llama a GPT con `callOpenAI()` (3 reintentos automáticos)
   - Extrae citas con `tryExtractAppointment()`
-  - Envía emails de notificación (leads, citas, límites)
+  - Envía emails de alertas de límite
   - Contador mensual con auto-reset
+  - **NO depende de cookies ni de getAuth()** — recibe userId y supabase listos
+- `app/api/chat/route.ts` — Wrapper para dashboard/widget
+  - Usa `getAuth()` + `processBotMessage()`
+  - Guarda historial en conversación `dashboard-{userId}-{botId}`
+
+### WhatsApp Integration (2026-03-15)
+**Fase 2B — Bot responde en WhatsApp en tiempo real**
+
+**Archivos**:
+- `lib/whatsapp.ts` → `sendWhatsAppMessage()`, `markWhatsAppMessageRead()`, `verifyWebhookSignature()`
+- `app/api/whatsapp/webhook/route.ts` → GET (challenge) + POST (mensajes entrantes)
+- `app/api/whatsapp/connections/route.ts` → GET/POST/DELETE para gestión desde el dashboard
+- `whatsapp-schema.sql` → DDL de `whatsapp_connections`
+
+**Flujo**:
+```
+Usuario escribe en WhatsApp
+  → Meta POST → /api/whatsapp/webhook
+  → Verifica X-Hub-Signature-256 (WHATSAPP_APP_SECRET)
+  → Busca conexión activa en whatsapp_connections (por phone_number_id)
+  → Carga historial de conversación (session_id = whatsapp-{waPhone})
+  → processBotMessage() → OpenAI → respuesta
+  → sendWhatsAppMessage() → Meta → usuario
+  → Guarda en conversations + messages
+```
+
+**Variables de entorno** (agregar en Vercel):
+```
+WHATSAPP_TOKEN           — Token de acceso permanente de Meta
+WHATSAPP_PHONE_NUMBER_ID — ID del número de teléfono
+WHATSAPP_VERIFY_TOKEN    — Token secreto para el challenge del webhook
+WHATSAPP_APP_SECRET      — App Secret de la app Meta (para verificar firma HMAC)
+```
+
+**Dashboard**: pestaña "📱 WhatsApp" en `/dashboard/bots/[id]`
+- Formulario para Phone Number ID y número visible
+- Instrucciones para registrar el webhook en Meta
+- Botones: Activar / Actualizar / Desactivar
+
+**Seguridad**:
+- No usa `getAuth()` en el webhook (endpoint público para Meta)
+- Verifica firma `X-Hub-Signature-256` con HMAC-SHA256 timing-safe
+- Ignora eventos `status` (delivered/read) para evitar bucles
+- Usa service role key de Supabase en el webhook
 - `app/widget/` — Iframe embebible
 - `app/book/` — Página pública de agendamiento
 
@@ -417,6 +474,12 @@ OPENAI_API_KEY=
 # Resend
 RESEND_API_KEY=
 
+# WhatsApp Cloud API (Meta)
+WHATSAPP_TOKEN=
+WHATSAPP_PHONE_NUMBER_ID=875188135685843
+WHATSAPP_VERIFY_TOKEN=          # string secreto que tú defines
+WHATSAPP_APP_SECRET=            # App Secret de la app Meta (para verificar firma)
+
 # App
 NEXT_PUBLIC_APP_URL=https://nexobot.net
 ```
@@ -489,7 +552,7 @@ printf '...HomeIT...' > app/it/page.tsx
 ### Alta prioridad
 | Tarea | Descripción | Notas |
 |---|---|---|
-| Fase 2B — WhatsApp Business API | Bot responde en WhatsApp con inventario en tiempo real | Requiere Meta Business account + webhook |
+| ✅ Fase 2B — WhatsApp Business API | Completada 2026-03-15 | Ver sección "WhatsApp Integration" |
 | Reportes mensuales PDF | Pro/Premium — resumen de gastos, ventas, margen | Usar lib/pdf o Puppeteer |
 | Export CSV | Gastos y ventas exportables | Pro/Premium |
 
