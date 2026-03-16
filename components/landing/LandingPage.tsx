@@ -237,7 +237,7 @@ export default function LandingPage({ t, locale }: Props) {
       </section>
 
       {/* ── PRICING ── */}
-      <PricingSection />
+      <PricingSection t={t.pricingSection} />
 
       {/* ── SERVICES ── */}
       <section id="services" className="py-24 bg-gray-50">

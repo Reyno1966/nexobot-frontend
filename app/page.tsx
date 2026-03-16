@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import DemoChat from "@/components/landing/DemoChat";
 import PricingSection from "@/components/landing/PricingSection";
+import { es } from "@/lib/i18n/landing";
 
 export default function Home() {
   return (
@@ -300,7 +301,7 @@ export default function Home() {
       </section>
 
       {/* ── PRICING ── */}
-      <PricingSection />
+      <PricingSection t={es.pricingSection} />
 
       {/* ── ADDITIONAL SERVICES ── */}
       <section id="services" className="py-24 bg-gray-50">

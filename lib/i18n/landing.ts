@@ -43,6 +43,17 @@ export interface LandingT {
   };
   cta: { title: string; titleHighlight: string; subtitle: string; button: string; noCard: string };
   footer: { copyright: string; pricing: string; faq: string; features: string; login: string; privacy: string; terms: string };
+  pricingSection: {
+    label: string; title: string; subtitle: string;
+    monthly: string; annual: string; saveBadge: string;
+    perMonth: string; perYear: string;
+    mostPopular: string; comingSoon: string;
+    plans: [
+      { desc: string; features: string[]; excluded: string[]; cta: string },
+      { desc: string; features: string[]; excluded: string[]; cta: string },
+      { desc: string; features: string[]; excluded: string[]; cta: string }
+    ];
+  };
 }
 
 // ── ESPAÑOL (raíz) ──────────────────────────────────────────────────────────
@@ -124,6 +135,18 @@ export const es: LandingT = {
     button: "Empezar gratis →", noCard: "Sin tarjeta de crédito · Cancela cuando quieras",
   },
   footer: { copyright: "© {year} NexoBot — Todos los derechos reservados.", pricing: "Precios", faq: "FAQ", features: "Características", login: "Iniciar sesión", privacy: "Privacidad", terms: "Términos" },
+  pricingSection: {
+    label: "Precios", title: "Planes diseñados para crecer contigo",
+    subtitle: "Elige el plan ideal para tu negocio y empieza a automatizar ventas y atención al cliente.",
+    monthly: "Mensual", annual: "Anual", saveBadge: "2 meses gratis",
+    perMonth: "/mes", perYear: "/año · 2 meses gratis",
+    mostPopular: "⭐ MÁS POPULAR", comingSoon: "Plan anual próximamente",
+    plans: [
+      { desc: "Ideal para emprendedores comenzando", features: ["Respuestas automáticas con IA", "Chat embebido para tu web", "Plantillas de mensajes", "Atención 24/7 sin esfuerzo", "Captura básica de leads", "Panel de control intuitivo"], excluded: ["WhatsApp no incluido", "Sin automatizaciones avanzadas"], cta: "Elegir Starter" },
+      { desc: "Para negocios que quieren escalar", features: ["Todo lo del Starter", "Integración con WhatsApp", "Flujos inteligentes de ventas", "Segmentación avanzada de clientes", "Captura avanzada de leads", "Integración con redes sociales", "Respuestas basadas en intención", "Automatizaciones personalizadas"], excluded: [], cta: "Elegir Pro" },
+      { desc: "Para empresas que necesitan máxima potencia", features: ["Todo lo del Pro", "Mensajes ilimitados", "Embudo de ventas automático", "Integraciones avanzadas", "Soporte prioritario", "Configuración asistida", "Automatizaciones premium"], excluded: [], cta: "Elegir Premium" },
+    ],
+  },
 };
 
 // ── ENGLISH ─────────────────────────────────────────────────────────────────
@@ -205,6 +228,18 @@ export const en: LandingT = {
     button: "Get started free →", noCard: "No credit card required · Cancel anytime",
   },
   footer: { copyright: "© {year} NexoBot — All rights reserved.", pricing: "Pricing", faq: "FAQ", features: "Features", login: "Sign in", privacy: "Privacy", terms: "Terms" },
+  pricingSection: {
+    label: "Pricing", title: "Plans designed to grow with you",
+    subtitle: "Choose the perfect plan for your business and start automating sales and customer support.",
+    monthly: "Monthly", annual: "Annual", saveBadge: "2 months free",
+    perMonth: "/mo", perYear: "/year · 2 months free",
+    mostPopular: "⭐ MOST POPULAR", comingSoon: "Annual plan coming soon",
+    plans: [
+      { desc: "Ideal for entrepreneurs getting started", features: ["Automatic AI replies", "Embedded chat for your website", "Message templates", "Effortless 24/7 support", "Basic lead capture", "Intuitive control panel"], excluded: ["WhatsApp not included", "No advanced automations"], cta: "Choose Starter" },
+      { desc: "For businesses ready to scale", features: ["Everything in Starter", "WhatsApp integration", "Smart sales flows", "Advanced customer segmentation", "Advanced lead capture", "Social media integration", "Intent-based replies", "Custom automations"], excluded: [], cta: "Choose Pro" },
+      { desc: "For businesses that need maximum power", features: ["Everything in Pro", "Unlimited messages", "Automatic sales funnel", "Advanced integrations", "Priority support", "Assisted setup", "Premium automations"], excluded: [], cta: "Choose Premium" },
+    ],
+  },
 };
 
 // ── ITALIANO ─────────────────────────────────────────────────────────────────
@@ -286,6 +321,18 @@ export const it: LandingT = {
     button: "Inizia gratis →", noCard: "Nessuna carta di credito · Disdici quando vuoi",
   },
   footer: { copyright: "© {year} NexoBot — Tutti i diritti riservati.", pricing: "Prezzi", faq: "FAQ", features: "Funzionalità", login: "Accedi", privacy: "Privacy", terms: "Termini" },
+  pricingSection: {
+    label: "Prezzi", title: "Piani progettati per crescere con te",
+    subtitle: "Scegli il piano ideale per la tua attività e inizia ad automatizzare vendite e assistenza clienti.",
+    monthly: "Mensile", annual: "Annuale", saveBadge: "2 mesi gratis",
+    perMonth: "/mese", perYear: "/anno · 2 mesi gratis",
+    mostPopular: "⭐ PIÙ POPOLARE", comingSoon: "Piano annuale in arrivo",
+    plans: [
+      { desc: "Ideale per chi sta iniziando", features: ["Risposte automatiche con IA", "Chat incorporata nel sito", "Modelli di messaggi", "Assistenza 24/7 senza sforzo", "Acquisizione base di lead", "Pannello di controllo intuitivo"], excluded: ["WhatsApp non incluso", "Senza automazioni avanzate"], cta: "Scegli Starter" },
+      { desc: "Per le aziende pronte a crescere", features: ["Tutto di Starter", "Integrazione WhatsApp", "Flussi di vendita intelligenti", "Segmentazione avanzata clienti", "Acquisizione avanzata di lead", "Integrazione social media", "Risposte basate sull'intento", "Automazioni personalizzate"], excluded: [], cta: "Scegli Pro" },
+      { desc: "Per le aziende che hanno bisogno del massimo", features: ["Tutto di Pro", "Messaggi illimitati", "Imbuto di vendita automatico", "Integrazioni avanzate", "Supporto prioritario", "Configurazione assistita", "Automazioni premium"], excluded: [], cta: "Scegli Premium" },
+    ],
+  },
 };
 
 // ── FRANÇAIS ─────────────────────────────────────────────────────────────────
@@ -367,6 +414,18 @@ export const fr: LandingT = {
     button: "Commencer gratuitement →", noCard: "Sans carte bancaire · Annulez quand vous voulez",
   },
   footer: { copyright: "© {year} NexoBot — Tous droits réservés.", pricing: "Tarifs", faq: "FAQ", features: "Fonctionnalités", login: "Se connecter", privacy: "Confidentialité", terms: "Conditions" },
+  pricingSection: {
+    label: "Tarifs", title: "Des forfaits conçus pour grandir avec vous",
+    subtitle: "Choisissez le forfait idéal pour votre entreprise et commencez à automatiser ventes et support client.",
+    monthly: "Mensuel", annual: "Annuel", saveBadge: "2 mois offerts",
+    perMonth: "/mois", perYear: "/an · 2 mois offerts",
+    mostPopular: "⭐ LE PLUS POPULAIRE", comingSoon: "Forfait annuel bientôt disponible",
+    plans: [
+      { desc: "Idéal pour les entrepreneurs qui démarrent", features: ["Réponses automatiques avec IA", "Chat intégré sur votre site", "Modèles de messages", "Support 24/7 sans effort", "Capture de leads basique", "Panneau de contrôle intuitif"], excluded: ["WhatsApp non inclus", "Sans automatisations avancées"], cta: "Choisir Starter" },
+      { desc: "Pour les entreprises prêtes à évoluer", features: ["Tout de Starter", "Intégration WhatsApp", "Flux de ventes intelligents", "Segmentation avancée clients", "Capture avancée de leads", "Intégration réseaux sociaux", "Réponses basées sur l'intention", "Automatisations personnalisées"], excluded: [], cta: "Choisir Pro" },
+      { desc: "Pour les entreprises qui ont besoin du maximum", features: ["Tout de Pro", "Messages illimités", "Entonnoir de ventes automatique", "Intégrations avancées", "Support prioritaire", "Configuration assistée", "Automatisations premium"], excluded: [], cta: "Choisir Premium" },
+    ],
+  },
 };
 
 // ── DEUTSCH ──────────────────────────────────────────────────────────────────
@@ -448,6 +507,18 @@ export const de: LandingT = {
     button: "Kostenlos starten →", noCard: "Keine Kreditkarte · Jederzeit kündbar",
   },
   footer: { copyright: "© {year} NexoBot — Alle Rechte vorbehalten.", pricing: "Preise", faq: "FAQ", features: "Funktionen", login: "Anmelden", privacy: "Datenschutz", terms: "AGB" },
+  pricingSection: {
+    label: "Preise", title: "Pläne, die mit Ihnen wachsen",
+    subtitle: "Wählen Sie den idealen Plan für Ihr Unternehmen und automatisieren Sie Verkäufe und Kundensupport.",
+    monthly: "Monatlich", annual: "Jährlich", saveBadge: "2 Monate gratis",
+    perMonth: "/Monat", perYear: "/Jahr · 2 Monate gratis",
+    mostPopular: "⭐ AM BELIEBTESTEN", comingSoon: "Jahresplan demnächst verfügbar",
+    plans: [
+      { desc: "Ideal für Unternehmer, die gerade starten", features: ["Automatische KI-Antworten", "Eingebetteter Chat für Ihre Website", "Nachrichtenvorlagen", "Müheloser 24/7-Support", "Grundlegende Lead-Erfassung", "Intuitives Kontrollpanel"], excluded: ["WhatsApp nicht enthalten", "Keine erweiterten Automatisierungen"], cta: "Starter wählen" },
+      { desc: "Für Unternehmen, die skalieren möchten", features: ["Alles aus Starter", "WhatsApp-Integration", "Intelligente Verkaufsabläufe", "Erweiterte Kundensegmentierung", "Erweiterte Lead-Erfassung", "Social-Media-Integration", "Intentionsbasierte Antworten", "Personalisierte Automatisierungen"], excluded: [], cta: "Pro wählen" },
+      { desc: "Für Unternehmen, die maximale Leistung benötigen", features: ["Alles aus Pro", "Unbegrenzte Nachrichten", "Automatischer Verkaufstrichter", "Erweiterte Integrationen", "Prioritätssupport", "Unterstützte Einrichtung", "Premium-Automatisierungen"], excluded: [], cta: "Premium wählen" },
+    ],
+  },
 };
 
 // ── PORTUGUÊS ─────────────────────────────────────────────────────────────────
@@ -529,6 +600,18 @@ export const pt: LandingT = {
     button: "Começar grátis →", noCard: "Sem cartão de crédito · Cancele quando quiser",
   },
   footer: { copyright: "© {year} NexoBot — Todos os direitos reservados.", pricing: "Preços", faq: "FAQ", features: "Funcionalidades", login: "Entrar", privacy: "Privacidade", terms: "Termos" },
+  pricingSection: {
+    label: "Preços", title: "Planos criados para crescer com você",
+    subtitle: "Escolha o plano ideal para o seu negócio e comece a automatizar vendas e atendimento ao cliente.",
+    monthly: "Mensal", annual: "Anual", saveBadge: "2 meses grátis",
+    perMonth: "/mês", perYear: "/ano · 2 meses grátis",
+    mostPopular: "⭐ MAIS POPULAR", comingSoon: "Plano anual em breve",
+    plans: [
+      { desc: "Ideal para empreendedores começando", features: ["Respostas automáticas com IA", "Chat embutido no seu site", "Modelos de mensagens", "Atendimento 24/7 sem esforço", "Captura básica de leads", "Painel de controle intuitivo"], excluded: ["WhatsApp não incluído", "Sem automatizações avançadas"], cta: "Escolher Starter" },
+      { desc: "Para negócios prontos para escalar", features: ["Tudo do Starter", "Integração com WhatsApp", "Fluxos inteligentes de vendas", "Segmentação avançada de clientes", "Captura avançada de leads", "Integração com redes sociais", "Respostas baseadas em intenção", "Automatizações personalizadas"], excluded: [], cta: "Escolher Pro" },
+      { desc: "Para empresas que precisam do máximo", features: ["Tudo do Pro", "Mensagens ilimitadas", "Funil de vendas automático", "Integrações avançadas", "Suporte prioritário", "Configuração assistida", "Automatizações premium"], excluded: [], cta: "Escolher Premium" },
+    ],
+  },
 };
 
 // ── ARABIC (RTL) ──────────────────────────────────────────────────────────────
@@ -610,6 +693,18 @@ export const ar: LandingT = {
     button: "← ابدأ مجانًا", noCard: "بدون بطاقة ائتمان · ألغِ في أي وقت",
   },
   footer: { copyright: "© {year} NexoBot — جميع الحقوق محفوظة.", pricing: "الأسعار", faq: "الأسئلة الشائعة", features: "المميزات", login: "تسجيل الدخول", privacy: "الخصوصية", terms: "الشروط" },
+  pricingSection: {
+    label: "الأسعار", title: "خطط مصممة للنمو معك",
+    subtitle: "اختر الخطة المثالية لعملك وابدأ في أتمتة المبيعات ودعم العملاء.",
+    monthly: "شهري", annual: "سنوي", saveBadge: "شهران مجانان",
+    perMonth: "/شهر", perYear: "/سنة · شهران مجانان",
+    mostPopular: "⭐ الأكثر شعبية", comingSoon: "الخطة السنوية قريباً",
+    plans: [
+      { desc: "مثالية لرواد الأعمال الجدد", features: ["ردود تلقائية بالذكاء الاصطناعي", "دردشة مدمجة في موقعك", "قوالب رسائل", "دعم 24/7 بلا جهد", "التقاط أساسي للعملاء المحتملين", "لوحة تحكم سهلة الاستخدام"], excluded: ["واتساب غير مشمول", "بدون أتمتة متقدمة"], cta: "اختر Starter" },
+      { desc: "للشركات المستعدة للتوسع", features: ["كل شيء في Starter", "تكامل واتساب", "تدفقات مبيعات ذكية", "تجزئة متقدمة للعملاء", "التقاط متقدم للعملاء المحتملين", "تكامل وسائل التواصل الاجتماعي", "ردود مبنية على النية", "أتمتة مخصصة"], excluded: [], cta: "اختر Pro" },
+      { desc: "للشركات التي تحتاج أقصى طاقة", features: ["كل شيء في Pro", "رسائل غير محدودة", "قمع مبيعات تلقائي", "تكاملات متقدمة", "دعم ذو أولوية", "إعداد مساعد", "أتمتة متميزة"], excluded: [], cta: "اختر Premium" },
+    ],
+  },
 };
 
 // ── 中文 (简体) ───────────────────────────────────────────────────────────────
@@ -691,6 +786,18 @@ export const zh: LandingT = {
     button: "免费开始 →", noCard: "无需信用卡 · 随时取消",
   },
   footer: { copyright: "© {year} NexoBot — 保留所有权利。", pricing: "价格", faq: "常见问题", features: "功能", login: "登录", privacy: "隐私政策", terms: "服务条款" },
+  pricingSection: {
+    label: "价格", title: "专为与您共同成长而设计的方案",
+    subtitle: "选择适合您业务的最佳方案，开始自动化销售和客户支持。",
+    monthly: "月付", annual: "年付", saveBadge: "免费2个月",
+    perMonth: "/月", perYear: "/年 · 免费2个月",
+    mostPopular: "⭐ 最受欢迎", comingSoon: "年付方案即将推出",
+    plans: [
+      { desc: "适合刚起步的创业者", features: ["AI自动回复", "网站嵌入式聊天", "消息模板", "无压力24/7支持", "基础线索收集", "直观控制面板"], excluded: ["不含WhatsApp", "无高级自动化"], cta: "选择Starter" },
+      { desc: "适合准备扩展的企业", features: ["包含Starter所有功能", "WhatsApp集成", "智能销售流程", "高级客户细分", "高级线索收集", "社交媒体集成", "基于意图的回复", "自定义自动化"], excluded: [], cta: "选择Pro" },
+      { desc: "适合需要最大能力的企业", features: ["包含Pro所有功能", "无限消息", "自动销售漏斗", "高级集成", "优先支持", "辅助设置", "高级自动化"], excluded: [], cta: "选择Premium" },
+    ],
+  },
 };
 
 // ── 日本語 ────────────────────────────────────────────────────────────────────
@@ -772,6 +879,18 @@ export const ja: LandingT = {
     button: "無料で始める →", noCard: "クレジットカード不要 · いつでもキャンセル可",
   },
   footer: { copyright: "© {year} NexoBot — 全著作権所有。", pricing: "料金", faq: "よくある質問", features: "機能", login: "ログイン", privacy: "プライバシーポリシー", terms: "利用規約" },
+  pricingSection: {
+    label: "料金", title: "あなたと共に成長するプラン",
+    subtitle: "あなたのビジネスに最適なプランを選び、販売とカスタマーサポートの自動化を始めましょう。",
+    monthly: "月払い", annual: "年払い", saveBadge: "2ヶ月無料",
+    perMonth: "/月", perYear: "/年 · 2ヶ月無料",
+    mostPopular: "⭐ 最も人気", comingSoon: "年払いプラン近日公開",
+    plans: [
+      { desc: "起業家に最適な入門プラン", features: ["AI自動返信", "ウェブサイト埋め込みチャット", "メッセージテンプレート", "24/7自動サポート", "基本的なリード獲得", "直感的なコントロールパネル"], excluded: ["WhatsApp非対応", "高度な自動化なし"], cta: "Starterを選ぶ" },
+      { desc: "スケールを目指す企業向け", features: ["Starterの全機能", "WhatsApp連携", "スマート販売フロー", "高度な顧客セグメント", "高度なリード獲得", "SNS連携", "意図ベースの返信", "カスタム自動化"], excluded: [], cta: "Proを選ぶ" },
+      { desc: "最大のパワーが必要な企業向け", features: ["Proの全機能", "無制限メッセージ", "自動セールスファネル", "高度な連携", "優先サポート", "設定サポート", "プレミアム自動化"], excluded: [], cta: "Premiumを選ぶ" },
+    ],
+  },
 };
 
 // ── РУССКИЙ ───────────────────────────────────────────────────────────────────
@@ -853,6 +972,18 @@ export const ru: LandingT = {
     button: "Начать бесплатно →", noCard: "Без кредитной карты · Отмена в любое время",
   },
   footer: { copyright: "© {year} NexoBot — Все права защищены.", pricing: "Цены", faq: "FAQ", features: "Возможности", login: "Войти", privacy: "Конфиденциальность", terms: "Условия" },
+  pricingSection: {
+    label: "Цены", title: "Планы, разработанные для роста вместе с вами",
+    subtitle: "Выберите оптимальный план для вашего бизнеса и начните автоматизировать продажи и поддержку клиентов.",
+    monthly: "Ежемесячно", annual: "Ежегодно", saveBadge: "2 месяца бесплатно",
+    perMonth: "/мес", perYear: "/год · 2 месяца бесплатно",
+    mostPopular: "⭐ САМЫЙ ПОПУЛЯРНЫЙ", comingSoon: "Годовой план скоро появится",
+    plans: [
+      { desc: "Идеально для начинающих предпринимателей", features: ["Автоматические ответы с ИИ", "Встроенный чат для сайта", "Шаблоны сообщений", "Поддержка 24/7 без усилий", "Базовый сбор лидов", "Интуитивная панель управления"], excluded: ["WhatsApp не включён", "Без расширенных автоматизаций"], cta: "Выбрать Starter" },
+      { desc: "Для бизнеса, готового к масштабированию", features: ["Всё из Starter", "Интеграция WhatsApp", "Умные продажные потоки", "Расширенная сегментация клиентов", "Расширенный сбор лидов", "Интеграция с соцсетями", "Ответы на основе намерений", "Персонализированные автоматизации"], excluded: [], cta: "Выбрать Pro" },
+      { desc: "Для компаний, которым нужна максимальная мощность", features: ["Всё из Pro", "Неограниченные сообщения", "Автоматическая воронка продаж", "Расширенные интеграции", "Приоритетная поддержка", "Помощь в настройке", "Премиум-автоматизации"], excluded: [], cta: "Выбрать Premium" },
+    ],
+  },
 };
 
 // ── 한국어 ────────────────────────────────────────────────────────────────────
@@ -934,6 +1065,18 @@ export const ko: LandingT = {
     button: "무료로 시작 →", noCard: "신용카드 불필요 · 언제든지 취소 가능",
   },
   footer: { copyright: "© {year} NexoBot — 모든 권리 보유.", pricing: "요금", faq: "자주 묻는 질문", features: "기능", login: "로그인", privacy: "개인정보처리방침", terms: "이용약관" },
+  pricingSection: {
+    label: "요금", title: "함께 성장하는 플랜",
+    subtitle: "비즈니스에 맞는 최적의 플랜을 선택하고 판매 및 고객 지원을 자동화하세요.",
+    monthly: "월간", annual: "연간", saveBadge: "2개월 무료",
+    perMonth: "/월", perYear: "/년 · 2개월 무료",
+    mostPopular: "⭐ 가장 인기", comingSoon: "연간 플랜 출시 예정",
+    plans: [
+      { desc: "창업자에게 이상적인 플랜", features: ["AI 자동 답변", "웹사이트 임베드 채팅", "메시지 템플릿", "24/7 자동 지원", "기본 리드 수집", "직관적인 제어판"], excluded: ["WhatsApp 미포함", "고급 자동화 없음"], cta: "Starter 선택" },
+      { desc: "확장 준비된 비즈니스를 위한 플랜", features: ["Starter의 모든 기능", "WhatsApp 통합", "스마트 영업 흐름", "고급 고객 세분화", "고급 리드 수집", "소셜 미디어 통합", "의도 기반 답변", "맞춤 자동화"], excluded: [], cta: "Pro 선택" },
+      { desc: "최대 성능이 필요한 기업을 위한 플랜", features: ["Pro의 모든 기능", "무제한 메시지", "자동 영업 깔때기", "고급 통합", "우선 지원", "설정 지원", "프리미엄 자동화"], excluded: [], cta: "Premium 선택" },
+    ],
+  },
 };
 
 // ── NEDERLANDS ────────────────────────────────────────────────────────────────
@@ -1015,6 +1158,18 @@ export const nl: LandingT = {
     button: "Gratis starten →", noCard: "Geen creditcard vereist · Altijd opzegbaar",
   },
   footer: { copyright: "© {year} NexoBot — Alle rechten voorbehouden.", pricing: "Prijzen", faq: "FAQ", features: "Functies", login: "Inloggen", privacy: "Privacy", terms: "Voorwaarden" },
+  pricingSection: {
+    label: "Prijzen", title: "Plannen die met u meegroeien",
+    subtitle: "Kies het ideale plan voor uw bedrijf en begin met het automatiseren van verkoop en klantenservice.",
+    monthly: "Maandelijks", annual: "Jaarlijks", saveBadge: "2 maanden gratis",
+    perMonth: "/mnd", perYear: "/jaar · 2 maanden gratis",
+    mostPopular: "⭐ MEEST POPULAIR", comingSoon: "Jaarplan binnenkort beschikbaar",
+    plans: [
+      { desc: "Ideaal voor startende ondernemers", features: ["Automatische AI-antwoorden", "Ingebedde chat voor uw website", "Berichtsjablonen", "24/7 ondersteuning zonder moeite", "Basis leadcapture", "Intuïtief controlepaneel"], excluded: ["WhatsApp niet inbegrepen", "Geen geavanceerde automatiseringen"], cta: "Starter kiezen" },
+      { desc: "Voor bedrijven die willen opschalen", features: ["Alles van Starter", "WhatsApp-integratie", "Slimme verkoopstromen", "Geavanceerde klantsegmentatie", "Geavanceerde leadcapture", "Social media-integratie", "Intentiegebaseerde antwoorden", "Gepersonaliseerde automatiseringen"], excluded: [], cta: "Pro kiezen" },
+      { desc: "Voor bedrijven die maximale kracht nodig hebben", features: ["Alles van Pro", "Onbeperkte berichten", "Automatische verkooptrechter", "Geavanceerde integraties", "Prioriteitsondersteuning", "Begeleide installatie", "Premium automatiseringen"], excluded: [], cta: "Premium kiezen" },
+    ],
+  },
 };
 
 // ── TÜRKÇE ────────────────────────────────────────────────────────────────────
@@ -1096,6 +1251,18 @@ export const tr: LandingT = {
     button: "Ücretsiz başla →", noCard: "Kredi kartı gerekmez · İstediğiniz zaman iptal",
   },
   footer: { copyright: "© {year} NexoBot — Tüm hakları saklıdır.", pricing: "Fiyatlar", faq: "SSS", features: "Özellikler", login: "Giriş yap", privacy: "Gizlilik", terms: "Koşullar" },
+  pricingSection: {
+    label: "Fiyatlar", title: "Sizinle birlikte büyümek için tasarlanmış planlar",
+    subtitle: "İşletmeniz için ideal planı seçin ve satışları ve müşteri desteğini otomatikleştirmeye başlayın.",
+    monthly: "Aylık", annual: "Yıllık", saveBadge: "2 ay ücretsiz",
+    perMonth: "/ay", perYear: "/yıl · 2 ay ücretsiz",
+    mostPopular: "⭐ EN POPÜLER", comingSoon: "Yıllık plan yakında",
+    plans: [
+      { desc: "Girişimciler için ideal başlangıç planı", features: ["Yapay zeka ile otomatik yanıtlar", "Web sitenize gömülü sohbet", "Mesaj şablonları", "Zahmetsiz 24/7 destek", "Temel müşteri adayı yakalama", "Sezgisel kontrol paneli"], excluded: ["WhatsApp dahil değil", "Gelişmiş otomasyon yok"], cta: "Starter'ı seç" },
+      { desc: "Büyümek isteyen işletmeler için", features: ["Starter'daki her şey", "WhatsApp entegrasyonu", "Akıllı satış akışları", "Gelişmiş müşteri segmentasyonu", "Gelişmiş müşteri adayı yakalama", "Sosyal medya entegrasyonu", "Niyet tabanlı yanıtlar", "Özelleştirilmiş otomasyonlar"], excluded: [], cta: "Pro'yu seç" },
+      { desc: "Maksimum güce ihtiyaç duyan işletmeler için", features: ["Pro'daki her şey", "Sınırsız mesaj", "Otomatik satış hunisi", "Gelişmiş entegrasyonlar", "Öncelikli destek", "Destekli kurulum", "Premium otomasyonlar"], excluded: [], cta: "Premium'u seç" },
+    ],
+  },
 };
 
 // ── BAHASA INDONESIA ──────────────────────────────────────────────────────────
@@ -1177,4 +1344,16 @@ export const id: LandingT = {
     button: "Mulai gratis →", noCard: "Tanpa kartu kredit · Batalkan kapan saja",
   },
   footer: { copyright: "© {year} NexoBot — Semua hak dilindungi.", pricing: "Harga", faq: "FAQ", features: "Fitur", login: "Masuk", privacy: "Privasi", terms: "Ketentuan" },
+  pricingSection: {
+    label: "Harga", title: "Paket yang dirancang untuk tumbuh bersama Anda",
+    subtitle: "Pilih paket ideal untuk bisnis Anda dan mulai otomatisasi penjualan dan dukungan pelanggan.",
+    monthly: "Bulanan", annual: "Tahunan", saveBadge: "2 bulan gratis",
+    perMonth: "/bln", perYear: "/thn · 2 bulan gratis",
+    mostPopular: "⭐ PALING POPULER", comingSoon: "Paket tahunan segera hadir",
+    plans: [
+      { desc: "Ideal untuk pengusaha yang baru memulai", features: ["Balasan otomatis dengan AI", "Chat tertanam di situs web Anda", "Template pesan", "Dukungan 24/7 tanpa usaha", "Tangkap prospek dasar", "Panel kontrol intuitif"], excluded: ["WhatsApp tidak termasuk", "Tanpa otomatisasi lanjutan"], cta: "Pilih Starter" },
+      { desc: "Untuk bisnis yang siap berkembang", features: ["Semua fitur Starter", "Integrasi WhatsApp", "Alur penjualan cerdas", "Segmentasi pelanggan lanjutan", "Tangkap prospek lanjutan", "Integrasi media sosial", "Balasan berbasis niat", "Otomatisasi kustom"], excluded: [], cta: "Pilih Pro" },
+      { desc: "Untuk bisnis yang membutuhkan kekuatan maksimal", features: ["Semua fitur Pro", "Pesan tak terbatas", "Corong penjualan otomatis", "Integrasi lanjutan", "Dukungan prioritas", "Pengaturan berbantuan", "Otomatisasi premium"], excluded: [], cta: "Pilih Premium" },
+    ],
+  },
 };
