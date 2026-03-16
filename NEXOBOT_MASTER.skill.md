@@ -541,6 +541,21 @@ printf '...HomeIT...' > app/it/page.tsx
 **Síntoma**: Los bullets del demo tenían emojis hardcodeados en el texto y se detectaban por texto frágil.
 **Solución**: Constante `DEMO_BULLET_ICONS = ["⚡","🧠","🎨","📲"]` indexada por posición, independiente del texto.
 
+### Error 7: PricingSection hardcodeado en español en todos los locales (2026-03-16)
+**Síntoma**: La sección de precios mostraba siempre texto en español sin importar el locale (`/en`, `/fr`, etc.).
+**Causa raíz (triple falla)**:
+1. `PricingSection()` no aceptaba ninguna prop — firma vacía
+2. Todo el texto (desc, features, cta, toggle, badges) hardcodeado en el array `PLANS` del componente en español
+3. `LandingT` no tenía key `pricingSection` — nunca se diseñó para i18n
+4. `app/page.tsx` (landing raíz) también llamaba `<PricingSection />` sin prop — falla secundaria
+
+**Solución**:
+- Agrega `pricingSection` al tipo `LandingT` y traducciones en los 13 locales de `landing.ts`
+- Refactoriza `PricingSection.tsx` para aceptar `t: PricingT`; price IDs y precios numéricos quedan en constantes internas
+- `LandingPage.tsx` pasa `t={t.pricingSection}`; `app/page.tsx` importa `es` y pasa `t={es.pricingSection}`
+
+**Regla aprendida**: Todo componente nuevo de la landing debe recibir prop `t` desde el inicio. Si no la recibe, el texto quedará hardcodeado en el idioma en que se escribió.
+
 ### Error 6: Merge olvidado antes de cerrar sesión
 **Síntoma**: Los cambios están en la rama de Claude pero no en producción (Vercel no despliega).
 **Solución**: Siempre como último paso: `git merge origin/claude/[rama] && git push origin main` desde el repo principal.
