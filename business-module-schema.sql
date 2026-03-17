@@ -5,13 +5,7 @@
 -- ─────────────────────────────────────────────────────────────────────────────
 
 
--- ── 1. Extensión de tabla products ───────────────────────────────────────────
--- Agrega costo de compra para calcular margen de ganancia/pérdida
-ALTER TABLE products
-  ADD COLUMN IF NOT EXISTS cost_price NUMERIC(10,2) NOT NULL DEFAULT 0;
-
-
--- ── 2. business_expenses — Gastos y compras del negocio ──────────────────────
+-- ── 1. business_expenses — Gastos y compras del negocio ──────────────────────
 CREATE TABLE IF NOT EXISTS business_expenses (
   id          UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id     UUID        NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -37,7 +31,7 @@ CREATE INDEX IF NOT EXISTS idx_business_expenses_user_id ON business_expenses(us
 CREATE INDEX IF NOT EXISTS idx_business_expenses_date    ON business_expenses(date DESC);
 
 
--- ── 3. business_sales — Ventas del día / caja diaria ─────────────────────────
+-- ── 2. business_sales — Ventas del día / caja diaria ─────────────────────────
 CREATE TABLE IF NOT EXISTS business_sales (
   id             UUID          PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id        UUID          NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -62,7 +56,7 @@ CREATE INDEX IF NOT EXISTS idx_business_sales_user_id ON business_sales(user_id)
 CREATE INDEX IF NOT EXISTS idx_business_sales_date    ON business_sales(date DESC);
 
 
--- ── 4. business_notes — Notas rápidas y recordatorios ────────────────────────
+-- ── 3. business_notes — Notas rápidas y recordatorios ────────────────────────
 CREATE TABLE IF NOT EXISTS business_notes (
   id         UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id    UUID        NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -83,7 +77,7 @@ CREATE POLICY "Users can manage their own notes"
 CREATE INDEX IF NOT EXISTS idx_business_notes_user_id ON business_notes(user_id);
 
 
--- ── 5. Función y triggers para updated_at automático ─────────────────────────
+-- ── 4. Función y triggers para updated_at automático ─────────────────────────
 -- (Si update_updated_at ya existe en la BD, omitir la función y solo los triggers)
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
@@ -110,8 +104,6 @@ CREATE TRIGGER notes_updated_at
 
 
 -- ─────────────────────────────────────────────────────────────────────────────
--- TABLAS REUTILIZADAS (no recrear)
--- ─────────────────────────────────────────────────────────────────────────────
--- products  → /dashboard/products  (ya existe, extendida con cost_price)
--- invoices  → /dashboard/invoices  (ya existe, sin cambios)
+-- NOTA: cost_price en products se añadirá en una sesión futura,
+-- cuando la tabla products esté creada.
 -- ─────────────────────────────────────────────────────────────────────────────
