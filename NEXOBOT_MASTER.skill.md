@@ -315,12 +315,20 @@ Usuario escribe en WhatsApp
   → Guarda en conversations + messages
 ```
 
-**Variables de entorno** (todas necesarias en Vercel):
+**Estado 2026-03-17**:
+- ✅ Webhook verificado en Meta (GET challenge)
+- ✅ Campo `messages` suscrito en Meta
+- ✅ Fila activa en `whatsapp_connections` con bot "Rey"
+- ✅ Bug fire-and-forget corregido → `await` directo
+- ⭕ Número real de WhatsApp Business (actualmente solo número de prueba sandbox)
+
+**Variables de entorno** (5 variables necesarias en Vercel):
 ```
-WHATSAPP_TOKEN           — Token de acceso permanente de Meta (empieza con EAA...)
-WHATSAPP_PHONE_NUMBER_ID — ID del número de teléfono (ej: 875188135685843)
-WHATSAPP_VERIFY_TOKEN    — nexobot-verify-2024
-WHATSAPP_APP_SECRET      — App Secret de Meta (para verificar firma HMAC-SHA256)
+WHATSAPP_TOKEN                  — Token de acceso permanente de Meta (EAA...)
+WHATSAPP_PHONE_NUMBER_ID        — ID del número: 875188135685843
+WHATSAPP_VERIFY_TOKEN           — nexobot-verify-2024
+WHATSAPP_APP_SECRET             — App Secret de Meta (HMAC-SHA256)
+WHATSAPP_BUSINESS_ACCOUNT_ID    — ID de la cuenta de WhatsApp Business
 ```
 
 **Requisito crítico — tabla whatsapp_connections**:
@@ -345,14 +353,19 @@ Sin esta fila, el webhook recibe el POST pero no hace nada (log: "No hay conexi�
 
 **Testing con curl** (reemplazar APP_SECRET):
 ```bash
-PAYLOAD='{"object":"whatsapp_business_account","entry":[...]}'
+# ⚠️ NO usar "!" en el mensaje — bash lo convierte en \! → JSON inválido
+PAYLOAD='{"object":"whatsapp_business_account","entry":[{"id":"123","changes":[{"field":"messages","value":{"messaging_product":"whatsapp","metadata":{"display_phone_number":"15551464450","phone_number_id":"875188135685843"},"contacts":[{"profile":{"name":"Test User"},"wa_id":"5491112345678"}],"messages":[{"from":"5491112345678","id":"wamid.test1","timestamp":"1710000001","type":"text","text":{"body":"Hola NexoBot"}}]}}]}]}'
 SIG="sha256=$(printf '%s' "$PAYLOAD" | openssl dgst -sha256 -hmac "APP_SECRET" | awk '{print $2}')"
 curl -X POST https://www.nexobot.net/api/whatsapp/webhook \
   -H "Content-Type: application/json" \
   -H "x-hub-signature-256: $SIG" \
   --data-raw "$PAYLOAD"
-# ⚠️ Usar printf (no echo) para el HMAC — echo agrega \n y cambia la firma
+# ⚠️ Usar printf '%s' (no echo) para el HMAC — echo agrega \n y cambia la firma
+# ⚠️ Usar --data-raw (no -d) para enviar el body sin modificar
 ```
+
+**Limitación del número de prueba sandbox**:
+El número +1 555 146 4450 es un número de sandbox de Meta. NO entrega webhooks POST de mensajes entrantes reales. Para pruebas end-to-end completas, registrar un número de teléfono real en Meta Dashboard → WhatsApp → Phone Numbers.
 
 ### Fase 2A — Bot conectado al inventario
 **Archivo**: `lib/getInventoryContext.ts`
@@ -499,11 +512,12 @@ OPENAI_API_KEY=
 # Resend
 RESEND_API_KEY=
 
-# WhatsApp Cloud API (Meta)
-WHATSAPP_TOKEN=
+# WhatsApp Cloud API (Meta) — 5 variables
+WHATSAPP_TOKEN=                         # Token permanente Meta (EAA...)
 WHATSAPP_PHONE_NUMBER_ID=875188135685843
-WHATSAPP_VERIFY_TOKEN=          # string secreto que tú defines
-WHATSAPP_APP_SECRET=            # App Secret de la app Meta (para verificar firma)
+WHATSAPP_VERIFY_TOKEN=nexobot-verify-2024
+WHATSAPP_APP_SECRET=                    # App Secret de Meta (HMAC-SHA256)
+WHATSAPP_BUSINESS_ACCOUNT_ID=           # ID de la cuenta WABA
 
 # App
 NEXT_PUBLIC_APP_URL=https://nexobot.net
@@ -610,6 +624,17 @@ SIG="sha256=$(echo "$PAYLOAD" | openssl dgst -sha256 -hmac "$SECRET" | awk '{pri
 SIG="sha256=$(printf '%s' "$PAYLOAD" | openssl dgst -sha256 -hmac "$SECRET" | awk '{print $2}')"
 ```
 
+### Error 10: "!" en payload curl → bash history expansion → JSON inválido
+**Síntoma**: curl devuelve 400 Bad Request (JSON parse error) aunque el payload parece correcto. HMAC pasa (401 no aparece), pero JSON.parse falla en el servidor.
+**Causa**: En bash interactivo con histexpand, `!` dentro de `"$VARIABLE"` puede ser procesado como history expansion, convirtiendo `!` en `\!` o expandiéndolo, lo que produce JSON inválido.
+**Diagnóstico**: `echo "$PAYLOAD" | python3 -m json.tool` → "Invalid \\escape" confirma la corrupción.
+**Solución**: Nunca usar `!` en mensajes de prueba en curl:
+```bash
+# ❌ "Hola NexoBot!" → bash puede convertir a "Hola NexoBot\!" → JSON inválido
+# ✅ "Hola NexoBot"  → sin caracteres especiales bash → JSON válido
+```
+**Nota**: En producción (Meta enviando HTTP real) este bug NO existe — Meta no pasa por bash.
+
 ### Error 6: Merge olvidado antes de cerrar sesión
 **Síntoma**: Los cambios están en la rama de Claude pero no en producción (Vercel no despliega).
 **Solución**: Siempre como último paso: `git merge origin/claude/[rama] && git push origin main` desde el repo principal.
@@ -621,7 +646,8 @@ SIG="sha256=$(printf '%s' "$PAYLOAD" | openssl dgst -sha256 -hmac "$SECRET" | aw
 ### Alta prioridad
 | Tarea | Descripción | Notas |
 |---|---|---|
-| ✅ Fase 2B — WhatsApp Business API | Completada 2026-03-15 | Ver sección "WhatsApp Integration" |
+| ✅ Fase 2B — WhatsApp Business API | Completada + debuggeada 2026-03-17 | Ver sección "WhatsApp Integration" |
+| Número real WhatsApp Business | Conectar número real en Meta para pruebas end-to-end | Sandbox +1 555 146 4450 no entrega webhooks reales |
 | Reportes mensuales PDF | Pro/Premium — resumen de gastos, ventas, margen | Usar lib/pdf o Puppeteer |
 | Export CSV | Gastos y ventas exportables | Pro/Premium |
 
