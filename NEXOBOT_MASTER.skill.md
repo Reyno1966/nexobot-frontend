@@ -1,6 +1,6 @@
 # NEXOBOT_MASTER.skill.md
 > Memoria permanente del proyecto — actualizar al final de cada sesión.
-> Última actualización: 2026-03-15
+> Última actualización: 2026-03-17
 
 ---
 
@@ -287,7 +287,7 @@ ALTER TABLE products ADD COLUMN cost_price NUMERIC(10,2);
   - Usa `getAuth()` + `processBotMessage()`
   - Guarda historial en conversación `dashboard-{userId}-{botId}`
 
-### WhatsApp Integration (2026-03-15)
+### WhatsApp Integration (2026-03-15, debuggeado 2026-03-17)
 **Fase 2B — Bot responde en WhatsApp en tiempo real**
 
 **Archivos**:
@@ -295,6 +295,13 @@ ALTER TABLE products ADD COLUMN cost_price NUMERIC(10,2);
 - `app/api/whatsapp/webhook/route.ts` → GET (challenge) + POST (mensajes entrantes)
 - `app/api/whatsapp/connections/route.ts` → GET/POST/DELETE para gestión desde el dashboard
 - `whatsapp-schema.sql` → DDL de `whatsapp_connections`
+
+**Datos de producción**:
+```
+URL webhook:      https://www.nexobot.net/api/whatsapp/webhook
+VERIFY_TOKEN:     nexobot-verify-2024
+phone_number_id:  875188135685843   (número de prueba Meta: +1 555 146 4450)
+```
 
 **Flujo**:
 ```
@@ -308,13 +315,22 @@ Usuario escribe en WhatsApp
   → Guarda en conversations + messages
 ```
 
-**Variables de entorno** (agregar en Vercel):
+**Variables de entorno** (todas necesarias en Vercel):
 ```
-WHATSAPP_TOKEN           — Token de acceso permanente de Meta
-WHATSAPP_PHONE_NUMBER_ID — ID del número de teléfono
-WHATSAPP_VERIFY_TOKEN    — Token secreto para el challenge del webhook
-WHATSAPP_APP_SECRET      — App Secret de la app Meta (para verificar firma HMAC)
+WHATSAPP_TOKEN           — Token de acceso permanente de Meta (empieza con EAA...)
+WHATSAPP_PHONE_NUMBER_ID — ID del número de teléfono (ej: 875188135685843)
+WHATSAPP_VERIFY_TOKEN    — nexobot-verify-2024
+WHATSAPP_APP_SECRET      — App Secret de Meta (para verificar firma HMAC-SHA256)
 ```
+
+**Requisito crítico — tabla whatsapp_connections**:
+Para que el webhook procese mensajes, DEBE existir una fila activa:
+```sql
+INSERT INTO whatsapp_connections (user_id, bot_id, phone_number_id, display_phone, wa_token, active)
+VALUES ('uuid-usuario', 'uuid-bot', '875188135685843', '15551464450', NULL, true);
+-- wa_token = NULL → usa WHATSAPP_TOKEN del entorno de Vercel
+```
+Sin esta fila, el webhook recibe el POST pero no hace nada (log: "No hay conexión activa").
 
 **Dashboard**: pestaña "📱 WhatsApp" en `/dashboard/bots/[id]`
 - Formulario para Phone Number ID y número visible
@@ -326,8 +342,17 @@ WHATSAPP_APP_SECRET      — App Secret de la app Meta (para verificar firma HMA
 - Verifica firma `X-Hub-Signature-256` con HMAC-SHA256 timing-safe
 - Ignora eventos `status` (delivered/read) para evitar bucles
 - Usa service role key de Supabase en el webhook
-- `app/widget/` — Iframe embebible
-- `app/book/` — Página pública de agendamiento
+
+**Testing con curl** (reemplazar APP_SECRET):
+```bash
+PAYLOAD='{"object":"whatsapp_business_account","entry":[...]}'
+SIG="sha256=$(printf '%s' "$PAYLOAD" | openssl dgst -sha256 -hmac "APP_SECRET" | awk '{print $2}')"
+curl -X POST https://www.nexobot.net/api/whatsapp/webhook \
+  -H "Content-Type: application/json" \
+  -H "x-hub-signature-256: $SIG" \
+  --data-raw "$PAYLOAD"
+# ⚠️ Usar printf (no echo) para el HMAC — echo agrega \n y cambia la firma
+```
 
 ### Fase 2A — Bot conectado al inventario
 **Archivo**: `lib/getInventoryContext.ts`
@@ -555,6 +580,35 @@ printf '...HomeIT...' > app/it/page.tsx
 - `LandingPage.tsx` pasa `t={t.pricingSection}`; `app/page.tsx` importa `es` y pasa `t={es.pricingSection}`
 
 **Regla aprendida**: Todo componente nuevo de la landing debe recibir prop `t` desde el inicio. Si no la recibe, el texto quedará hardcodeado en el idioma en que se escribió.
+
+### Error 8: after() de Next.js no funciona en Vercel Serverless (2026-03-17)
+**Síntoma**: Webhook responde 200 pero no se crean filas en Supabase. Los logs de Supabase no muestran ninguna query tras el POST.
+**Causa**: `after()` de `next/server` NO completa callbacks en Vercel Serverless estándar. Vercel congela el contexto de ejecución al enviar la respuesta. `after()` requiere Vercel Fluid Compute (plan Enterprise) para funcionar de forma confiable.
+**Solución**: Usar `await` directo en el POST handler. OpenAI responde en ~2-4s, dentro del límite de 15s de Meta:
+```typescript
+// ❌ Falla silenciosamente en Vercel Serverless
+after(() => processEntries(payload.entry).catch(...));
+return NextResponse.json({ ok: true });
+
+// ✅ Correcto — await directo, Meta espera hasta 15s
+await processEntries(payload.entry).catch((err) => {
+  console.error("[WhatsApp Webhook] Error:", err);
+});
+return NextResponse.json({ ok: true });
+```
+**Archivo afectado**: `app/api/whatsapp/webhook/route.ts`
+
+### Error 9: echo vs printf en HMAC-SHA256 para curl
+**Síntoma**: curl devuelve 401 Unauthorized aunque el APP_SECRET es correcto.
+**Causa**: `echo "$PAYLOAD"` agrega `\n` al final del string, cambiando el hash HMAC. El servidor computa el hash del payload sin `\n`, pero el cliente lo envía con `\n`.
+**Solución**: Siempre usar `printf '%s'` para calcular firmas HMAC:
+```bash
+# ❌ Firma incorrecta
+SIG="sha256=$(echo "$PAYLOAD" | openssl dgst -sha256 -hmac "$SECRET" | awk '{print $2}')"
+
+# ✅ Firma correcta
+SIG="sha256=$(printf '%s' "$PAYLOAD" | openssl dgst -sha256 -hmac "$SECRET" | awk '{print $2}')"
+```
 
 ### Error 6: Merge olvidado antes de cerrar sesión
 **Síntoma**: Los cambios están en la rama de Claude pero no en producción (Vercel no despliega).
