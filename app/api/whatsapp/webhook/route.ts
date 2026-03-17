@@ -85,15 +85,15 @@ export async function POST(req: Request) {
     return new Response("Bad Request", { status: 400 });
   }
 
-  // Meta envía "whatsapp" en el campo object para mensajes de WhatsApp
-  if (payload.object !== "whatsapp_business_account") {
+  // Meta puede enviar "whatsapp_business_account" o "whatsapp" según el contexto
+  if (payload.object !== "whatsapp_business_account" && payload.object !== "whatsapp") {
     return NextResponse.json({ ok: true });
   }
 
   // ── 4. Procesar cada entry y cada mensaje ─────────────────────────────────
-  // Respondemos 200 inmediatamente a Meta; el procesamiento es interno.
-  // Meta requiere respuesta < 15 segundos o reintentará el webhook.
-  processEntries(payload.entry).catch((err) => {
+  // Await directo: OpenAI tarda ~2-4s, bien dentro del límite de 15s de Meta.
+  // after() no funciona de forma confiable en Vercel Serverless (sin Fluid Compute).
+  await processEntries(payload.entry).catch((err) => {
     console.error("[WhatsApp Webhook] Error procesando entries:", err);
   });
 
