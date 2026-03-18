@@ -13,7 +13,7 @@ export async function GET() {
 
   const { data, error } = await supabase
     .from("business_notes")
-    .select("*")
+    .select("id, content, color, is_pinned, created_at, updated_at")
     .eq("user_id", userId)
     .order("is_pinned", { ascending: false })
     .order("created_at", { ascending: false });

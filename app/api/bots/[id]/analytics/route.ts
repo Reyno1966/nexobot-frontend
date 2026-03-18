@@ -21,36 +21,55 @@ export async function GET(
 
     if (!bot) return NextResponse.json({ error: "Bot no encontrado" }, { status: 404 });
 
-    // Total conversaciones
-    const { count: totalConversations } = await supabase
-      .from("conversations")
-      .select("id", { count: "exact", head: true })
-      .eq("bot_id", botId);
-
-    // Conversaciones de los últimos 7 días
     const since7d = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
-    const { count: convsThisWeek } = await supabase
-      .from("conversations")
-      .select("id", { count: "exact", head: true })
-      .eq("bot_id", botId)
-      .gte("created_at", since7d);
-
-    // Conversaciones hoy
     const todayStart = new Date(); todayStart.setHours(0, 0, 0, 0);
-    const { count: convsToday } = await supabase
-      .from("conversations")
-      .select("id", { count: "exact", head: true })
-      .eq("bot_id", botId)
-      .gte("created_at", todayStart.toISOString());
-
-    // Mensajes por día (últimos 14 días)
     const since14d = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString();
-    const { data: dailyMsgs } = await supabase
-      .from("messages")
-      .select("created_at")
-      .eq("bot_id", botId)
-      .gte("created_at", since14d)
-      .eq("role", "user");
+
+    // Paralelizar las 5 queries independientes
+    const [
+      { count: totalConversations },
+      { count: convsThisWeek },
+      { count: convsToday },
+      { data: dailyMsgs },
+      { data: lastConv },
+    ] = await Promise.all([
+      // Total conversaciones
+      supabase
+        .from("conversations")
+        .select("id", { count: "exact", head: true })
+        .eq("bot_id", botId),
+
+      // Conversaciones de los últimos 7 días
+      supabase
+        .from("conversations")
+        .select("id", { count: "exact", head: true })
+        .eq("bot_id", botId)
+        .gte("created_at", since7d),
+
+      // Conversaciones hoy
+      supabase
+        .from("conversations")
+        .select("id", { count: "exact", head: true })
+        .eq("bot_id", botId)
+        .gte("created_at", todayStart.toISOString()),
+
+      // Mensajes por día (últimos 14 días)
+      supabase
+        .from("messages")
+        .select("created_at")
+        .eq("bot_id", botId)
+        .gte("created_at", since14d)
+        .eq("role", "user"),
+
+      // Última conversación
+      supabase
+        .from("conversations")
+        .select("created_at")
+        .eq("bot_id", botId)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle(),
+    ]);
 
     // Agrupar mensajes por día
     const dailyMap: Record<string, number> = {};
@@ -65,15 +84,6 @@ export async function GET(
       const key = d.toISOString().split("T")[0];
       return { date: key, count: dailyMap[key] ?? 0 };
     });
-
-    // Última conversación
-    const { data: lastConv } = await supabase
-      .from("conversations")
-      .select("created_at")
-      .eq("bot_id", botId)
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle();
 
     return NextResponse.json({
       totalMessages: bot.messages_count ?? 0,

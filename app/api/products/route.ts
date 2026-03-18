@@ -13,7 +13,7 @@ export async function GET(req: Request) {
 
   let query = supabase
     .from("products")
-    .select("*")
+    .select("id, name, description, price, cost_price, currency, stock, unit, category, sku, status, image_url, created_at")
     .eq("user_id", userId)
     .order("created_at", { ascending: false })
     .limit(500);

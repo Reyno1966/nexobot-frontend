@@ -9,7 +9,7 @@ export async function GET() {
 
   const { data: bots, error } = await supabase
     .from("bots")
-    .select("*")
+    .select("id, name, description, status, widget_color, welcome_message, messages_count, messages_this_month, created_at, updated_at")
     .eq("user_id", userId)
     .order("created_at", { ascending: false });
 

@@ -26,9 +26,10 @@ export async function GET(
   // Obtener mensajes de la conversación
   const { data: messages } = await supabase
     .from("messages")
-    .select("*")
+    .select("id, role, content, tokens_used, created_at")
     .eq("conversation_id", id)
-    .order("created_at", { ascending: true });
+    .order("created_at", { ascending: true })
+    .limit(500);
 
   return NextResponse.json({ conversation: conv, messages: messages ?? [] });
 }

@@ -35,7 +35,8 @@ export async function GET() {
     .select("created_at")
     .in("bot_id", botIds)
     .eq("role", "user")
-    .gte("created_at", thirtyDaysAgo.toISOString());
+    .gte("created_at", thirtyDaysAgo.toISOString())
+    .limit(5000);
 
   // Agrupar por fecha
   const byDate: Record<string, number> = {};

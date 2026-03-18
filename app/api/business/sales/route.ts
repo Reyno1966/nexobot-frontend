@@ -26,12 +26,13 @@ export async function GET(req: Request) {
 
   const { data, error } = await supabase
     .from("business_sales")
-    .select("*")
+    .select("id, description, amount, payment_method, category, date, notes, created_at")
     .eq("user_id", userId)
     .gte("date", from)
     .lte("date", to)
     .order("date", { ascending: false })
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .limit(500);
 
   if (error) {
     console.error("[GET /api/business/sales]", error);
