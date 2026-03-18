@@ -61,8 +61,8 @@ export const es: LandingT = {
   nav: { features: "Características", pricing: "Precios", faq: "FAQ", login: "Iniciar sesión", cta: "Empezar gratis →" },
   hero: {
     badge: "Más de 500 negocios confían en NexoBot",
-    h1: "Automatiza tus ventas y atención al cliente con NexoBot",
-    subtitle: "Tu asistente con IA que responde clientes, genera ventas y trabaja por ti 24/7. Ahorra tiempo, aumenta ingresos y escala sin esfuerzo.",
+    h1: "Tu negocio responde solo, por WhatsApp, las 24 horas",
+    subtitle: "NexoBot atiende a tus clientes por WhatsApp automáticamente — agenda citas, responde preguntas y cierra ventas mientras tú duermes.",
     cta1: "Empezar gratis →", cta2: "Ver cómo funciona", noCard: "Sin tarjeta de crédito · Cancela cuando quieras",
     stats: [
       { value: "500+", label: "Negocios activos" },
@@ -82,7 +82,7 @@ export const es: LandingT = {
     subtitle: "NexoBot combina IA, automatización y multicanalidad para atender más clientes y vender más sin esfuerzo.",
     items: [
       { title: "Responde en segundos",  desc: "Tu bot atiende automáticamente 24/7, sin retrasos ni tiempos de espera." },
-      { title: "Conecta tus canales",   desc: "WhatsApp, web, redes sociales o CRM. NexoBot se integra fácilmente con tu ecosistema." },
+      { title: "WhatsApp Business integrado", desc: "Tus clientes escriben donde ya están. El bot responde en segundos con info real de tu negocio." },
       { title: "Genera más ventas",     desc: "Flujos inteligentes, embudos automatizados y segmentación para convertir más clientes." },
     ],
   },
@@ -154,8 +154,8 @@ export const en: LandingT = {
   nav: { features: "Features", pricing: "Pricing", faq: "FAQ", login: "Sign in", cta: "Get started free →" },
   hero: {
     badge: "500+ businesses trust NexoBot",
-    h1: "Automate your sales and customer support with NexoBot",
-    subtitle: "Your AI assistant that replies to customers, generates sales, and works for you 24/7. Save time, increase revenue, and scale effortlessly.",
+    h1: "Your business responds on its own, on WhatsApp, 24 hours a day",
+    subtitle: "NexoBot automatically handles your customers on WhatsApp — schedules appointments, answers questions, and closes sales while you sleep.",
     cta1: "Get started free →", cta2: "See how it works", noCard: "No credit card required · Cancel anytime",
     stats: [
       { value: "500+", label: "Active businesses" },
@@ -175,7 +175,7 @@ export const en: LandingT = {
     subtitle: "NexoBot combines AI, automation, and multichannel to serve more customers and close more sales — effortlessly.",
     items: [
       { title: "Replies in seconds",    desc: "Your bot handles customers automatically 24/7, with no delays or waiting times." },
-      { title: "Connect your channels", desc: "WhatsApp, web, social media or CRM. NexoBot integrates easily with your ecosystem." },
+      { title: "WhatsApp Business integrated", desc: "Your customers write where they already are. The bot replies in seconds with real info about your business." },
       { title: "Generate more sales",   desc: "Smart flows, automated funnels, and segmentation to convert more customers." },
     ],
   },
@@ -247,8 +247,8 @@ export const it: LandingT = {
   nav: { features: "Funzionalità", pricing: "Prezzi", faq: "FAQ", login: "Accedi", cta: "Inizia gratis →" },
   hero: {
     badge: "Oltre 500 aziende si fidano di NexoBot",
-    h1: "Automatizza le tue vendite e il supporto clienti con NexoBot",
-    subtitle: "Il tuo assistente IA che risponde ai clienti, genera vendite e lavora per te 24/7. Risparmia tempo, aumenta le entrate e scala senza fatica.",
+    h1: "Il tuo business risponde da solo, su WhatsApp, 24 ore su 24",
+    subtitle: "NexoBot gestisce automaticamente i tuoi clienti su WhatsApp — fissa appuntamenti, risponde a domande e chiude vendite mentre dormi.",
     cta1: "Inizia gratis →", cta2: "Scopri come funziona", noCard: "Nessuna carta di credito · Disdici quando vuoi",
     stats: [
       { value: "500+", label: "Aziende attive" },
@@ -268,7 +268,7 @@ export const it: LandingT = {
     subtitle: "NexoBot combina IA, automazione e multicanalità per servire più clienti e vendere di più — senza sforzo.",
     items: [
       { title: "Risponde in secondi",     desc: "Il tuo bot gestisce i clienti automaticamente 24/7, senza ritardi né attese." },
-      { title: "Connetti i tuoi canali",  desc: "WhatsApp, web, social o CRM. NexoBot si integra facilmente con il tuo ecosistema." },
+      { title: "WhatsApp Business integrato", desc: "I tuoi clienti scrivono dove già sono. Il bot risponde in secondi con informazioni reali del tuo business." },
       { title: "Genera più vendite",      desc: "Flussi intelligenti, funnel automatizzati e segmentazione per convertire più clienti." },
     ],
   },
@@ -340,8 +340,8 @@ export const fr: LandingT = {
   nav: { features: "Fonctionnalités", pricing: "Tarifs", faq: "FAQ", login: "Se connecter", cta: "Commencer gratuitement →" },
   hero: {
     badge: "Plus de 500 entreprises font confiance à NexoBot",
-    h1: "Automatisez vos ventes et le support client avec NexoBot",
-    subtitle: "Votre assistant IA qui répond aux clients, génère des ventes et travaille pour vous 24h/24. Gagnez du temps, augmentez vos revenus et évoluez sans effort.",
+    h1: "Votre entreprise répond seule, sur WhatsApp, 24h/24",
+    subtitle: "NexoBot gère automatiquement vos clients sur WhatsApp — planifie des rendez-vous, répond aux questions et conclut des ventes pendant que vous dormez.",
     cta1: "Commencer gratuitement →", cta2: "Voir comment ça marche", noCard: "Sans carte bancaire · Annulez quand vous voulez",
     stats: [
       { value: "500+", label: "Entreprises actives" },
@@ -361,7 +361,7 @@ export const fr: LandingT = {
     subtitle: "NexoBot combine IA, automatisation et multicanal pour servir plus de clients et vendre plus — sans effort.",
     items: [
       { title: "Répond en secondes",       desc: "Votre bot gère les clients automatiquement 24h/24, sans délai ni attente." },
-      { title: "Connectez vos canaux",     desc: "WhatsApp, web, réseaux sociaux ou CRM. NexoBot s'intègre facilement à votre écosystème." },
+      { title: "WhatsApp Business intégré", desc: "Vos clients écrivent là où ils se trouvent déjà. Le bot répond en quelques secondes avec des infos réelles sur votre entreprise." },
       { title: "Générez plus de ventes",   desc: "Flux intelligents, tunnels automatisés et segmentation pour convertir plus de clients." },
     ],
   },
@@ -433,8 +433,8 @@ export const de: LandingT = {
   nav: { features: "Funktionen", pricing: "Preise", faq: "FAQ", login: "Anmelden", cta: "Kostenlos starten →" },
   hero: {
     badge: "Über 500 Unternehmen vertrauen NexoBot",
-    h1: "Automatisiere deinen Vertrieb und Kundensupport mit NexoBot",
-    subtitle: "Dein KI-Assistent, der Kunden antwortet, Verkäufe generiert und rund um die Uhr für dich arbeitet. Spare Zeit, steigere Einnahmen und skaliere mühelos.",
+    h1: "Dein Unternehmen antwortet automatisch, über WhatsApp, rund um die Uhr",
+    subtitle: "NexoBot betreut deine Kunden automatisch über WhatsApp — vereinbart Termine, beantwortet Fragen und schließt Verkäufe ab, während du schläfst.",
     cta1: "Kostenlos starten →", cta2: "Sehen wie es funktioniert", noCard: "Keine Kreditkarte · Jederzeit kündbar",
     stats: [
       { value: "500+", label: "Aktive Unternehmen" },
@@ -454,7 +454,7 @@ export const de: LandingT = {
     subtitle: "NexoBot kombiniert KI, Automatisierung und Multi-Channel, um mehr Kunden zu bedienen und mehr zu verkaufen — mühelos.",
     items: [
       { title: "Antwortet in Sekunden",      desc: "Dein Bot betreut Kunden automatisch rund um die Uhr, ohne Verzögerungen." },
-      { title: "Verbinde deine Kanäle",      desc: "WhatsApp, Web, soziale Medien oder CRM. NexoBot integriert sich nahtlos in dein Ökosystem." },
+      { title: "WhatsApp Business integriert", desc: "Deine Kunden schreiben dort, wo sie bereits sind. Der Bot antwortet in Sekunden mit echten Infos über dein Unternehmen." },
       { title: "Generiere mehr Umsatz",      desc: "Intelligente Flows, automatisierte Funnels und Segmentierung, um mehr Kunden zu konvertieren." },
     ],
   },
@@ -526,8 +526,8 @@ export const pt: LandingT = {
   nav: { features: "Funcionalidades", pricing: "Preços", faq: "FAQ", login: "Entrar", cta: "Começar grátis →" },
   hero: {
     badge: "Mais de 500 empresas confiam no NexoBot",
-    h1: "Automatize suas vendas e suporte ao cliente com NexoBot",
-    subtitle: "Seu assistente com IA que responde clientes, gera vendas e trabalha por você 24/7. Economize tempo, aumente receitas e escale sem esforço.",
+    h1: "Seu negócio responde sozinho, pelo WhatsApp, 24 horas por dia",
+    subtitle: "NexoBot atende seus clientes pelo WhatsApp automaticamente — agenda compromissos, responde perguntas e fecha vendas enquanto você dorme.",
     cta1: "Começar grátis →", cta2: "Ver como funciona", noCard: "Sem cartão de crédito · Cancele quando quiser",
     stats: [
       { value: "500+", label: "Empresas ativas" },
@@ -547,7 +547,7 @@ export const pt: LandingT = {
     subtitle: "NexoBot combina IA, automação e multicanal para atender mais clientes e vender mais — sem esforço.",
     items: [
       { title: "Responde em segundos",      desc: "Seu bot atende clientes automaticamente 24/7, sem atrasos nem esperas." },
-      { title: "Conecte seus canais",       desc: "WhatsApp, web, redes sociais ou CRM. NexoBot se integra facilmente ao seu ecossistema." },
+      { title: "WhatsApp Business integrado", desc: "Seus clientes escrevem onde já estão. O bot responde em segundos com informações reais do seu negócio." },
       { title: "Gere mais vendas",          desc: "Fluxos inteligentes, funis automatizados e segmentação para converter mais clientes." },
     ],
   },
@@ -619,8 +619,8 @@ export const ar: LandingT = {
   nav: { features: "المميزات", pricing: "الأسعار", faq: "الأسئلة الشائعة", login: "تسجيل الدخول", cta: "← ابدأ مجانًا" },
   hero: {
     badge: "أكثر من 500 شركة تثق في NexoBot",
-    h1: "أتمتة مبيعاتك ودعم عملائك مع NexoBot",
-    subtitle: "مساعدك الذكي بالذكاء الاصطناعي الذي يرد على العملاء ويولّد المبيعات ويعمل لأجلك 24/7. وفّر الوقت، وزِد الإيرادات، واتسع بسهولة.",
+    h1: "عملك يرد تلقائيًا، عبر واتساب، على مدار الساعة",
+    subtitle: "NexoBot يخدم عملاءك عبر واتساب تلقائيًا — يحدد المواعيد، ويجيب على الأسئلة، ويُتم الصفقات بينما أنت نائم.",
     cta1: "← ابدأ مجانًا", cta2: "شاهد كيف يعمل", noCard: "بدون بطاقة ائتمان · ألغِ في أي وقت",
     stats: [
       { value: "+500", label: "شركة نشطة" },
@@ -640,7 +640,7 @@ export const ar: LandingT = {
     subtitle: "NexoBot يجمع الذكاء الاصطناعي والأتمتة والتعدد القنوات لخدمة المزيد من العملاء وزيادة المبيعات — بكل سهولة.",
     items: [
       { title: "يرد في ثوانٍ",           desc: "يتعامل الروبوت مع العملاء تلقائيًا على مدار الساعة، بدون تأخير." },
-      { title: "اربط قنواتك",             desc: "واتساب، الويب، وسائل التواصل الاجتماعي أو CRM. NexoBot يتكامل بسهولة مع منظومتك." },
+      { title: "WhatsApp Business مدمج",   desc: "عملاؤك يكتبون من حيث هم. الروبوت يرد في ثوانٍ بمعلومات حقيقية عن عملك." },
       { title: "ولّد المزيد من المبيعات", desc: "تدفقات ذكية وقمع مبيعات مؤتمت وتجزئة لتحويل المزيد من العملاء." },
     ],
   },
@@ -712,8 +712,8 @@ export const zh: LandingT = {
   nav: { features: "功能", pricing: "价格", faq: "常见问题", login: "登录", cta: "免费开始 →" },
   hero: {
     badge: "超过500家企业信赖NexoBot",
-    h1: "用NexoBot自动化您的销售和客户支持",
-    subtitle: "您的AI助手全天候回复客户、创造销售、为您工作。节省时间，增加收入，轻松扩展。",
+    h1: "您的业务通过WhatsApp全天候自动回复",
+    subtitle: "NexoBot自动通过WhatsApp服务您的客户 — 预约预定、回答问题、促成交易，而您只需安心休息。",
     cta1: "免费开始 →", cta2: "了解工作原理", noCard: "无需信用卡 · 随时取消",
     stats: [
       { value: "500+", label: "活跃企业" },
@@ -733,7 +733,7 @@ export const zh: LandingT = {
     subtitle: "NexoBot结合AI、自动化和多渠道，轻松服务更多客户、销售更多产品。",
     items: [
       { title: "秒速回复",         desc: "您的机器人全天候自动服务客户，无延迟、无等待。" },
-      { title: "连接您的渠道",     desc: "WhatsApp、网页、社交媒体或CRM。NexoBot轻松与您的生态系统集成。" },
+      { title: "WhatsApp Business 集成", desc: "您的客户在他们常用的地方发消息。机器人在几秒内用您业务的真实信息回复。" },
       { title: "创造更多销售",     desc: "智能流程、自动化漏斗和细分，转化更多客户。" },
     ],
   },
@@ -805,8 +805,8 @@ export const ja: LandingT = {
   nav: { features: "機能", pricing: "料金", faq: "よくある質問", login: "ログイン", cta: "無料で始める →" },
   hero: {
     badge: "500社以上がNexoBotを信頼",
-    h1: "NexoBotで販売とカスタマーサポートを自動化",
-    subtitle: "顧客に返信し、販売を生み出し、24時間365日あなたのために働くAIアシスタント。時間を節約し、収益を増やし、手間なくスケールアップ。",
+    h1: "あなたのビジネスがWhatsAppで24時間自動応答",
+    subtitle: "NexoBotがWhatsAppであなたの顧客を自動対応 — 予約を調整し、質問に答え、あなたが眠っている間に販売を成立させます。",
     cta1: "無料で始める →", cta2: "仕組みを見る", noCard: "クレジットカード不要 · いつでもキャンセル可",
     stats: [
       { value: "500+", label: "稼働中の企業" },
@@ -826,7 +826,7 @@ export const ja: LandingT = {
     subtitle: "NexoBotはAI、自動化、マルチチャネルを組み合わせ、より多くの顧客にサービスを提供し、売上を増加させます。",
     items: [
       { title: "数秒で返信",         desc: "ボットが24時間365日自動的に顧客対応。遅延も待ち時間もありません。" },
-      { title: "チャネルを接続",     desc: "WhatsApp、ウェブ、SNS、CRM。NexoBotはエコシステムに簡単に統合できます。" },
+      { title: "WhatsApp Business 統合", desc: "顧客はすでに使っているアプリでメッセージを送ります。ボットがあなたのビジネスの実際の情報で数秒以内に返信。" },
       { title: "売上を増やす",       desc: "スマートフロー、自動ファネル、セグメンテーションでより多くの顧客をコンバージョン。" },
     ],
   },
@@ -898,8 +898,8 @@ export const ru: LandingT = {
   nav: { features: "Возможности", pricing: "Цены", faq: "FAQ", login: "Войти", cta: "Начать бесплатно →" },
   hero: {
     badge: "Более 500 компаний доверяют NexoBot",
-    h1: "Автоматизируйте продажи и поддержку клиентов с NexoBot",
-    subtitle: "Ваш AI-ассистент, который отвечает клиентам, генерирует продажи и работает за вас 24/7. Экономьте время, увеличивайте доход и масштабируйтесь без усилий.",
+    h1: "Ваш бизнес отвечает сам, через WhatsApp, круглосуточно",
+    subtitle: "NexoBot автоматически обслуживает ваших клиентов через WhatsApp — назначает встречи, отвечает на вопросы и заключает сделки, пока вы спите.",
     cta1: "Начать бесплатно →", cta2: "Узнать как это работает", noCard: "Без кредитной карты · Отмена в любое время",
     stats: [
       { value: "500+", label: "Активных компаний" },
@@ -919,7 +919,7 @@ export const ru: LandingT = {
     subtitle: "NexoBot сочетает AI, автоматизацию и многоканальность для обслуживания большего числа клиентов и увеличения продаж.",
     items: [
       { title: "Отвечает за секунды",      desc: "Ваш бот автоматически обслуживает клиентов 24/7 без задержек и ожидания." },
-      { title: "Подключайте каналы",       desc: "WhatsApp, веб, соцсети или CRM. NexoBot легко интегрируется в вашу экосистему." },
+      { title: "WhatsApp Business интегрирован", desc: "Ваши клиенты пишут там, где им удобно. Бот отвечает за секунды с реальной информацией о вашем бизнесе." },
       { title: "Генерируйте больше продаж", desc: "Умные сценарии, автоматические воронки и сегментация для конверсии большего числа клиентов." },
     ],
   },
@@ -991,8 +991,8 @@ export const ko: LandingT = {
   nav: { features: "기능", pricing: "요금", faq: "자주 묻는 질문", login: "로그인", cta: "무료로 시작 →" },
   hero: {
     badge: "500개 이상의 기업이 NexoBot을 신뢰합니다",
-    h1: "NexoBot으로 판매 및 고객 지원 자동화",
-    subtitle: "고객에게 응답하고, 판매를 창출하며, 24/7 당신을 위해 일하는 AI 어시스턴트. 시간을 절약하고, 수익을 늘리고, 손쉽게 확장하세요.",
+    h1: "당신의 비즈니스가 WhatsApp으로 24시간 자동 응답합니다",
+    subtitle: "NexoBot이 WhatsApp으로 고객을 자동 응대합니다 — 당신이 자는 동안 예약을 잡고, 질문에 답하고, 판매를 성사시킵니다.",
     cta1: "무료로 시작 →", cta2: "작동 방식 보기", noCard: "신용카드 불필요 · 언제든지 취소 가능",
     stats: [
       { value: "500+", label: "활성 기업" },
@@ -1012,7 +1012,7 @@ export const ko: LandingT = {
     subtitle: "NexoBot은 AI, 자동화, 멀티채널을 결합하여 더 많은 고객을 서비스하고 더 많이 판매합니다.",
     items: [
       { title: "몇 초 만에 응답",     desc: "봇이 24/7 자동으로 고객을 처리합니다. 지연이나 대기 없이." },
-      { title: "채널 연결",           desc: "WhatsApp, 웹, 소셜 미디어 또는 CRM. NexoBot은 에코시스템과 쉽게 통합됩니다." },
+      { title: "WhatsApp Business 통합", desc: "고객이 이미 사용하는 곳에서 메시지를 보냅니다. 봇이 몇 초 안에 실제 비즈니스 정보로 답합니다." },
       { title: "더 많은 매출 창출",   desc: "스마트 플로우, 자동화된 퍼널, 세분화로 더 많은 고객을 전환하세요." },
     ],
   },
@@ -1084,8 +1084,8 @@ export const nl: LandingT = {
   nav: { features: "Functies", pricing: "Prijzen", faq: "FAQ", login: "Inloggen", cta: "Gratis starten →" },
   hero: {
     badge: "Meer dan 500 bedrijven vertrouwen NexoBot",
-    h1: "Automatiseer verkoop en klantenservice met NexoBot",
-    subtitle: "Uw AI-assistent die klanten beantwoordt, verkoop genereert en 24/7 voor u werkt. Bespaar tijd, verhoog inkomsten en schaal moeiteloos op.",
+    h1: "Uw bedrijf antwoordt vanzelf, via WhatsApp, 24 uur per dag",
+    subtitle: "NexoBot bedient uw klanten automatisch via WhatsApp — plant afspraken, beantwoordt vragen en sluit verkopen terwijl u slaapt.",
     cta1: "Gratis starten →", cta2: "Bekijk hoe het werkt", noCard: "Geen creditcard vereist · Altijd opzegbaar",
     stats: [
       { value: "500+", label: "Actieve bedrijven" },
@@ -1105,7 +1105,7 @@ export const nl: LandingT = {
     subtitle: "NexoBot combineert AI, automatisering en meerdere kanalen om meer klanten te bedienen en meer te verkopen.",
     items: [
       { title: "Antwoordt in seconden",      desc: "Uw bot bedient klanten automatisch 24/7 zonder vertragingen of wachttijden." },
-      { title: "Verbind uw kanalen",         desc: "WhatsApp, web, social media of CRM. NexoBot integreert eenvoudig in uw ecosysteem." },
+      { title: "WhatsApp Business geïntegreerd", desc: "Uw klanten schrijven waar ze al zijn. De bot antwoordt in seconden met echte informatie over uw bedrijf." },
       { title: "Genereer meer verkopen",     desc: "Slimme flows, geautomatiseerde funnels en segmentatie om meer klanten te converteren." },
     ],
   },
@@ -1177,8 +1177,8 @@ export const tr: LandingT = {
   nav: { features: "Özellikler", pricing: "Fiyatlar", faq: "SSS", login: "Giriş yap", cta: "Ücretsiz başla →" },
   hero: {
     badge: "500'den fazla şirket NexoBot'a güveniyor",
-    h1: "NexoBot ile satışlarınızı ve müşteri desteğinizi otomatikleştirin",
-    subtitle: "Müşterilere yanıt veren, satış üreten ve 7/24 sizin için çalışan yapay zeka asistanınız. Zaman kazanın, gelir artırın ve zahmetsizce büyüyün.",
+    h1: "İşletmeniz WhatsApp'ta 7/24 otomatik yanıt veriyor",
+    subtitle: "NexoBot, müşterilerinizi WhatsApp üzerinden otomatik olarak karşılar — siz uyurken randevu alır, soruları yanıtlar ve satışları kapatır.",
     cta1: "Ücretsiz başla →", cta2: "Nasıl çalıştığını gör", noCard: "Kredi kartı gerekmez · İstediğiniz zaman iptal",
     stats: [
       { value: "500+", label: "Aktif şirket" },
@@ -1198,7 +1198,7 @@ export const tr: LandingT = {
     subtitle: "NexoBot, daha fazla müşteriye hizmet vermek ve daha fazla satmak için yapay zeka, otomasyon ve çok kanallılığı birleştirir.",
     items: [
       { title: "Saniyeler içinde yanıt",    desc: "Botunuz müşterileri 7/24 otomatik olarak karşılar. Gecikme veya bekleme yok." },
-      { title: "Kanallarınızı bağlayın",   desc: "WhatsApp, web, sosyal medya veya CRM. NexoBot ekosisteминizle kolayca entegre olur." },
+      { title: "WhatsApp Business entegre", desc: "Müşterileriniz zaten kullandıkları yerde yazar. Bot saniyeler içinde işletmeniz hakkında gerçek bilgilerle yanıt verir." },
       { title: "Daha fazla satış üretin",  desc: "Akıllı akışlar, otomatik huniler ve segmentasyon ile daha fazla müşteriyi dönüştürün." },
     ],
   },
