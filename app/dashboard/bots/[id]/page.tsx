@@ -19,6 +19,7 @@ interface Bot {
   notify_whatsapp: string | null;
   notify_telegram_token: string | null;
   notify_telegram_chat_id: string | null;
+  agent_enabled: boolean;
 }
 
 interface ChatMessage {
@@ -55,6 +56,7 @@ export default function BotDetailPage() {
   const [widgetColor, setWidgetColor] = useState("#2CC5C5");
   const [welcomeMessage, setWelcomeMessage] = useState("¡Hola! 👋 ¿En qué puedo ayudarte hoy?");
   const [hexInput, setHexInput] = useState("#2CC5C5");
+  const [agentEnabled, setAgentEnabled] = useState(false);
 
   // Chat test
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
@@ -250,6 +252,7 @@ export default function BotDetailPage() {
       setNotifyWhatsapp(found.notify_whatsapp ?? "");
       setNotifyTelegramToken(found.notify_telegram_token ?? "");
       setNotifyTelegramChatId(found.notify_telegram_chat_id ?? "");
+      setAgentEnabled(found.agent_enabled ?? false);
       setLoading(false);
     }
     load();
@@ -290,6 +293,7 @@ export default function BotDetailPage() {
         notify_whatsapp: notifyWhatsapp || null,
         notify_telegram_token: notifyTelegramToken || null,
         notify_telegram_chat_id: notifyTelegramChatId || null,
+        agent_enabled: agentEnabled,
       }),
     });
     if (res.ok) {
@@ -477,6 +481,37 @@ export default function BotDetailPage() {
             <p className="text-xs text-gray-400 mt-2">
               💡 Para bots de citas: incluye un flujo paso a paso y termina confirmando con la fecha y hora. Máximo 1500 caracteres.
             </p>
+          </div>
+
+          {/* Agente AI */}
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+            <div className="flex items-start justify-between">
+              <div className="flex-1">
+                <div className="flex items-center gap-2">
+                  <h2 className="font-semibold text-gray-900">Agente AI</h2>
+                  <span className="text-xs font-bold bg-gradient-to-r from-[#2CC5C5] to-[#F5A623] text-white px-2 py-0.5 rounded-full">NUEVO</span>
+                </div>
+                <p className="text-sm text-gray-500 mt-1">
+                  El agente puede consultar tu inventario, agendar citas y buscar productos en tiempo real usando herramientas inteligentes.
+                  {agentEnabled && <span className="ml-1 text-[#2CC5C5] font-medium">Activo</span>}
+                </p>
+                {agentEnabled && (
+                  <ul className="mt-3 space-y-1 text-xs text-gray-500">
+                    <li className="flex items-center gap-1.5"><span className="text-[#2CC5C5]">✓</span>Consultar inventario y precios</li>
+                    <li className="flex items-center gap-1.5"><span className="text-[#2CC5C5]">✓</span>Buscar productos por nombre</li>
+                    <li className="flex items-center gap-1.5"><span className="text-[#2CC5C5]">✓</span>Verificar disponibilidad de citas</li>
+                    <li className="flex items-center gap-1.5"><span className="text-[#2CC5C5]">✓</span>Agendar citas automáticamente</li>
+                  </ul>
+                )}
+              </div>
+              <button
+                onClick={() => setAgentEnabled(!agentEnabled)}
+                className={`relative flex-shrink-0 ml-4 w-12 h-6 rounded-full transition-colors ${agentEnabled ? "bg-[#2CC5C5]" : "bg-gray-200"}`}
+                aria-label="Activar/desactivar Agente AI"
+              >
+                <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${agentEnabled ? "translate-x-6" : "translate-x-0"}`} />
+              </button>
+            </div>
           </div>
 
           <div className="flex items-center gap-3">

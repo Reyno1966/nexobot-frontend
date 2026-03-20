@@ -7,6 +7,7 @@
 
 import { SupabaseClient, createClient } from "@supabase/supabase-js";
 import { callOpenAI, AI_MODEL, MAX_OUTPUT_TOKENS, MAX_HISTORY_MESSAGES, MAX_SYSTEM_PROMPT_CHARS, needsMonthlyReset } from "@/lib/openai";
+import { runAgentLoop } from "@/lib/agentLoop";
 import { tryExtractAppointment } from "@/lib/appointments";
 import { getInventoryContext } from "@/lib/getInventoryContext";
 import { PLAN_LIMITS } from "@/lib/plans";
@@ -105,23 +106,33 @@ export async function processBotMessage({
 
   const userMessage = message.trim().substring(0, 800);
 
-  // ── 6. Llamar a OpenAI con reintentos ─────────────────────────────────────
+  // ── 6. Llamar a OpenAI — modo agente o modo simple ────────────────────────
   let reply      = "";
   let tokensUsed = 0;
 
+  const openAIMessages = [
+    { role: "system" as const, content: systemPrompt },
+    ...recentHistory,
+    { role: "user" as const, content: userMessage },
+  ];
+
   try {
-    const completion = await callOpenAI({
-      model: AI_MODEL,
-      max_tokens: MAX_OUTPUT_TOKENS,
-      temperature: 0.7,
-      messages: [
-        { role: "system", content: systemPrompt },
-        ...recentHistory,
-        { role: "user", content: userMessage },
-      ],
-    });
-    reply      = completion.choices[0]?.message?.content ?? "Lo siento, no pude procesar tu mensaje.";
-    tokensUsed = completion.usage?.total_tokens ?? 0;
+    if (bot.agent_enabled) {
+      // Modo Agente AI: loop con tool calling (get_inventory, search_appointments, etc.)
+      const agentResult = await runAgentLoop(openAIMessages, { supabase, userId, botId });
+      reply      = agentResult.reply;
+      tokensUsed = agentResult.tokensUsed;
+    } else {
+      // Modo clásico: una sola llamada a OpenAI (comportamiento original)
+      const completion = await callOpenAI({
+        model:       AI_MODEL,
+        max_tokens:  MAX_OUTPUT_TOKENS,
+        temperature: 0.7,
+        messages:    openAIMessages,
+      });
+      reply      = completion.choices[0]?.message?.content ?? "Lo siento, no pude procesar tu mensaje.";
+      tokensUsed = completion.usage?.total_tokens ?? 0;
+    }
   } catch (err) {
     const msg = err instanceof Error ? err.message : "Error desconocido";
     console.error("[processBotMessage] OpenAI error:", msg);

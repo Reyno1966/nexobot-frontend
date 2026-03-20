@@ -13,6 +13,7 @@ export async function PUT(
   const {
     name, description, channel, status, system_prompt, widget_color, welcome_message,
     notify_email, notify_whatsapp, notify_telegram_token, notify_telegram_chat_id,
+    agent_enabled,
   } = await req.json();
 
   const { data: bot, error } = await supabase
@@ -29,6 +30,7 @@ export async function PUT(
       notify_whatsapp: notify_whatsapp ?? null,
       notify_telegram_token: notify_telegram_token ?? null,
       notify_telegram_chat_id: notify_telegram_chat_id ?? null,
+      agent_enabled: agent_enabled ?? false,
       updated_at: new Date().toISOString(),
     })
     .eq("id", id)
