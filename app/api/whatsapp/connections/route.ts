@@ -1,7 +1,9 @@
 /**
  * app/api/whatsapp/connections/route.ts
- * GET  → Obtiene la conexión WhatsApp activa del bot dado
- * POST → Crea o actualiza la conexión WhatsApp para un bot
+ * GET    → Obtiene la conexión WhatsApp activa del bot dado
+ *          Devuelve has_token: boolean en lugar del token real
+ * POST   → Crea o actualiza la conexión WhatsApp para un bot
+ *          Acepta waToken para guardarlo en wa_token
  * DELETE → Desactiva la conexión (no elimina el historial)
  */
 
@@ -31,13 +33,21 @@ export async function GET(req: Request) {
 
   const { data: connection } = await supabase
     .from("whatsapp_connections")
-    .select("id, phone_number_id, display_phone, active, created_at")
+    .select("id, phone_number_id, display_phone, active, created_at, wa_token")
     .eq("bot_id", botId)
     .eq("user_id", userId)
     .single();
 
-  // Retornar null si no hay conexión (no es un error)
-  return NextResponse.json({ connection: connection ?? null });
+  if (!connection) return NextResponse.json({ connection: null });
+
+  // Nunca devolver el token real — solo indicar si está configurado
+  const { wa_token, ...rest } = connection;
+  return NextResponse.json({
+    connection: {
+      ...rest,
+      has_token: Boolean(wa_token),
+    },
+  });
 }
 
 // ─── POST ─────────────────────────────────────────────────────────────────────
@@ -48,14 +58,18 @@ export async function POST(req: Request) {
   const { supabase, userId } = auth;
 
   const body = await req.json();
-  const { botId, phoneNumberId, displayPhone } = body as {
-    botId:         string;
-    phoneNumberId: string;
-    displayPhone?: string;
+  const { botId, phoneNumberId, displayPhone, waToken } = body as {
+    botId:          string;
+    phoneNumberId:  string;
+    displayPhone?:  string;
+    waToken?:       string;
   };
 
   if (!botId || !phoneNumberId?.trim()) {
-    return NextResponse.json({ error: "Faltan parámetros: botId y phoneNumberId son requeridos" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Faltan parámetros: botId y phoneNumberId son requeridos" },
+      { status: 400 }
+    );
   }
 
   // Verificar ownership del bot
@@ -68,21 +82,25 @@ export async function POST(req: Request) {
 
   if (!bot) return NextResponse.json({ error: "Bot no encontrado" }, { status: 404 });
 
-  // Upsert: si ya existe una conexión para este phone_number_id la actualiza
+  // Construir el payload — solo incluir wa_token si se proporcionó uno nuevo
+  // Un string vacío significa "borrar el token" (volver a usar el env global)
+  const upsertPayload: Record<string, unknown> = {
+    user_id:         userId,
+    bot_id:          botId,
+    phone_number_id: phoneNumberId.trim(),
+    display_phone:   displayPhone?.trim() || null,
+    active:          true,
+    updated_at:      new Date().toISOString(),
+  };
+
+  if (waToken !== undefined) {
+    upsertPayload.wa_token = waToken.trim() || null;
+  }
+
   const { data: connection, error } = await supabase
     .from("whatsapp_connections")
-    .upsert(
-      {
-        user_id:         userId,
-        bot_id:          botId,
-        phone_number_id: phoneNumberId.trim(),
-        display_phone:   displayPhone?.trim() ?? null,
-        active:          true,
-        updated_at:      new Date().toISOString(),
-      },
-      { onConflict: "phone_number_id" }
-    )
-    .select("id, phone_number_id, display_phone, active, created_at")
+    .upsert(upsertPayload, { onConflict: "phone_number_id" })
+    .select("id, phone_number_id, display_phone, active, created_at, wa_token")
     .single();
 
   if (error) {
@@ -90,7 +108,13 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Error al guardar la conexión" }, { status: 500 });
   }
 
-  return NextResponse.json({ connection });
+  const { wa_token: savedToken, ...rest } = connection;
+  return NextResponse.json({
+    connection: {
+      ...rest,
+      has_token: Boolean(savedToken),
+    },
+  });
 }
 
 // ─── DELETE ───────────────────────────────────────────────────────────────────

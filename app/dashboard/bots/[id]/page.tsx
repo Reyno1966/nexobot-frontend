@@ -81,13 +81,24 @@ export default function BotDetailPage() {
     phone_number_id: string;
     display_phone: string | null;
     active: boolean;
+    has_token: boolean;
     created_at: string;
+  }
+  interface WAVerifyResult {
+    displayName: string | null;
+    phoneNumber: string | null;
   }
   const [waConnection, setWaConnection]       = useState<WAConnection | null>(null);
   const [waLoading, setWaLoading]             = useState(false);
   const [waSaving, setWaSaving]               = useState(false);
   const [waPhoneNumberId, setWaPhoneNumberId] = useState("");
   const [waDisplayPhone, setWaDisplayPhone]   = useState("");
+  const [waToken, setWaToken]                 = useState("");
+  const [waHasToken, setWaHasToken]           = useState(false);
+  const [waShowToken, setWaShowToken]         = useState(false);
+  const [waVerifying, setWaVerifying]         = useState(false);
+  const [waVerified, setWaVerified]           = useState<WAVerifyResult | null>(null);
+  const [waVerifyError, setWaVerifyError]     = useState("");
   const [waSaved, setWaSaved]                 = useState(false);
   const [waError, setWaError]                 = useState("");
 
@@ -131,27 +142,70 @@ export default function BotDetailPage() {
         if (data.connection) {
           setWaPhoneNumberId(data.connection.phone_number_id ?? "");
           setWaDisplayPhone(data.connection.display_phone ?? "");
+          setWaHasToken(data.connection.has_token ?? false);
         }
       }
     } catch { /* silencioso */ }
     setWaLoading(false);
   }
 
+  async function handleVerifyWA() {
+    const tokenToVerify = waToken.trim();
+    if (!waPhoneNumberId.trim() || !tokenToVerify) {
+      setWaVerifyError("Ingresa el Phone Number ID y el token antes de verificar.");
+      return;
+    }
+    setWaVerifying(true);
+    setWaVerified(null);
+    setWaVerifyError("");
+    try {
+      const res = await fetch("/api/whatsapp/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ botId: id, phoneNumberId: waPhoneNumberId, waToken: tokenToVerify }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        setWaVerifyError(data.error ?? "No se pudo verificar la conexión con Meta.");
+      } else {
+        setWaVerified({ displayName: data.displayName, phoneNumber: data.phoneNumber });
+        // Autocompletar display_phone si está vacío
+        if (!waDisplayPhone && data.phoneNumber) {
+          setWaDisplayPhone(data.phoneNumber);
+        }
+      }
+    } catch {
+      setWaVerifyError("Error de red al verificar.");
+    }
+    setWaVerifying(false);
+  }
+
   async function handleSaveWA() {
     setWaSaving(true);
     setWaError("");
     try {
+      const body: Record<string, string> = {
+        botId:         id,
+        phoneNumberId: waPhoneNumberId,
+        displayPhone:  waDisplayPhone,
+      };
+      // Solo enviar waToken si el usuario escribió uno nuevo
+      if (waToken.trim()) body.waToken = waToken.trim();
+
       const res = await fetch("/api/whatsapp/connections", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ botId: id, phoneNumberId: waPhoneNumberId, displayPhone: waDisplayPhone }),
+        body: JSON.stringify(body),
       });
       const data = await res.json();
       if (!res.ok) {
         setWaError(data.error ?? "Error al guardar");
       } else {
         setWaConnection(data.connection);
+        setWaHasToken(data.connection?.has_token ?? false);
+        setWaToken(""); // Limpiar campo de token tras guardar
         setWaSaved(true);
         setTimeout(() => setWaSaved(false), 2500);
       }
@@ -171,6 +225,9 @@ export default function BotDetailPage() {
       setWaConnection(null);
       setWaPhoneNumberId("");
       setWaDisplayPhone("");
+      setWaToken("");
+      setWaHasToken(false);
+      setWaVerified(null);
     }
   }
 
@@ -1086,6 +1143,7 @@ export default function BotDetailPage() {
               </div>
             ) : (
               <div className="space-y-4">
+                {/* Phone Number ID */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">
                     Phone Number ID <span className="text-red-400">*</span>
@@ -1093,15 +1151,56 @@ export default function BotDetailPage() {
                   <input
                     type="text"
                     value={waPhoneNumberId}
-                    onChange={(e) => setWaPhoneNumberId(e.target.value)}
+                    onChange={(e) => { setWaPhoneNumberId(e.target.value); setWaVerified(null); }}
                     placeholder="ej: 875188135685843"
                     className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-[#2CC5C5]"
                   />
                   <p className="text-xs text-gray-400 mt-1">
-                    Lo encuentras en Meta for Developers → tu app → WhatsApp → API Setup → Phone Number ID
+                    Meta for Developers → tu app → WhatsApp → API Setup → Phone Number ID
                   </p>
                 </div>
 
+                {/* Token de acceso */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                    Token de acceso permanente{" "}
+                    {waHasToken && !waToken && (
+                      <span className="ml-1.5 text-xs font-normal text-green-600 bg-green-50 px-2 py-0.5 rounded-full">
+                        ✓ configurado
+                      </span>
+                    )}
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={waShowToken ? "text" : "password"}
+                      value={waToken}
+                      onChange={(e) => { setWaToken(e.target.value); setWaVerified(null); setWaVerifyError(""); }}
+                      placeholder={waHasToken ? "Deja vacío para mantener el token actual" : "EAABs..."}
+                      className="w-full border border-gray-200 rounded-xl px-4 py-2.5 pr-12 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-[#2CC5C5]"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setWaShowToken((v) => !v)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    >
+                      {waShowToken ? (
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                        </svg>
+                      ) : (
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                      )}
+                    </button>
+                  </div>
+                  <p className="text-xs text-gray-400 mt-1">
+                    Meta for Developers → tu app → WhatsApp → API Setup → Temporary/Permanent Token
+                  </p>
+                </div>
+
+                {/* Número visible */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">
                     Número visible (opcional)
@@ -1110,9 +1209,50 @@ export default function BotDetailPage() {
                     type="text"
                     value={waDisplayPhone}
                     onChange={(e) => setWaDisplayPhone(e.target.value)}
-                    placeholder="ej: +1 555 123 4567"
+                    placeholder="ej: +52 55 1234 5678"
                     className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#2CC5C5]"
                   />
+                </div>
+
+                {/* Verificar conexión */}
+                <div className="border border-gray-100 rounded-xl p-4 bg-gray-50">
+                  <div className="flex items-center justify-between gap-3 flex-wrap">
+                    <div>
+                      <p className="text-sm font-medium text-gray-700">Verificar conexión con Meta</p>
+                      <p className="text-xs text-gray-400 mt-0.5">
+                        Comprueba que el Phone Number ID y el token son válidos antes de guardar.
+                      </p>
+                    </div>
+                    <button
+                      onClick={handleVerifyWA}
+                      disabled={waVerifying || !waPhoneNumberId.trim() || (!waToken.trim() && !waHasToken)}
+                      className="flex-shrink-0 px-4 py-2 border border-[#2CC5C5] text-[#2CC5C5] rounded-xl text-sm font-medium hover:bg-[#2CC5C5]/5 transition disabled:opacity-40"
+                    >
+                      {waVerifying ? (
+                        <span className="flex items-center gap-2">
+                          <span className="w-3.5 h-3.5 border-2 border-[#2CC5C5] border-t-transparent rounded-full animate-spin" />
+                          Verificando...
+                        </span>
+                      ) : "Verificar conexión"}
+                    </button>
+                  </div>
+
+                  {waVerified && (
+                    <div className="mt-3 flex items-start gap-2 text-sm text-green-700 bg-green-50 rounded-lg px-3 py-2">
+                      <svg className="w-4 h-4 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span>
+                        Conexión verificada
+                        {waVerified.displayName && <> — <strong>{waVerified.displayName}</strong></>}
+                        {waVerified.phoneNumber && <> ({waVerified.phoneNumber})</>}
+                      </span>
+                    </div>
+                  )}
+
+                  {waVerifyError && (
+                    <p className="mt-3 text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2">{waVerifyError}</p>
+                  )}
                 </div>
 
                 {waError && (
@@ -1177,12 +1317,11 @@ export default function BotDetailPage() {
 
           {/* Variables de entorno necesarias */}
           <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5 text-sm text-amber-800">
-            <p className="font-semibold mb-2">Variables de entorno requeridas en Vercel</p>
+            <p className="font-semibold mb-2">Variables de entorno requeridas en Vercel (solo para el administrador)</p>
             <ul className="space-y-1 font-mono text-xs text-amber-700">
-              <li>WHATSAPP_TOKEN — Token de acceso permanente de Meta</li>
-              <li>WHATSAPP_PHONE_NUMBER_ID — ID del número de teléfono</li>
-              <li>WHATSAPP_VERIFY_TOKEN — Token secreto para verificar el webhook</li>
-              <li>WHATSAPP_APP_SECRET — App Secret de tu app Meta (para verificar firma)</li>
+              <li>WHATSAPP_VERIFY_TOKEN — Token secreto para verificar el webhook (ej: nexobot_webhook_2024)</li>
+              <li>WHATSAPP_APP_SECRET — App Secret de tu app Meta (para verificar la firma HMAC)</li>
+              <li className="text-amber-500">WHATSAPP_TOKEN — Opcional: token global de fallback si el cliente no configura el suyo</li>
             </ul>
           </div>
         </div>
