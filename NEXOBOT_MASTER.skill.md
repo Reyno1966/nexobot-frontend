@@ -287,8 +287,8 @@ ALTER TABLE products ADD COLUMN cost_price NUMERIC(10,2);
   - Usa `getAuth()` + `processBotMessage()`
   - Guarda historial en conversación `dashboard-{userId}-{botId}`
 
-### WhatsApp Integration (2026-03-15, debuggeado 2026-03-17)
-**Fase 2B — Bot responde en WhatsApp en tiempo real**
+### WhatsApp Integration (2026-03-15, debuggeado 2026-03-17, pipeline verificado 2026-03-18)
+**Fase 2B — Bot responde en WhatsApp en tiempo real — ✅ 100% COMPLETADA**
 
 **Archivos**:
 - `lib/whatsapp.ts` → `sendWhatsAppMessage()`, `markWhatsAppMessageRead()`, `verifyWebhookSignature()`
@@ -324,34 +324,86 @@ WHATSAPP_APP_SECRET      — App Secret de Meta (para verificar firma HMAC-SHA25
 ```
 
 **Requisito crítico — tabla whatsapp_connections**:
-Para que el webhook procese mensajes, DEBE existir una fila activa:
+Para que el webhook procese mensajes, DEBE existir una fila activa con `wa_token` seteado:
 ```sql
 INSERT INTO whatsapp_connections (user_id, bot_id, phone_number_id, display_phone, wa_token, active)
-VALUES ('uuid-usuario', 'uuid-bot', '875188135685843', '15551464450', NULL, true);
--- wa_token = NULL → usa WHATSAPP_TOKEN del entorno de Vercel
+VALUES ('uuid-usuario', 'uuid-bot', '875188135685843', '15551464450', 'EAATZA...token', true);
+-- wa_token DEBE tener el token permanente de Meta (empieza con EAAT...)
+-- Si wa_token = NULL el código cae a WHATSAPP_TOKEN env var, pero SIEMPRE preferir guardarlo en BD
 ```
-Sin esta fila, el webhook recibe el POST pero no hace nada (log: "No hay conexión activa").
+
+**Actualizar token en producción**:
+```sql
+UPDATE whatsapp_connections
+SET wa_token = 'EAAT...token_permanente', updated_at = now()
+WHERE phone_number_id = '875188135685843';
+```
+
+Sin esta fila (o con `wa_token = NULL` y sin `WHATSAPP_TOKEN` en Vercel), el webhook retorna 200 OK
+pero no envía nada — el bot procesa con OpenAI pero la respuesta se pierde en silencio.
+
+**Bug crítico resuelto (2026-03-18)**: `wa_token = NULL` en `whatsapp_connections` →
+webhook aceptaba mensajes (200 OK), llamaba OpenAI, pero `sendWhatsAppMessage()` no tenía token
+→ respuesta nunca llegaba al WhatsApp del usuario (fallo silencioso).
+```sql
+UPDATE whatsapp_connections SET wa_token = 'EAA...' WHERE phone_number_id = '875188135685843';
+```
+**Regla**: `wa_token` SIEMPRE debe estar en la BD. No depender solo de la env var `WHATSAPP_TOKEN`.
+
+**Testing — diagnóstico por tiempo de respuesta**:
+- `~7.5s` → flujo completo OK (Webhook → Supabase → OpenAI → Meta → WhatsApp ✅)
+- `<1s` → fallo silencioso antes de OpenAI (revisar conexión, token, bot status)
+
+**Pipeline verificado**: Meta → Webhook → Supabase → OpenAI → WhatsApp ✅
 
 **Dashboard**: pestaña "📱 WhatsApp" en `/dashboard/bots/[id]`
-- Formulario para Phone Number ID y número visible
-- Instrucciones para registrar el webhook en Meta
+- Formulario: Phone Number ID, Token de acceso permanente (password con show/hide), Número visible
+- Badge "✓ configurado" si ya existe `wa_token` en BD (sin exponer el valor)
+- Botón "Verificar conexión" → llama a `/api/whatsapp/verify` → Meta API → muestra displayName y número real
+- Autocompletado de número visible desde el resultado de Meta
 - Botones: Activar / Actualizar / Desactivar
+- Instrucciones para registrar el webhook en Meta
+
+**Multi-tenant (2026-03-20)**:
+- Cada cliente guarda su propio `wa_token` en `whatsapp_connections.wa_token`
+- La API GET devuelve `has_token: boolean` (nunca el token real)
+- La API POST acepta `waToken` — si está vacío, no sobreescribe el token existente
+- El webhook usa `wa_token` del cliente primero, fallback a env `WHATSAPP_TOKEN`
+- `app/api/whatsapp/verify/route.ts` → verifica contra `graph.facebook.com/v19.0/{phoneNumberId}`
 
 **Seguridad**:
 - No usa `getAuth()` en el webhook (endpoint público para Meta)
 - Verifica firma `X-Hub-Signature-256` con HMAC-SHA256 timing-safe
 - Ignora eventos `status` (delivered/read) para evitar bucles
 - Usa service role key de Supabase en el webhook
+- `wa_token` nunca se devuelve en GET; solo `has_token: boolean`
 
-**Testing con curl** (reemplazar APP_SECRET):
-```bash
-PAYLOAD='{"object":"whatsapp_business_account","entry":[...]}'
-SIG="sha256=$(printf '%s' "$PAYLOAD" | openssl dgst -sha256 -hmac "APP_SECRET" | awk '{print $2}')"
-curl -X POST https://www.nexobot.net/api/whatsapp/webhook \
-  -H "Content-Type: application/json" \
-  -H "x-hub-signature-256: $SIG" \
-  --data-raw "$PAYLOAD"
-# ⚠️ Usar printf (no echo) para el HMAC — echo agrega \n y cambia la firma
+**Testing con curl** (usar Python para HMAC — más confiable que bash):
+```python
+import hmac, hashlib, json, subprocess, time
+
+APP_SECRET = "fb90acb8ed10f8a65e9609b9f783c60c"
+PHONE_NUMBER_ID = "875188135685843"
+FROM_PHONE = "41789027648"
+
+payload = {
+  "object": "whatsapp_business_account",
+  "entry": [{"id": "123456789", "changes": [{"value": {
+    "messaging_product": "whatsapp",
+    "metadata": {"display_phone_number": "15550000000", "phone_number_id": PHONE_NUMBER_ID},
+    "contacts": [{"profile": {"name": "Test"}, "wa_id": FROM_PHONE}],
+    "messages": [{"from": FROM_PHONE, "id": f"wamid.test_{int(time.time())}",
+                  "timestamp": str(int(time.time())), "type": "text", "text": {"body": "Hola"}}]
+  }, "field": "messages"}]}]
+}
+body = json.dumps(payload, separators=(',', ':'))
+sig = "sha256=" + hmac.new(APP_SECRET.encode(), body.encode(), hashlib.sha256).hexdigest()
+
+subprocess.run(["curl", "-s", "-w", "\nHTTP: %{http_code} TIME: %{time_total}s",
+  "-X", "POST", "https://www.nexobot.net/api/whatsapp/webhook",
+  "-H", "Content-Type: application/json", "-H", f"X-Hub-Signature-256: {sig}", "-d", body])
+# Respuesta esperada: {"ok":true} HTTP: 200 TIME: ~7.5s (confirma que OpenAI + Meta corrieron)
+# Si TIME < 1s → algo falló silenciosamente antes de llegar a OpenAI
 ```
 
 ### Fase 2A — Bot conectado al inventario
