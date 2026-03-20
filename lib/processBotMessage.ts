@@ -7,7 +7,7 @@
 
 import { SupabaseClient, createClient } from "@supabase/supabase-js";
 import { callOpenAI, AI_MODEL, MAX_OUTPUT_TOKENS, MAX_HISTORY_MESSAGES, MAX_SYSTEM_PROMPT_CHARS, needsMonthlyReset } from "@/lib/openai";
-import { runAgentLoop } from "@/lib/agentLoop";
+import { runAgentLoop, AGENT_SYSTEM_INSTRUCTIONS } from "@/lib/agentLoop";
 import { tryExtractAppointment } from "@/lib/appointments";
 import { getInventoryContext } from "@/lib/getInventoryContext";
 import { PLAN_LIMITS } from "@/lib/plans";
@@ -97,7 +97,10 @@ export async function processBotMessage({
 
   // Contexto de inventario (si el cliente tiene productos)
   const inventoryCtx = await getInventoryContext(userId, supabase);
-  const systemPrompt = basePrompt + inventoryCtx;
+
+  // En modo agente, inyectar protocolo de agendamiento al final del system prompt
+  const agentInstructions = bot.agent_enabled ? AGENT_SYSTEM_INSTRUCTIONS : "";
+  const systemPrompt = basePrompt + inventoryCtx + agentInstructions;
 
   // ── 5. Preparar historial recortado ──────────────────────────────────────
   const recentHistory: BotMessage[] = history
