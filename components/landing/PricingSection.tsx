@@ -22,19 +22,19 @@ const PLAN_STRIPE = [
     annual:  { priceId: PLAN_PRICES.Pro.annual.stripe_price_id },
   },
   {
-    monthly: { priceId: PLAN_PRICES.Business.monthly.stripe_price_id },
-    annual:  { priceId: PLAN_PRICES.Business.annual.stripe_price_id },
+    monthly: { priceId: PLAN_PRICES.Premium.monthly.stripe_price_id },
+    annual:  { priceId: PLAN_PRICES.Premium.annual.stripe_price_id },
   },
 ];
 
 const PLAN_PRICES_DISPLAY = [
   null,                                                              // Free
-  { monthly: "$19", annual: "$190", monthlyEquiv: "$16" },          // Starter
-  { monthly: "$39", annual: "$390", monthlyEquiv: "$33" },          // Pro
-  { monthly: "$79", annual: "$790", monthlyEquiv: "$66" },          // Business
+  { monthly: "$19", annual: "$182", monthlyEquiv: "$15" },          // Starter
+  { monthly: "$39", annual: "$374", monthlyEquiv: "$31" },          // Pro
+  { monthly: "$79", annual: "$778", monthlyEquiv: "$65" },          // Premium
 ];
 
-const PLAN_NAMES = ["Free", "Starter", "Pro", "Business"];
+const PLAN_NAMES = ["Free", "Starter", "Pro", "Premium"];
 
 // índice del plan destacado (Pro)
 const FEATURED_INDEX = 2;

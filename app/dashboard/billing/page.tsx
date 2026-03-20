@@ -16,24 +16,24 @@ interface Subscription {
 const PLANS = [
   {
     name: "Starter",
-    monthly:  { price: "$14",  priceId: PLAN_PRICES.Starter.monthly.stripe_price_id },
-    annual:   { price: "$134", monthlyEquiv: "$11", priceId: PLAN_PRICES.Starter.annual.stripe_price_id },
+    monthly:  { price: "$19",  priceId: PLAN_PRICES.Starter.monthly.stripe_price_id },
+    annual:   { price: "$182", monthlyEquiv: "$15", priceId: PLAN_PRICES.Starter.annual.stripe_price_id },
     color: "border-blue-200",
     badge: "",
-    features: ["3 bots activos", "5.000 mensajes/mes", "Soporte por email", "Analíticas básicas"],
+    features: ["2 bots activos", "1.000 mensajes/mes", "Chat web", "WhatsApp Business", "Soporte por email"],
   },
   {
     name: "Pro",
-    monthly:  { price: "$29",  priceId: PLAN_PRICES.Pro.monthly.stripe_price_id },
-    annual:   { price: "$278", monthlyEquiv: "$23", priceId: PLAN_PRICES.Pro.annual.stripe_price_id },
+    monthly:  { price: "$39",  priceId: PLAN_PRICES.Pro.monthly.stripe_price_id },
+    annual:   { price: "$374", monthlyEquiv: "$31", priceId: PLAN_PRICES.Pro.annual.stripe_price_id },
     color: "border-blue-500",
     badge: "Más popular",
-    features: ["10 bots activos", "20.000 mensajes/mes", "Soporte prioritario", "Analíticas avanzadas", "Integraciones"],
+    features: ["5 bots activos", "5.000 mensajes/mes", "Chat web + WhatsApp Business", "Inventario en tiempo real", "Agendamiento automático", "Soporte prioritario"],
   },
   {
-    name: "Business",
-    monthly:  { price: "$79",  priceId: PLAN_PRICES.Business.monthly.stripe_price_id },
-    annual:   { price: "$790", monthlyEquiv: "$66", priceId: PLAN_PRICES.Business.annual.stripe_price_id },
+    name: "Premium",
+    monthly:  { price: "$79",  priceId: PLAN_PRICES.Premium.monthly.stripe_price_id },
+    annual:   { price: "$778", monthlyEquiv: "$65", priceId: PLAN_PRICES.Premium.annual.stripe_price_id },
     color: "border-purple-400",
     badge: "",
     features: ["Bots ilimitados", "Mensajes ilimitados", "Todo lo del Pro", "Agente AI dedicado", "Soporte dedicado"],
@@ -269,9 +269,9 @@ export default function BillingPage() {
         <h2 className="text-base font-semibold text-gray-900 mb-4">Servicios adicionales (pago único)</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {[
-            { name: "Personalización Avanzada", price: "$49", priceId: "price_1T8ehkRap0JkQNsmtky7j7ZL", desc: "Diseño y configuración personalizada de tu bot" },
-            { name: "Automatizaciones Avanzadas", price: "$79", priceId: "price_1T8f2CRap0JkQNsmyzuyUvU4", desc: "Flujos complejos y automatizaciones a medida" },
-            { name: "Integración Sistemas Externos", price: "$99", priceId: "price_1T8eyARap0JkQNsmWVnTTioZ", desc: "Conecta tu bot con CRM, ERP u otros sistemas" },
+            { name: "Personalización Avanzada", price: "$69", priceId: "price_1TCzXvRap0JkQNsmZu8qpWIX", desc: "Diseño y configuración personalizada de tu bot" },
+            { name: "Automatizaciones Avanzadas", price: "$99", priceId: "price_1TCzaERap0JkQNsmDF5hgJ75", desc: "Flujos complejos y automatizaciones a medida" },
+            { name: "Integración Sistemas Externos", price: "$149", priceId: "price_1TCzdPRap0JkQNsmkZRPlJPC", desc: "Conecta tu bot con CRM, ERP u otros sistemas" },
           ].map((addon) => (
             <div key={addon.name} className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5 flex flex-col gap-3">
               <div>
