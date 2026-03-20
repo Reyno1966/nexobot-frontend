@@ -1,6 +1,6 @@
 # NEXOBOT_MASTER.skill.md
 > Memoria permanente del proyecto — actualizar al final de cada sesión.
-> Última actualización: 2026-03-20
+> Última actualización: 2026-03-20 (pricing v3 — Stripe IDs actualizados, plan Premium $79)
 
 ---
 
@@ -254,21 +254,39 @@ ALTER TABLE products ADD COLUMN cost_price NUMERIC(10,2);
 
 ## 6. Planes y precios
 
+> Versión v3 — 2026-03-20. Stripe price IDs actualizados (`price_1TCy*`).
+
 | Plan | Bots | Msgs/mes | Mensual | Anual | Equiv. mensual |
 |---|---|---|---|---|---|
 | free | 1 | 100 | — | — | — |
-| Starter | 3 | 5.000 | $14 | $134 | $11 |
-| Pro | 10 | 20.000 | $29 | $278 | $23 |
-| Premium | ∞ | ∞ | $49 | $470 | $39 |
+| Starter | 2 | 1.000 | $19 | $182 | $15 |
+| Pro | 5 | 5.000 | $39 | $374 | $31 |
+| Premium | ∞ | ∞ | $79 | $778 | $65 |
 
 `PLAN_LIMITS.Premium = { bots: -1, messages: -1 }` → `-1` significa ilimitado.
+`PLAN_LIMITS.Business` existe como alias legacy → apunta a los mismos valores que Premium.
 
-### Add-ons (pago único)
+### Stripe price IDs v3 (activos)
+| Plan | Ciclo | Price ID |
+|---|---|---|
+| Starter | mensual | `price_1TCyOpRap0JkQNsmITpDzS3K` |
+| Starter | anual | `price_1TCyWDRap0JkQNsmF2TqoFIh` |
+| Pro | mensual | `price_1TCyZtRap0JkQNsmgI7TTCsN` |
+| Pro | anual | `price_1TCyd3Rap0JkQNsmkNvp1VvQ` |
+| Premium | mensual | `price_1TCyjDRap0JkQNsmsD2sNoh7` |
+| Premium | anual | `price_1TCylLRap0JkQNsm2rjF94Ny` |
+
+### Add-ons (pago único) — v3
 | Servicio | Precio | Stripe price ID |
 |---|---|---|
-| Personalización Avanzada | $49 | `price_1T8ehkRap0JkQNsmtky7j7ZL` |
-| Automatizaciones Avanzadas | $79 | `price_1T8f2CRap0JkQNsmyzuyUvU4` |
-| Integración Sistemas Externos | $99 | `price_1T8eyARap0JkQNsmWVnTTioZ` |
+| Personalización Avanzada | $69 | `price_1TCzXvRap0JkQNsmZu8qpWIX` |
+| Automatizaciones Avanzadas | $99 | `price_1TCzaERap0JkQNsmDF5hgJ75` |
+| Integración Sistemas Externos | $149 | `price_1TCzdPRap0JkQNsmkZRPlJPC` |
+
+### Legacy price IDs (mantener en PRICE_TO_PLAN para clientes existentes)
+- v2 mensuales: `price_1T8eHgRap0JkQNsmxXKjK3IH` (Starter), `price_1T8eNZRap0JkQNsmeObpDc8j` (Pro), `price_1T8eRdRap0JkQNsmllSsPbVs` (Premium)
+- v2 anuales: `price_1T8qkPRap0JkQNsm1MI5XoYm`, `price_1T8qndRap0JkQNsmswIpSK3M`, `price_1T8qr5Rap0JkQNsm8wzRX02G`
+- v1 (legacy): `price_1T18BGRap0JkQNsmaUVhyNFr`, `price_1T15gVRap0JkQNsm59vukMuR`, `price_1T15jDRap0JkQNsmQRvEkpcm`
 
 ---
 
@@ -702,6 +720,7 @@ SIG="sha256=$(printf '%s' "$PAYLOAD" | openssl dgst -sha256 -hmac "$SECRET" | aw
 |---|---|---|
 | ✅ Fase 2B — WhatsApp Business API | Completada 2026-03-15 | Ver sección "WhatsApp Integration" |
 | ✅ WhatsApp self-service multi-tenant | Completado 2026-03-20 | Token por cliente, verify endpoint, has_token seguro |
+| ✅ Pricing v3 — 4 planes + Stripe IDs | Completado 2026-03-20 | Free/$0, Starter/$19, Pro/$39, Premium/$79. IDs `price_1TCy*` |
 | Reportes mensuales PDF | Pro/Premium — resumen de gastos, ventas, margen | Usar lib/pdf o Puppeteer |
 | Export CSV | Gastos y ventas exportables | Pro/Premium |
 
@@ -709,14 +728,12 @@ SIG="sha256=$(printf '%s' "$PAYLOAD" | openssl dgst -sha256 -hmac "$SECRET" | aw
 | Tarea | Descripción | Notas |
 |---|---|---|
 | Gráficas de tendencia | Overview business — últimos 6 meses | SVG inline o canvas (sin recharts) |
-| Plan Business $79 | Si se decide crear plan dedicado para el Business Module | — |
 | Resumen semanal por email | Email automático los lunes con stats de la semana | Usar Resend + cron |
 
 ### Baja prioridad / Futuro
 | Tarea | Descripción |
 |---|---|
 | DemoChat en múltiples idiomas | Actualmente hardcoded en español |
-| PricingSection en múltiples idiomas | Actualmente hardcoded en español |
 | App móvil | React Native o PWA consumiendo las mismas API Routes |
 
 ---
