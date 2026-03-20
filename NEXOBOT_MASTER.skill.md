@@ -242,12 +242,27 @@ if (limits.bots !== -1 && botCount >= limits.bots) {
 
 **Schema**: `whatsapp-schema.sql` en raíz del proyecto.
 
+### Agente AI (nuevas — 2026-03-20)
+| Tabla | Descripción | Columnas clave |
+|---|---|---|
+| `customers` | Clientes registrados por el agente | id, user_id, name, phone, email, notes |
+
+**Índice UNIQUE**: `customers(user_id, phone)` WHERE phone IS NOT NULL — para upsert eficiente.
+
+**Columna extra en tabla existente**:
+```sql
+-- appointments: enlace al cliente registrado
+ALTER TABLE appointments ADD COLUMN customer_id UUID REFERENCES customers(id);
+```
+
 **Regla de oro**: RLS activo en TODAS las tablas. Siempre `.eq("user_id", userId)`.
 
-### Columna extra en tabla existente
+### Columnas extra en tablas existentes
 ```sql
 -- products: margen de ganancia
 ALTER TABLE products ADD COLUMN cost_price NUMERIC(10,2);
+-- appointments: enlace al cliente (Agente AI)
+ALTER TABLE appointments ADD COLUMN customer_id UUID REFERENCES customers(id);
 ```
 
 ---
@@ -307,7 +322,7 @@ ALTER TABLE products ADD COLUMN cost_price NUMERIC(10,2);
   - Usa `getAuth()` + `processBotMessage()`
   - Guarda historial en conversación `dashboard-{userId}-{botId}`
 
-### Agente AI con Tool Calling (2026-03-20)
+### Agente AI con Tool Calling (2026-03-20, mejorado 2026-03-20)
 **Archivo**: `lib/agentLoop.ts`
 
 **Activación**: toggle "Agente AI" en `/dashboard/bots/[id]` → pestaña Config
@@ -315,28 +330,36 @@ ALTER TABLE products ADD COLUMN cost_price NUMERIC(10,2);
 - API: `PUT /api/bots/[id]` acepta y persiste `agent_enabled`
 
 **Herramientas disponibles (BOT_TOOLS)**:
-| Tool | Descripción |
-|---|---|
-| `get_inventory` | Inventario completo: nombre, precio, stock |
-| `get_products` | Busca productos por nombre/categoría (ilike) |
-| `search_appointments` | Consulta citas por fecha o visitante |
-| `create_appointment` | Crea cita (previo check de duplicado por fecha+hora) |
+| Tool | Obligatorio | Descripción |
+|---|---|---|
+| `get_inventory` | — | Inventario completo: nombre, precio, stock |
+| `get_products` | — | Busca productos por nombre/categoría (ilike) |
+| `search_appointments` | — | Verifica disponibilidad por fecha o visitante |
+| `upsert_customer` | name, phone | Crea o actualiza cliente por (user_id, phone); devuelve customer_id |
+| `create_appointment` | name, phone, date, time, service | Crea cita; requiere llamar upsert_customer primero |
+
+**Protocolo de agendamiento** (AGENT_SYSTEM_INSTRUCTIONS inyectado en system prompt):
+1. Recopila nombre + teléfono + email(opt) + servicio + fecha + hora — uno a uno
+2. Llama `search_appointments` para verificar disponibilidad
+3. Muestra resumen y pide confirmación explícita
+4. Solo tras confirmación: `upsert_customer` → `create_appointment` (con customer_id)
+5. Confirma con resumen: "✅ ¡Cita agendada! [nombre] — [servicio] — [fecha] a las [hora]"
 
 **Flujo del loop**:
 ```
 messages → openai.chat.completions.create({ tools: BOT_TOOLS, tool_choice: "auto" })
   → finish_reason === "stop"  → retorna reply final
   → finish_reason === "tool_calls" → executeTool() → push tool result → re-llama OpenAI
-  → máx. 4 iteraciones (≈12s) para respetar timeout de 15s de Meta WhatsApp
-  → fallback si se agotan iteraciones sin respuesta final
+  → máx. 5 iteraciones (≈12s) — aumentado para flujo upsert + create
+  → fallback si se agotan iteraciones
 ```
 
-**Datos requeridos para tools**:
+**Datos requeridos por herramienta**:
 - `get_inventory` / `get_products` → filtra por `user_id`
 - `search_appointments` / `create_appointment` → filtra por `bot_id`
+- `upsert_customer` → filtra por `user_id`; UNIQUE INDEX en (user_id, phone)
 
-**TypeScript note**: `ChatCompletionMessageToolCall` es union con `ChatCompletionMessageCustomToolCall`
-→ guard obligatorio: `if (toolCall.type !== "function") continue;` antes de acceder a `.function`
+**TypeScript note**: guard `if (toolCall.type !== "function") continue;` antes de `.function`
 
 ### WhatsApp Integration (2026-03-15, debuggeado 2026-03-17, pipeline verificado 2026-03-18)
 **Fase 2B — Bot responde en WhatsApp en tiempo real — ✅ 100% COMPLETADA**
