@@ -1,6 +1,31 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
+// ── Rate limiting (sliding window, in-memory por instancia Edge) ──────────────
+// Protege endpoints de auth contra spam, credential stuffing y abuso.
+// Nota: es per-Edge-instance; suficiente para la escala actual de NexoBot.
+const _rateLimitStore = new Map<string, number[]>();
+
+const RATE_LIMITS: Record<string, { max: number; windowMs: number }> = {
+  "/api/auth/signup": { max: 5,  windowMs: 15 * 60 * 1000 }, // 5 por 15 min
+  "/api/auth/login":  { max: 10, windowMs: 15 * 60 * 1000 }, // 10 por 15 min
+  "/api/auth/reset":  { max: 3,  windowMs: 15 * 60 * 1000 }, // 3 por 15 min
+};
+
+function isRateLimited(ip: string, path: string): boolean {
+  const limit = RATE_LIMITS[path];
+  if (!limit) return false;
+
+  const key  = `${ip}:${path}`;
+  const now  = Date.now();
+  const prev = (_rateLimitStore.get(key) ?? []).filter(t => now - t < limit.windowMs);
+
+  if (prev.length >= limit.max) return true;
+
+  _rateLimitStore.set(key, [...prev, now]);
+  return false;
+}
+
 const SUPPORTED_LOCALES = [
   "en", "pt", "fr", "it", "de", "nl", "ar", "zh", "ja", "ru", "ko", "tr", "id",
 ];
@@ -19,12 +44,27 @@ function detectLocale(req: NextRequest): string {
 }
 
 export function middleware(req: NextRequest) {
+  const { pathname } = req.nextUrl;
+
+  // Rate limiting — solo en POST a rutas de auth
+  if (req.method === "POST" && RATE_LIMITS[pathname]) {
+    const ip =
+      req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
+      req.headers.get("x-real-ip") ??
+      "unknown";
+
+    if (isRateLimited(ip, pathname)) {
+      return new Response(
+        JSON.stringify({ error: "Demasiadas solicitudes. Espera unos minutos e intenta de nuevo." }),
+        { status: 429, headers: { "Content-Type": "application/json", "Retry-After": "900" } }
+      );
+    }
+  }
+
   const accessToken = req.cookies.get("sb-access-token")?.value;
   const refreshToken = req.cookies.get("sb-refresh-token")?.value;
 
   const isLoggedIn = !!(accessToken && refreshToken);
-
-  const { pathname } = req.nextUrl;
 
   // Redireccionamientos legacy para rutas antiguas
   if (pathname === "/login") {

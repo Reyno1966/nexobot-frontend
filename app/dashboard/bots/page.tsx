@@ -122,10 +122,12 @@ export default function BotsPage() {
   const [showTemplates, setShowTemplates] = useState(false);
   const [showForm, setShowForm]     = useState(false);
   const [editingBot, setEditingBot] = useState<Bot | null>(null);
-  const [saving, setSaving]         = useState(false);
-  const [saveError, setSaveError]   = useState("");
-  const [deleting, setDeleting]     = useState<string | null>(null);
-  const [form, setForm]             = useState<FormState>({ name: "", description: "", channel: "web", system_prompt: "" });
+  const [saving, setSaving]               = useState(false);
+  const [saveError, setSaveError]         = useState("");
+  const [deleting, setDeleting]           = useState<string | null>(null);
+  const [confirmDeleteId, setConfirmDeleteId]     = useState<string | null>(null);
+  const [confirmDeleteName, setConfirmDeleteName] = useState("");
+  const [form, setForm]                   = useState<FormState>({ name: "", description: "", channel: "web", system_prompt: "" });
 
   async function fetchBots() {
     const res = await fetch("/api/bots", { credentials: "include" });
@@ -214,8 +216,15 @@ export default function BotsPage() {
     }
   }
 
-  async function handleDelete(id: string) {
-    if (!confirm("¿Eliminar este bot? Esta acción no se puede deshacer.")) return;
+  function handleDelete(bot: Bot) {
+    setConfirmDeleteName(bot.name);
+    setConfirmDeleteId(bot.id);
+  }
+
+  async function executeDelete() {
+    if (!confirmDeleteId) return;
+    const id = confirmDeleteId;
+    setConfirmDeleteId(null);
     setDeleting(id);
     const res = await fetch(`/api/bots/${id}`, { method: "DELETE", credentials: "include" });
     if (res.ok) setBots((prev) => prev.filter((b) => b.id !== id));
@@ -350,6 +359,39 @@ export default function BotsPage() {
                 className="flex-1 py-2.5 bg-gradient-to-r from-[#2CC5C5] to-[#F5A623] text-white rounded-xl text-sm font-semibold hover:opacity-90 transition disabled:opacity-50"
               >
                 {saving ? "Guardando..." : editingBot ? "Guardar cambios" : "Crear bot"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Modal: Confirmar eliminación ── */}
+      {confirmDeleteId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6">
+            <div className="w-12 h-12 bg-red-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <svg className="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+            <h2 className="text-lg font-bold text-gray-900 text-center mb-2">¿Eliminar bot?</h2>
+            <p className="text-sm text-gray-500 text-center mb-6">
+              Se eliminará <span className="font-semibold text-gray-800">&quot;{confirmDeleteName}&quot;</span> y todas
+              sus conversaciones. Esta acción no se puede deshacer.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setConfirmDeleteId(null)}
+                className="flex-1 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 transition"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={executeDelete}
+                className="flex-1 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl text-sm font-semibold transition"
+              >
+                Eliminar
               </button>
             </div>
           </div>
