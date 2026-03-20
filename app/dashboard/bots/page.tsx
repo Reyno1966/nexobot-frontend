@@ -461,7 +461,7 @@ export default function BotsPage() {
                     Editar
                   </button>
                   <button
-                    onClick={() => handleDelete(bot.id)}
+                    onClick={() => handleDelete(bot)}
                     disabled={deleting === bot.id}
                     className="text-xs text-gray-500 hover:text-red-600 font-medium transition px-2 py-1 rounded-lg hover:bg-red-50 disabled:opacity-50"
                   >

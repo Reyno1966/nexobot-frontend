@@ -31,12 +31,12 @@ const PLANS = [
     features: ["10 bots activos", "20.000 mensajes/mes", "Soporte prioritario", "Analíticas avanzadas", "Integraciones"],
   },
   {
-    name: "Premium",
-    monthly:  { price: "$49",  priceId: PLAN_PRICES.Premium.monthly.stripe_price_id },
-    annual:   { price: "$470", monthlyEquiv: "$39", priceId: PLAN_PRICES.Premium.annual.stripe_price_id },
+    name: "Business",
+    monthly:  { price: "$79",  priceId: PLAN_PRICES.Business.monthly.stripe_price_id },
+    annual:   { price: "$790", monthlyEquiv: "$66", priceId: PLAN_PRICES.Business.annual.stripe_price_id },
     color: "border-purple-400",
     badge: "",
-    features: ["Bots ilimitados", "Mensajes ilimitados", "Soporte 24/7", "Panel personalizado", "API acceso completo"],
+    features: ["Bots ilimitados", "Mensajes ilimitados", "Todo lo del Pro", "Agente AI dedicado", "Soporte dedicado"],
   },
 ];
 

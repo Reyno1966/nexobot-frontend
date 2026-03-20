@@ -51,6 +51,7 @@ export interface LandingT {
     plans: [
       { desc: string; features: string[]; excluded: string[]; cta: string },
       { desc: string; features: string[]; excluded: string[]; cta: string },
+      { desc: string; features: string[]; excluded: string[]; cta: string },
       { desc: string; features: string[]; excluded: string[]; cta: string }
     ];
   };
@@ -122,7 +123,7 @@ export const es: LandingT = {
     label: "FAQ", title: "Preguntas frecuentes", subtitle: "Resolvemos tus dudas para que empieces con total confianza.",
     items: [
       { q: "¿Necesito conocimientos técnicos para usar NexoBot?",  a: "No. NexoBot está diseñado para que cualquier persona pueda configurarlo en minutos sin conocimientos técnicos." },
-      { q: "¿Puedo usar NexoBot en WhatsApp?",                      a: "Sí. Los planes Pro y Premium incluyen integración con WhatsApp para automatizar tus conversaciones y ventas." },
+      { q: "¿Puedo usar NexoBot en WhatsApp?",                      a: "Sí. Todos los planes de pago (Starter, Pro y Business) incluyen WhatsApp Business para automatizar tus conversaciones y ventas." },
       { q: "¿Qué pasa si supero el límite de mensajes?",            a: "Te avisaremos antes de llegar al límite. Puedes actualizar tu plan en cualquier momento sin interrupciones." },
       { q: "¿Puedo cancelar cuando quiera?",                        a: "Sí. Sin contratos ni permanencias. Puedes cancelar tu suscripción cuando quieras desde tu panel de control." },
       { q: "¿Ofrecen soporte?",                                     a: "Todos los planes incluyen soporte. El plan Premium cuenta con soporte prioritario para respuestas más rápidas." },
@@ -142,9 +143,10 @@ export const es: LandingT = {
     perMonth: "/mes", perYear: "/año · 2 meses gratis",
     mostPopular: "⭐ MÁS POPULAR", comingSoon: "Plan anual próximamente",
     plans: [
-      { desc: "Ideal para emprendedores comenzando", features: ["Respuestas automáticas con IA", "Chat embebido para tu web", "Plantillas de mensajes", "Atención 24/7 sin esfuerzo", "Captura básica de leads", "Panel de control intuitivo"], excluded: ["WhatsApp no incluido", "Sin automatizaciones avanzadas"], cta: "Elegir Starter" },
-      { desc: "Para negocios que quieren escalar", features: ["Todo lo del Starter", "Integración con WhatsApp", "Flujos inteligentes de ventas", "Segmentación avanzada de clientes", "Captura avanzada de leads", "Integración con redes sociales", "Respuestas basadas en intención", "Automatizaciones personalizadas"], excluded: [], cta: "Elegir Pro" },
-      { desc: "Para empresas que necesitan máxima potencia", features: ["Todo lo del Pro", "Mensajes ilimitados", "Embudo de ventas automático", "Integraciones avanzadas", "Soporte prioritario", "Configuración asistida", "Automatizaciones premium"], excluded: [], cta: "Elegir Premium" },
+      { desc: "Para explorar NexoBot sin costo", features: ["1 bot", "100 mensajes/mes", "Chat web", "Panel de control"], excluded: ["WhatsApp no incluido"], cta: "Empezar gratis" },
+      { desc: "Para negocios que empiezan a crecer", features: ["2 bots", "1.000 mensajes/mes", "Chat web", "WhatsApp Business", "Soporte por email"], excluded: [], cta: "Elegir Starter" },
+      { desc: "Para negocios en plena expansión", features: ["5 bots", "5.000 mensajes/mes", "Chat web + WhatsApp Business", "Inventario en tiempo real", "Agendamiento automático", "Soporte prioritario"], excluded: [], cta: "Elegir Pro" },
+      { desc: "Para empresas que necesitan el máximo", features: ["Bots ilimitados", "Mensajes ilimitados", "Todo lo del Pro", "Agente AI dedicado", "Soporte dedicado"], excluded: [], cta: "Elegir Business" },
     ],
   },
 };
@@ -215,7 +217,7 @@ export const en: LandingT = {
     label: "FAQ", title: "Frequently asked questions", subtitle: "Everything you need to start with full confidence.",
     items: [
       { q: "Do I need technical skills to use NexoBot?",    a: "No. NexoBot is designed so anyone can set it up in minutes without technical knowledge." },
-      { q: "Can I use NexoBot on WhatsApp?",                a: "Yes. Pro and Premium plans include WhatsApp integration to automate your conversations and sales." },
+      { q: "Can I use NexoBot on WhatsApp?",                a: "Yes. All paid plans (Starter, Pro and Business) include WhatsApp Business to automate your conversations and sales." },
       { q: "What happens if I exceed the message limit?",   a: "We'll notify you before you reach the limit. You can upgrade your plan anytime without interruption." },
       { q: "Can I cancel anytime?",                         a: "Yes. No contracts or commitments. Cancel your subscription anytime from your dashboard." },
       { q: "Do you offer support?",                         a: "All plans include support. The Premium plan has priority support for faster responses." },
@@ -235,9 +237,10 @@ export const en: LandingT = {
     perMonth: "/mo", perYear: "/year · 2 months free",
     mostPopular: "⭐ MOST POPULAR", comingSoon: "Annual plan coming soon",
     plans: [
-      { desc: "Ideal for entrepreneurs getting started", features: ["Automatic AI replies", "Embedded chat for your website", "Message templates", "Effortless 24/7 support", "Basic lead capture", "Intuitive control panel"], excluded: ["WhatsApp not included", "No advanced automations"], cta: "Choose Starter" },
-      { desc: "For businesses ready to scale", features: ["Everything in Starter", "WhatsApp integration", "Smart sales flows", "Advanced customer segmentation", "Advanced lead capture", "Social media integration", "Intent-based replies", "Custom automations"], excluded: [], cta: "Choose Pro" },
-      { desc: "For businesses that need maximum power", features: ["Everything in Pro", "Unlimited messages", "Automatic sales funnel", "Advanced integrations", "Priority support", "Assisted setup", "Premium automations"], excluded: [], cta: "Choose Premium" },
+      { desc: "Start for free, no card needed", features: ["1 bot", "100 messages/month", "Web chat", "Control panel"], excluded: ["WhatsApp not included"], cta: "Start for free" },
+      { desc: "For businesses starting to grow", features: ["2 bots", "1,000 messages/month", "Web chat", "WhatsApp Business", "Email support"], excluded: [], cta: "Choose Starter" },
+      { desc: "For businesses scaling up", features: ["5 bots", "5,000 messages/month", "Web chat + WhatsApp Business", "Real-time inventory", "Automatic scheduling", "Priority support"], excluded: [], cta: "Choose Pro" },
+      { desc: "For companies that need maximum power", features: ["Unlimited bots", "Unlimited messages", "Everything in Pro", "Dedicated AI agent", "Dedicated support"], excluded: [], cta: "Choose Business" },
     ],
   },
 };
@@ -308,7 +311,7 @@ export const it: LandingT = {
     label: "FAQ", title: "Domande frequenti", subtitle: "Risolviamo i tuoi dubbi per iniziare con piena fiducia.",
     items: [
       { q: "Ho bisogno di competenze tecniche per usare NexoBot?", a: "No. NexoBot è progettato per essere configurato da chiunque in pochi minuti, senza competenze tecniche." },
-      { q: "Posso usare NexoBot su WhatsApp?",                     a: "Sì. I piani Pro e Premium includono l'integrazione con WhatsApp per automatizzare conversazioni e vendite." },
+      { q: "Posso usare NexoBot su WhatsApp?",                     a: "Sì. Tutti i piani a pagamento (Starter, Pro e Business) includono WhatsApp Business per automatizzare conversazioni e vendite." },
       { q: "Cosa succede se supero il limite di messaggi?",         a: "Ti avviseremo prima di raggiungere il limite. Puoi aggiornare il piano in qualsiasi momento senza interruzioni." },
       { q: "Posso disdire quando voglio?",                          a: "Sì. Nessun contratto né vincolo. Puoi cancellare l'abbonamento quando vuoi dal pannello di controllo." },
       { q: "Offrite supporto?",                                     a: "Tutti i piani includono supporto. Il piano Premium include supporto prioritario per risposte più rapide." },
@@ -328,9 +331,10 @@ export const it: LandingT = {
     perMonth: "/mese", perYear: "/anno · 2 mesi gratis",
     mostPopular: "⭐ PIÙ POPOLARE", comingSoon: "Piano annuale in arrivo",
     plans: [
-      { desc: "Ideale per chi sta iniziando", features: ["Risposte automatiche con IA", "Chat incorporata nel sito", "Modelli di messaggi", "Assistenza 24/7 senza sforzo", "Acquisizione base di lead", "Pannello di controllo intuitivo"], excluded: ["WhatsApp non incluso", "Senza automazioni avanzate"], cta: "Scegli Starter" },
-      { desc: "Per le aziende pronte a crescere", features: ["Tutto di Starter", "Integrazione WhatsApp", "Flussi di vendita intelligenti", "Segmentazione avanzata clienti", "Acquisizione avanzata di lead", "Integrazione social media", "Risposte basate sull'intento", "Automazioni personalizzate"], excluded: [], cta: "Scegli Pro" },
-      { desc: "Per le aziende che hanno bisogno del massimo", features: ["Tutto di Pro", "Messaggi illimitati", "Imbuto di vendita automatico", "Integrazioni avanzate", "Supporto prioritario", "Configurazione assistita", "Automazioni premium"], excluded: [], cta: "Scegli Premium" },
+      { desc: "Per provare NexoBot senza costo", features: ["1 bot", "100 messaggi/mese", "Chat web", "Pannello di controllo"], excluded: ["WhatsApp non incluso"], cta: "Inizia gratis" },
+      { desc: "Per aziende che iniziano a crescere", features: ["2 bot", "1.000 messaggi/mese", "Chat web", "WhatsApp Business", "Supporto email"], excluded: [], cta: "Scegli Starter" },
+      { desc: "Per aziende in espansione", features: ["5 bot", "5.000 messaggi/mese", "Chat web + WhatsApp Business", "Inventario in tempo reale", "Appuntamenti automatici", "Supporto prioritario"], excluded: [], cta: "Scegli Pro" },
+      { desc: "Per aziende che hanno bisogno del massimo", features: ["Bot illimitati", "Messaggi illimitati", "Tutto di Pro", "Agente AI dedicato", "Supporto dedicato"], excluded: [], cta: "Scegli Business" },
     ],
   },
 };
@@ -401,7 +405,7 @@ export const fr: LandingT = {
     label: "FAQ", title: "Questions fréquentes", subtitle: "Nous répondons à toutes vos questions pour démarrer en toute confiance.",
     items: [
       { q: "Ai-je besoin de compétences techniques pour utiliser NexoBot ?", a: "Non. NexoBot est conçu pour être configuré par n'importe qui en quelques minutes, sans compétences techniques." },
-      { q: "Puis-je utiliser NexoBot sur WhatsApp ?",                         a: "Oui. Les plans Pro et Premium incluent l'intégration WhatsApp pour automatiser vos conversations et vos ventes." },
+      { q: "Puis-je utiliser NexoBot sur WhatsApp ?",                         a: "Oui. Tous les plans payants (Starter, Pro et Business) incluent WhatsApp Business pour automatiser vos conversations et vos ventes." },
       { q: "Que se passe-t-il si je dépasse la limite de messages ?",         a: "Nous vous avertirons avant d'atteindre la limite. Vous pouvez mettre à niveau votre plan à tout moment sans interruption." },
       { q: "Puis-je annuler quand je veux ?",                                 a: "Oui. Sans contrat ni engagement. Annulez votre abonnement quand vous voulez depuis votre tableau de bord." },
       { q: "Proposez-vous un support ?",                                      a: "Tous les plans incluent un support. Le plan Premium bénéficie d'un support prioritaire pour des réponses plus rapides." },
@@ -421,9 +425,10 @@ export const fr: LandingT = {
     perMonth: "/mois", perYear: "/an · 2 mois offerts",
     mostPopular: "⭐ LE PLUS POPULAIRE", comingSoon: "Forfait annuel bientôt disponible",
     plans: [
-      { desc: "Idéal pour les entrepreneurs qui démarrent", features: ["Réponses automatiques avec IA", "Chat intégré sur votre site", "Modèles de messages", "Support 24/7 sans effort", "Capture de leads basique", "Panneau de contrôle intuitif"], excluded: ["WhatsApp non inclus", "Sans automatisations avancées"], cta: "Choisir Starter" },
-      { desc: "Pour les entreprises prêtes à évoluer", features: ["Tout de Starter", "Intégration WhatsApp", "Flux de ventes intelligents", "Segmentation avancée clients", "Capture avancée de leads", "Intégration réseaux sociaux", "Réponses basées sur l'intention", "Automatisations personnalisées"], excluded: [], cta: "Choisir Pro" },
-      { desc: "Pour les entreprises qui ont besoin du maximum", features: ["Tout de Pro", "Messages illimités", "Entonnoir de ventes automatique", "Intégrations avancées", "Support prioritaire", "Configuration assistée", "Automatisations premium"], excluded: [], cta: "Choisir Premium" },
+      { desc: "Pour commencer sans frais", features: ["1 bot", "100 messages/mois", "Chat web", "Tableau de bord"], excluded: ["WhatsApp non inclus"], cta: "Commencer gratuitement" },
+      { desc: "Pour les entreprises qui commencent à croître", features: ["2 bots", "1 000 messages/mois", "Chat web", "WhatsApp Business", "Support par email"], excluded: [], cta: "Choisir Starter" },
+      { desc: "Pour les entreprises en pleine expansion", features: ["5 bots", "5 000 messages/mois", "Chat web + WhatsApp Business", "Inventaire en temps réel", "Prise de rendez-vous automatique", "Support prioritaire"], excluded: [], cta: "Choisir Pro" },
+      { desc: "Pour les entreprises qui ont besoin du maximum", features: ["Bots illimités", "Messages illimités", "Tout de Pro", "Agent IA dédié", "Support dédié"], excluded: [], cta: "Choisir Business" },
     ],
   },
 };
@@ -494,7 +499,7 @@ export const de: LandingT = {
     label: "FAQ", title: "Häufig gestellte Fragen", subtitle: "Wir beantworten deine Fragen, damit du mit vollem Vertrauen starten kannst.",
     items: [
       { q: "Brauche ich technische Kenntnisse, um NexoBot zu nutzen?", a: "Nein. NexoBot ist so konzipiert, dass es jeder in wenigen Minuten ohne technische Kenntnisse einrichten kann." },
-      { q: "Kann ich NexoBot auf WhatsApp nutzen?",                     a: "Ja. Die Pro- und Premium-Pläne beinhalten die WhatsApp-Integration zur Automatisierung deiner Gespräche und Verkäufe." },
+      { q: "Kann ich NexoBot auf WhatsApp nutzen?",                     a: "Ja. Alle kostenpflichtigen Pläne (Starter, Pro und Business) beinhalten WhatsApp Business zur Automatisierung deiner Gespräche und Verkäufe." },
       { q: "Was passiert, wenn ich das Nachrichtenlimit überschreite?", a: "Wir benachrichtigen dich, bevor du das Limit erreichst. Du kannst deinen Plan jederzeit ohne Unterbrechung upgraden." },
       { q: "Kann ich jederzeit kündigen?",                              a: "Ja. Keine Verträge oder Verpflichtungen. Kündige dein Abonnement jederzeit über dein Dashboard." },
       { q: "Bietet ihr Support an?",                                    a: "Alle Pläne beinhalten Support. Der Premium-Plan bietet Priority-Support für schnellere Antworten." },
@@ -514,9 +519,10 @@ export const de: LandingT = {
     perMonth: "/Monat", perYear: "/Jahr · 2 Monate gratis",
     mostPopular: "⭐ AM BELIEBTESTEN", comingSoon: "Jahresplan demnächst verfügbar",
     plans: [
-      { desc: "Ideal für Unternehmer, die gerade starten", features: ["Automatische KI-Antworten", "Eingebetteter Chat für Ihre Website", "Nachrichtenvorlagen", "Müheloser 24/7-Support", "Grundlegende Lead-Erfassung", "Intuitives Kontrollpanel"], excluded: ["WhatsApp nicht enthalten", "Keine erweiterten Automatisierungen"], cta: "Starter wählen" },
-      { desc: "Für Unternehmen, die skalieren möchten", features: ["Alles aus Starter", "WhatsApp-Integration", "Intelligente Verkaufsabläufe", "Erweiterte Kundensegmentierung", "Erweiterte Lead-Erfassung", "Social-Media-Integration", "Intentionsbasierte Antworten", "Personalisierte Automatisierungen"], excluded: [], cta: "Pro wählen" },
-      { desc: "Für Unternehmen, die maximale Leistung benötigen", features: ["Alles aus Pro", "Unbegrenzte Nachrichten", "Automatischer Verkaufstrichter", "Erweiterte Integrationen", "Prioritätssupport", "Unterstützte Einrichtung", "Premium-Automatisierungen"], excluded: [], cta: "Premium wählen" },
+      { desc: "Kostenlos starten", features: ["1 Bot", "100 Nachrichten/Monat", "Web-Chat", "Kontrollpanel"], excluded: ["WhatsApp nicht enthalten"], cta: "Kostenlos starten" },
+      { desc: "Für Unternehmen, die wachsen möchten", features: ["2 Bots", "1.000 Nachrichten/Monat", "Web-Chat", "WhatsApp Business", "E-Mail-Support"], excluded: [], cta: "Starter wählen" },
+      { desc: "Für expandierende Unternehmen", features: ["5 Bots", "5.000 Nachrichten/Monat", "Web-Chat + WhatsApp Business", "Echtzeit-Inventar", "Automatische Terminplanung", "Prioritätssupport"], excluded: [], cta: "Pro wählen" },
+      { desc: "Für Unternehmen, die maximale Leistung benötigen", features: ["Unbegrenzte Bots", "Unbegrenzte Nachrichten", "Alles aus Pro", "Dedizierter KI-Agent", "Dedizierter Support"], excluded: [], cta: "Business wählen" },
     ],
   },
 };
@@ -587,7 +593,7 @@ export const pt: LandingT = {
     label: "FAQ", title: "Perguntas frequentes", subtitle: "Respondemos suas dúvidas para você começar com total confiança.",
     items: [
       { q: "Preciso de conhecimento técnico para usar NexoBot?", a: "Não. NexoBot é projetado para que qualquer pessoa possa configurá-lo em minutos sem conhecimento técnico." },
-      { q: "Posso usar NexoBot no WhatsApp?",                    a: "Sim. Os planos Pro e Premium incluem integração com WhatsApp para automatizar suas conversas e vendas." },
+      { q: "Posso usar NexoBot no WhatsApp?",                    a: "Sim. Todos os planos pagos (Starter, Pro e Business) incluem WhatsApp Business para automatizar suas conversas e vendas." },
       { q: "O que acontece se eu ultrapassar o limite de mensagens?", a: "Avisaremos antes de atingir o limite. Você pode atualizar seu plano a qualquer momento sem interrupções." },
       { q: "Posso cancelar quando quiser?",                      a: "Sim. Sem contratos ou permanências. Cancele sua assinatura quando quiser pelo painel de controle." },
       { q: "Oferecem suporte?",                                  a: "Todos os planos incluem suporte. O plano Premium conta com suporte prioritário para respostas mais rápidas." },
@@ -607,9 +613,10 @@ export const pt: LandingT = {
     perMonth: "/mês", perYear: "/ano · 2 meses grátis",
     mostPopular: "⭐ MAIS POPULAR", comingSoon: "Plano anual em breve",
     plans: [
-      { desc: "Ideal para empreendedores começando", features: ["Respostas automáticas com IA", "Chat embutido no seu site", "Modelos de mensagens", "Atendimento 24/7 sem esforço", "Captura básica de leads", "Painel de controle intuitivo"], excluded: ["WhatsApp não incluído", "Sem automatizações avançadas"], cta: "Escolher Starter" },
-      { desc: "Para negócios prontos para escalar", features: ["Tudo do Starter", "Integração com WhatsApp", "Fluxos inteligentes de vendas", "Segmentação avançada de clientes", "Captura avançada de leads", "Integração com redes sociais", "Respostas baseadas em intenção", "Automatizações personalizadas"], excluded: [], cta: "Escolher Pro" },
-      { desc: "Para empresas que precisam do máximo", features: ["Tudo do Pro", "Mensagens ilimitadas", "Funil de vendas automático", "Integrações avançadas", "Suporte prioritário", "Configuração assistida", "Automatizações premium"], excluded: [], cta: "Escolher Premium" },
+      { desc: "Para começar sem custo", features: ["1 bot", "100 mensagens/mês", "Chat web", "Painel de controle"], excluded: ["WhatsApp não incluído"], cta: "Começar grátis" },
+      { desc: "Para negócios que estão crescendo", features: ["2 bots", "1.000 mensagens/mês", "Chat web", "WhatsApp Business", "Suporte por email"], excluded: [], cta: "Escolher Starter" },
+      { desc: "Para negócios em expansão", features: ["5 bots", "5.000 mensagens/mês", "Chat web + WhatsApp Business", "Inventário em tempo real", "Agendamento automático", "Suporte prioritário"], excluded: [], cta: "Escolher Pro" },
+      { desc: "Para empresas que precisam do máximo", features: ["Bots ilimitados", "Mensagens ilimitadas", "Tudo do Pro", "Agente IA dedicado", "Suporte dedicado"], excluded: [], cta: "Escolher Business" },
     ],
   },
 };
@@ -680,7 +687,7 @@ export const ar: LandingT = {
     label: "الأسئلة الشائعة", title: "أسئلة شائعة", subtitle: "نجيب على تساؤلاتك لتبدأ بكل ثقة.",
     items: [
       { q: "هل أحتاج خبرة تقنية لاستخدام NexoBot؟",           a: "لا. NexoBot مصمم ليتمكن أي شخص من إعداده في دقائق بدون معرفة تقنية." },
-      { q: "هل يمكنني استخدام NexoBot على واتساب؟",             a: "نعم. تشمل خطتا Pro وPremium تكاملًا مع واتساب لأتمتة محادثاتك ومبيعاتك." },
+      { q: "هل يمكنني استخدام NexoBot على واتساب؟",             a: "نعم. جميع الخطط المدفوعة (Starter وPro وBusiness) تشمل واتساب بيزنس لأتمتة محادثاتك ومبيعاتك." },
       { q: "ماذا يحدث إذا تجاوزت حد الرسائل؟",                a: "سنخطرك قبل الوصول إلى الحد. يمكنك ترقية خطتك في أي وقت دون انقطاع." },
       { q: "هل يمكنني الإلغاء في أي وقت؟",                     a: "نعم. بدون عقود أو التزامات. ألغِ اشتراكك متى تشاء من لوحة التحكم." },
       { q: "هل تقدمون دعمًا فنيًا؟",                           a: "جميع الخطط تشمل الدعم. خطة Premium تتميز بدعم ذي أولوية للردود الأسرع." },
@@ -700,9 +707,10 @@ export const ar: LandingT = {
     perMonth: "/شهر", perYear: "/سنة · شهران مجانان",
     mostPopular: "⭐ الأكثر شعبية", comingSoon: "الخطة السنوية قريباً",
     plans: [
-      { desc: "مثالية لرواد الأعمال الجدد", features: ["ردود تلقائية بالذكاء الاصطناعي", "دردشة مدمجة في موقعك", "قوالب رسائل", "دعم 24/7 بلا جهد", "التقاط أساسي للعملاء المحتملين", "لوحة تحكم سهلة الاستخدام"], excluded: ["واتساب غير مشمول", "بدون أتمتة متقدمة"], cta: "اختر Starter" },
-      { desc: "للشركات المستعدة للتوسع", features: ["كل شيء في Starter", "تكامل واتساب", "تدفقات مبيعات ذكية", "تجزئة متقدمة للعملاء", "التقاط متقدم للعملاء المحتملين", "تكامل وسائل التواصل الاجتماعي", "ردود مبنية على النية", "أتمتة مخصصة"], excluded: [], cta: "اختر Pro" },
-      { desc: "للشركات التي تحتاج أقصى طاقة", features: ["كل شيء في Pro", "رسائل غير محدودة", "قمع مبيعات تلقائي", "تكاملات متقدمة", "دعم ذو أولوية", "إعداد مساعد", "أتمتة متميزة"], excluded: [], cta: "اختر Premium" },
+      { desc: "للبدء بدون تكلفة", features: ["1 بوت", "100 رسالة/شهر", "دردشة ويب", "لوحة تحكم"], excluded: ["واتساب غير مشمول"], cta: "← ابدأ مجانًا" },
+      { desc: "للشركات التي تبدأ في النمو", features: ["2 بوت", "1,000 رسالة/شهر", "دردشة ويب", "واتساب بيزنس", "دعم عبر البريد الإلكتروني"], excluded: [], cta: "اختر Starter" },
+      { desc: "للشركات في مرحلة التوسع", features: ["5 بوت", "5,000 رسالة/شهر", "دردشة ويب + واتساب بيزنس", "مخزون في الوقت الفعلي", "جدولة تلقائية", "دعم ذو أولوية"], excluded: [], cta: "اختر Pro" },
+      { desc: "للشركات التي تحتاج إلى أقصى قدرة", features: ["بوتات غير محدودة", "رسائل غير محدودة", "كل شيء في Pro", "وكيل AI مخصص", "دعم مخصص"], excluded: [], cta: "اختر Business" },
     ],
   },
 };
@@ -773,7 +781,7 @@ export const zh: LandingT = {
     label: "常见问题", title: "常见问题解答", subtitle: "我们解答您的疑虑，让您满怀信心地开始。",
     items: [
       { q: "使用NexoBot需要技术知识吗？",    a: "不需要。NexoBot专为任何人设计，无需技术知识，几分钟即可完成配置。" },
-      { q: "我可以在WhatsApp上使用NexoBot吗？", a: "可以。Pro和Premium套餐包含WhatsApp集成，以自动化您的对话和销售。" },
+      { q: "我可以在WhatsApp上使用NexoBot吗？", a: "可以。所有付费套餐（Starter、Pro和Business）均包含WhatsApp Business，以自动化您的对话和销售。" },
       { q: "超过消息限制会怎样？",            a: "我们会在您达到限制之前通知您。您可以随时升级套餐，不会中断服务。" },
       { q: "我可以随时取消吗？",              a: "可以。无合同或约束。随时从控制面板取消订阅。" },
       { q: "是否提供支持？",                  a: "所有套餐均包含支持。Premium套餐提供优先支持，响应更快。" },
@@ -793,9 +801,10 @@ export const zh: LandingT = {
     perMonth: "/月", perYear: "/年 · 免费2个月",
     mostPopular: "⭐ 最受欢迎", comingSoon: "年付方案即将推出",
     plans: [
-      { desc: "适合刚起步的创业者", features: ["AI自动回复", "网站嵌入式聊天", "消息模板", "无压力24/7支持", "基础线索收集", "直观控制面板"], excluded: ["不含WhatsApp", "无高级自动化"], cta: "选择Starter" },
-      { desc: "适合准备扩展的企业", features: ["包含Starter所有功能", "WhatsApp集成", "智能销售流程", "高级客户细分", "高级线索收集", "社交媒体集成", "基于意图的回复", "自定义自动化"], excluded: [], cta: "选择Pro" },
-      { desc: "适合需要最大能力的企业", features: ["包含Pro所有功能", "无限消息", "自动销售漏斗", "高级集成", "优先支持", "辅助设置", "高级自动化"], excluded: [], cta: "选择Premium" },
+      { desc: "免费开始体验", features: ["1个机器人", "100条消息/月", "网站聊天", "控制面板"], excluded: ["不含WhatsApp"], cta: "免费开始" },
+      { desc: "适合刚起步的企业", features: ["2个机器人", "1,000条消息/月", "网站聊天", "WhatsApp Business", "邮件支持"], excluded: [], cta: "选择Starter" },
+      { desc: "适合快速成长的企业", features: ["5个机器人", "5,000条消息/月", "网站聊天 + WhatsApp Business", "实时库存", "自动预约", "优先支持"], excluded: [], cta: "选择Pro" },
+      { desc: "适合需要最大能力的企业", features: ["无限机器人", "无限消息", "包含Pro所有功能", "专属AI代理", "专属支持"], excluded: [], cta: "选择Business" },
     ],
   },
 };
@@ -866,7 +875,7 @@ export const ja: LandingT = {
     label: "よくある質問", title: "よくある質問", subtitle: "安心してスタートするために必要なすべて。",
     items: [
       { q: "NexoBotを使うのに技術的な知識は必要ですか？",   a: "不要です。NexoBotは誰でも数分でセットアップできるよう設計されています。" },
-      { q: "WhatsAppでNexoBotを使えますか？",               a: "はい。ProとPremiumプランにはWhatsApp統合が含まれています。" },
+      { q: "WhatsAppでNexoBotを使えますか？",               a: "はい。すべての有料プラン（Starter、Pro、Business）にWhatsApp Businessが含まれています。" },
       { q: "メッセージ制限を超えるとどうなりますか？",       a: "制限に達する前にお知らせします。いつでもプランをアップグレードできます。" },
       { q: "いつでもキャンセルできますか？",                 a: "はい。契約や縛りはありません。ダッシュボードからいつでもキャンセル可能です。" },
       { q: "サポートはありますか？",                         a: "すべてのプランにサポートが含まれています。Premiumプランは優先サポートです。" },
@@ -886,9 +895,10 @@ export const ja: LandingT = {
     perMonth: "/月", perYear: "/年 · 2ヶ月無料",
     mostPopular: "⭐ 最も人気", comingSoon: "年払いプラン近日公開",
     plans: [
-      { desc: "起業家に最適な入門プラン", features: ["AI自動返信", "ウェブサイト埋め込みチャット", "メッセージテンプレート", "24/7自動サポート", "基本的なリード獲得", "直感的なコントロールパネル"], excluded: ["WhatsApp非対応", "高度な自動化なし"], cta: "Starterを選ぶ" },
-      { desc: "スケールを目指す企業向け", features: ["Starterの全機能", "WhatsApp連携", "スマート販売フロー", "高度な顧客セグメント", "高度なリード獲得", "SNS連携", "意図ベースの返信", "カスタム自動化"], excluded: [], cta: "Proを選ぶ" },
-      { desc: "最大のパワーが必要な企業向け", features: ["Proの全機能", "無制限メッセージ", "自動セールスファネル", "高度な連携", "優先サポート", "設定サポート", "プレミアム自動化"], excluded: [], cta: "Premiumを選ぶ" },
+      { desc: "無料で始める", features: ["1ボット", "100メッセージ/月", "ウェブチャット", "コントロールパネル"], excluded: ["WhatsApp非対応"], cta: "無料で始める" },
+      { desc: "成長を始める企業向け", features: ["2ボット", "月1,000メッセージ", "ウェブチャット", "WhatsApp Business", "メールサポート"], excluded: [], cta: "Starterを選ぶ" },
+      { desc: "拡大中の企業向け", features: ["5ボット", "月5,000メッセージ", "ウェブチャット + WhatsApp Business", "リアルタイム在庫", "自動予約", "優先サポート"], excluded: [], cta: "Proを選ぶ" },
+      { desc: "最大のパワーが必要な企業向け", features: ["無制限ボット", "無制限メッセージ", "Proの全機能", "専任AIエージェント", "専任サポート"], excluded: [], cta: "Businessを選ぶ" },
     ],
   },
 };
@@ -959,7 +969,7 @@ export const ru: LandingT = {
     label: "FAQ", title: "Часто задаваемые вопросы", subtitle: "Всё, что нужно для уверенного старта.",
     items: [
       { q: "Нужны ли технические знания для использования NexoBot?", a: "Нет. NexoBot разработан так, чтобы любой мог настроить его за несколько минут без технических знаний." },
-      { q: "Могу ли я использовать NexoBot в WhatsApp?",              a: "Да. Тарифы Pro и Premium включают интеграцию с WhatsApp для автоматизации диалогов и продаж." },
+      { q: "Могу ли я использовать NexoBot в WhatsApp?",              a: "Да. Все платные тарифы (Starter, Pro и Business) включают WhatsApp Business для автоматизации диалогов и продаж." },
       { q: "Что будет, если я превышу лимит сообщений?",             a: "Мы уведомим вас до достижения лимита. Вы можете обновить тариф в любое время без перебоев." },
       { q: "Могу ли я отменить в любое время?",                      a: "Да. Без договоров и обязательств. Отмените подписку в любое время из панели управления." },
       { q: "Предоставляется ли поддержка?",                          a: "Все тарифы включают поддержку. Тариф Premium предоставляет приоритетную поддержку." },
@@ -979,9 +989,10 @@ export const ru: LandingT = {
     perMonth: "/мес", perYear: "/год · 2 месяца бесплатно",
     mostPopular: "⭐ САМЫЙ ПОПУЛЯРНЫЙ", comingSoon: "Годовой план скоро появится",
     plans: [
-      { desc: "Идеально для начинающих предпринимателей", features: ["Автоматические ответы с ИИ", "Встроенный чат для сайта", "Шаблоны сообщений", "Поддержка 24/7 без усилий", "Базовый сбор лидов", "Интуитивная панель управления"], excluded: ["WhatsApp не включён", "Без расширенных автоматизаций"], cta: "Выбрать Starter" },
-      { desc: "Для бизнеса, готового к масштабированию", features: ["Всё из Starter", "Интеграция WhatsApp", "Умные продажные потоки", "Расширенная сегментация клиентов", "Расширенный сбор лидов", "Интеграция с соцсетями", "Ответы на основе намерений", "Персонализированные автоматизации"], excluded: [], cta: "Выбрать Pro" },
-      { desc: "Для компаний, которым нужна максимальная мощность", features: ["Всё из Pro", "Неограниченные сообщения", "Автоматическая воронка продаж", "Расширенные интеграции", "Приоритетная поддержка", "Помощь в настройке", "Премиум-автоматизации"], excluded: [], cta: "Выбрать Premium" },
+      { desc: "Начните бесплатно", features: ["1 бот", "100 сообщений/мес", "Веб-чат", "Панель управления"], excluded: ["WhatsApp не включён"], cta: "Начать бесплатно" },
+      { desc: "Для бизнеса, который начинает расти", features: ["2 бота", "1 000 сообщений/мес", "Веб-чат", "WhatsApp Business", "Поддержка по email"], excluded: [], cta: "Выбрать Starter" },
+      { desc: "Для бизнеса в фазе роста", features: ["5 ботов", "5 000 сообщений/мес", "Веб-чат + WhatsApp Business", "Инвентарь в реальном времени", "Автоматическое планирование", "Приоритетная поддержка"], excluded: [], cta: "Выбрать Pro" },
+      { desc: "Для компаний, которым нужна максимальная мощность", features: ["Неограниченные боты", "Неограниченные сообщения", "Всё из Pro", "Выделенный ИИ-агент", "Выделенная поддержка"], excluded: [], cta: "Выбрать Business" },
     ],
   },
 };
@@ -1052,7 +1063,7 @@ export const ko: LandingT = {
     label: "자주 묻는 질문", title: "자주 묻는 질문", subtitle: "완전한 자신감으로 시작하는 데 필요한 모든 것.",
     items: [
       { q: "NexoBot을 사용하는 데 기술적인 지식이 필요한가요?", a: "아니요. NexoBot은 누구나 기술적 지식 없이 몇 분 안에 설정할 수 있도록 설계되었습니다." },
-      { q: "WhatsApp에서 NexoBot을 사용할 수 있나요?",          a: "예. Pro 및 Premium 플랜에는 대화와 판매를 자동화하는 WhatsApp 통합이 포함됩니다." },
+      { q: "WhatsApp에서 NexoBot을 사용할 수 있나요?",          a: "예. 모든 유료 플랜(Starter, Pro, Business)에는 대화와 판매를 자동화하는 WhatsApp Business가 포함됩니다." },
       { q: "메시지 한도를 초과하면 어떻게 되나요?",             a: "한도에 도달하기 전에 알려드립니다. 중단 없이 언제든지 플랜을 업그레이드할 수 있습니다." },
       { q: "언제든지 취소할 수 있나요?",                        a: "예. 계약이나 약정이 없습니다. 대시보드에서 언제든지 구독을 취소하세요." },
       { q: "지원이 제공되나요?",                                a: "모든 플랜에 지원이 포함됩니다. Premium 플랜은 우선 지원을 제공합니다." },
@@ -1072,9 +1083,10 @@ export const ko: LandingT = {
     perMonth: "/월", perYear: "/년 · 2개월 무료",
     mostPopular: "⭐ 가장 인기", comingSoon: "연간 플랜 출시 예정",
     plans: [
-      { desc: "창업자에게 이상적인 플랜", features: ["AI 자동 답변", "웹사이트 임베드 채팅", "메시지 템플릿", "24/7 자동 지원", "기본 리드 수집", "직관적인 제어판"], excluded: ["WhatsApp 미포함", "고급 자동화 없음"], cta: "Starter 선택" },
-      { desc: "확장 준비된 비즈니스를 위한 플랜", features: ["Starter의 모든 기능", "WhatsApp 통합", "스마트 영업 흐름", "고급 고객 세분화", "고급 리드 수집", "소셜 미디어 통합", "의도 기반 답변", "맞춤 자동화"], excluded: [], cta: "Pro 선택" },
-      { desc: "최대 성능이 필요한 기업을 위한 플랜", features: ["Pro의 모든 기능", "무제한 메시지", "자동 영업 깔때기", "고급 통합", "우선 지원", "설정 지원", "프리미엄 자동화"], excluded: [], cta: "Premium 선택" },
+      { desc: "무료로 시작하기", features: ["봇 1개", "월 100개 메시지", "웹 채팅", "제어판"], excluded: ["WhatsApp 미포함"], cta: "무료로 시작" },
+      { desc: "성장을 시작하는 비즈니스를 위한 플랜", features: ["봇 2개", "월 1,000개 메시지", "웹 채팅", "WhatsApp Business", "이메일 지원"], excluded: [], cta: "Starter 선택" },
+      { desc: "성장 중인 비즈니스를 위한 플랜", features: ["봇 5개", "월 5,000개 메시지", "웹 채팅 + WhatsApp Business", "실시간 재고", "자동 예약", "우선 지원"], excluded: [], cta: "Pro 선택" },
+      { desc: "최대 성능이 필요한 기업을 위한 플랜", features: ["무제한 봇", "무제한 메시지", "Pro의 모든 기능", "전담 AI 에이전트", "전담 지원"], excluded: [], cta: "Business 선택" },
     ],
   },
 };
@@ -1145,7 +1157,7 @@ export const nl: LandingT = {
     label: "FAQ", title: "Veelgestelde vragen", subtitle: "Alles wat u nodig heeft om vol vertrouwen te starten.",
     items: [
       { q: "Heb ik technische kennis nodig om NexoBot te gebruiken?", a: "Nee. NexoBot is ontworpen zodat iedereen het in minuten kan instellen zonder technische kennis." },
-      { q: "Kan ik NexoBot op WhatsApp gebruiken?",                   a: "Ja. Pro- en Premium-plannen bevatten WhatsApp-integratie om uw gesprekken en verkoop te automatiseren." },
+      { q: "Kan ik NexoBot op WhatsApp gebruiken?",                   a: "Ja. Alle betaalde plannen (Starter, Pro en Business) bevatten WhatsApp Business om uw gesprekken en verkoop te automatiseren." },
       { q: "Wat gebeurt er als ik de berichtenlimiet overschrijd?",   a: "We stellen u op de hoogte voordat u de limiet bereikt. U kunt uw plan op elk moment upgraden." },
       { q: "Kan ik op elk moment opzeggen?",                         a: "Ja. Geen contracten of verplichtingen. Zeg uw abonnement op elk moment op via uw dashboard." },
       { q: "Biedt u ondersteuning?",                                 a: "Alle plannen omvatten ondersteuning. Het Premium-plan heeft prioriteitsondersteuning." },
@@ -1165,9 +1177,10 @@ export const nl: LandingT = {
     perMonth: "/mnd", perYear: "/jaar · 2 maanden gratis",
     mostPopular: "⭐ MEEST POPULAIR", comingSoon: "Jaarplan binnenkort beschikbaar",
     plans: [
-      { desc: "Ideaal voor startende ondernemers", features: ["Automatische AI-antwoorden", "Ingebedde chat voor uw website", "Berichtsjablonen", "24/7 ondersteuning zonder moeite", "Basis leadcapture", "Intuïtief controlepaneel"], excluded: ["WhatsApp niet inbegrepen", "Geen geavanceerde automatiseringen"], cta: "Starter kiezen" },
-      { desc: "Voor bedrijven die willen opschalen", features: ["Alles van Starter", "WhatsApp-integratie", "Slimme verkoopstromen", "Geavanceerde klantsegmentatie", "Geavanceerde leadcapture", "Social media-integratie", "Intentiegebaseerde antwoorden", "Gepersonaliseerde automatiseringen"], excluded: [], cta: "Pro kiezen" },
-      { desc: "Voor bedrijven die maximale kracht nodig hebben", features: ["Alles van Pro", "Onbeperkte berichten", "Automatische verkooptrechter", "Geavanceerde integraties", "Prioriteitsondersteuning", "Begeleide installatie", "Premium automatiseringen"], excluded: [], cta: "Premium kiezen" },
+      { desc: "Start gratis", features: ["1 bot", "100 berichten/maand", "Webchat", "Controlepaneel"], excluded: ["WhatsApp niet inbegrepen"], cta: "Gratis starten" },
+      { desc: "Voor bedrijven die beginnen te groeien", features: ["2 bots", "1.000 berichten/maand", "Webchat", "WhatsApp Business", "E-mailondersteuning"], excluded: [], cta: "Starter kiezen" },
+      { desc: "Voor bedrijven in volle expansie", features: ["5 bots", "5.000 berichten/maand", "Webchat + WhatsApp Business", "Realtime inventaris", "Automatisch inroosteren", "Prioriteitsondersteuning"], excluded: [], cta: "Pro kiezen" },
+      { desc: "Voor bedrijven die maximale kracht nodig hebben", features: ["Onbeperkte bots", "Onbeperkte berichten", "Alles van Pro", "Toegewijde AI-agent", "Toegewijde ondersteuning"], excluded: [], cta: "Business kiezen" },
     ],
   },
 };
@@ -1238,7 +1251,7 @@ export const tr: LandingT = {
     label: "SSS", title: "Sık sorulan sorular", subtitle: "Tam güvenle başlamak için ihtiyacınız olan her şey.",
     items: [
       { q: "NexoBot'u kullanmak için teknik bilgi gerekiyor mu?", a: "Hayır. NexoBot, herkesin teknik bilgi olmadan dakikalar içinde kurabilmesi için tasarlanmıştır." },
-      { q: "NexoBot'u WhatsApp'ta kullanabilir miyim?",           a: "Evet. Pro ve Premium planlar, konuşmalarınızı ve satışlarınızı otomatikleştirmek için WhatsApp entegrasyonu içerir." },
+      { q: "NexoBot'u WhatsApp'ta kullanabilir miyim?",           a: "Evet. Tüm ücretli planlar (Starter, Pro ve Business), konuşmalarınızı ve satışlarınızı otomatikleştirmek için WhatsApp Business içerir." },
       { q: "Mesaj limitini aşarsam ne olur?",                    a: "Limite ulaşmadan önce sizi bilgilendiririz. Kesinti olmadan istediğiniz zaman planınızı yükseltebilirsiniz." },
       { q: "İstediğim zaman iptal edebilir miyim?",              a: "Evet. Sözleşme veya taahhüt yok. Aboneliğinizi panodan istediğiniz zaman iptal edin." },
       { q: "Destek sunuyor musunuz?",                            a: "Tüm planlar destek içerir. Premium plan, daha hızlı yanıtlar için öncelikli destek sunar." },
@@ -1258,9 +1271,10 @@ export const tr: LandingT = {
     perMonth: "/ay", perYear: "/yıl · 2 ay ücretsiz",
     mostPopular: "⭐ EN POPÜLER", comingSoon: "Yıllık plan yakında",
     plans: [
-      { desc: "Girişimciler için ideal başlangıç planı", features: ["Yapay zeka ile otomatik yanıtlar", "Web sitenize gömülü sohbet", "Mesaj şablonları", "Zahmetsiz 24/7 destek", "Temel müşteri adayı yakalama", "Sezgisel kontrol paneli"], excluded: ["WhatsApp dahil değil", "Gelişmiş otomasyon yok"], cta: "Starter'ı seç" },
-      { desc: "Büyümek isteyen işletmeler için", features: ["Starter'daki her şey", "WhatsApp entegrasyonu", "Akıllı satış akışları", "Gelişmiş müşteri segmentasyonu", "Gelişmiş müşteri adayı yakalama", "Sosyal medya entegrasyonu", "Niyet tabanlı yanıtlar", "Özelleştirilmiş otomasyonlar"], excluded: [], cta: "Pro'yu seç" },
-      { desc: "Maksimum güce ihtiyaç duyan işletmeler için", features: ["Pro'daki her şey", "Sınırsız mesaj", "Otomatik satış hunisi", "Gelişmiş entegrasyonlar", "Öncelikli destek", "Destekli kurulum", "Premium otomasyonlar"], excluded: [], cta: "Premium'u seç" },
+      { desc: "Ücretsiz başla", features: ["1 bot", "100 mesaj/ay", "Web sohbet", "Kontrol paneli"], excluded: ["WhatsApp dahil değil"], cta: "Ücretsiz başla" },
+      { desc: "Büyümeye başlayan işletmeler için", features: ["2 bot", "Ayda 1.000 mesaj", "Web sohbet", "WhatsApp Business", "E-posta desteği"], excluded: [], cta: "Starter'ı seç" },
+      { desc: "Büyüyen işletmeler için", features: ["5 bot", "Ayda 5.000 mesaj", "Web sohbet + WhatsApp Business", "Gerçek zamanlı envanter", "Otomatik randevu", "Öncelikli destek"], excluded: [], cta: "Pro'yu seç" },
+      { desc: "Maksimum güce ihtiyaç duyan işletmeler için", features: ["Sınırsız bot", "Sınırsız mesaj", "Pro'daki her şey", "Özel AI ajanı", "Özel destek"], excluded: [], cta: "Business'ı seç" },
     ],
   },
 };
@@ -1331,7 +1345,7 @@ export const id: LandingT = {
     label: "FAQ", title: "Pertanyaan yang sering diajukan", subtitle: "Semua yang Anda butuhkan untuk memulai dengan penuh keyakinan.",
     items: [
       { q: "Apakah saya perlu keahlian teknis untuk menggunakan NexoBot?", a: "Tidak. NexoBot dirancang agar siapa saja dapat mengaturnya dalam hitungan menit tanpa pengetahuan teknis." },
-      { q: "Bisakah saya menggunakan NexoBot di WhatsApp?",                a: "Ya. Paket Pro dan Premium mencakup integrasi WhatsApp untuk mengotomatiskan percakapan dan penjualan Anda." },
+      { q: "Bisakah saya menggunakan NexoBot di WhatsApp?",                a: "Ya. Semua paket berbayar (Starter, Pro dan Business) mencakup WhatsApp Business untuk mengotomatiskan percakapan dan penjualan Anda." },
       { q: "Apa yang terjadi jika saya melebihi batas pesan?",             a: "Kami akan memberi tahu Anda sebelum mencapai batas. Anda dapat meningkatkan paket kapan saja tanpa gangguan." },
       { q: "Bisakah saya membatalkan kapan saja?",                         a: "Ya. Tidak ada kontrak atau komitmen. Batalkan langganan kapan saja dari dasbor Anda." },
       { q: "Apakah Anda menyediakan dukungan?",                            a: "Semua paket mencakup dukungan. Paket Premium memiliki dukungan prioritas untuk respons lebih cepat." },
@@ -1351,9 +1365,10 @@ export const id: LandingT = {
     perMonth: "/bln", perYear: "/thn · 2 bulan gratis",
     mostPopular: "⭐ PALING POPULER", comingSoon: "Paket tahunan segera hadir",
     plans: [
-      { desc: "Ideal untuk pengusaha yang baru memulai", features: ["Balasan otomatis dengan AI", "Chat tertanam di situs web Anda", "Template pesan", "Dukungan 24/7 tanpa usaha", "Tangkap prospek dasar", "Panel kontrol intuitif"], excluded: ["WhatsApp tidak termasuk", "Tanpa otomatisasi lanjutan"], cta: "Pilih Starter" },
-      { desc: "Untuk bisnis yang siap berkembang", features: ["Semua fitur Starter", "Integrasi WhatsApp", "Alur penjualan cerdas", "Segmentasi pelanggan lanjutan", "Tangkap prospek lanjutan", "Integrasi media sosial", "Balasan berbasis niat", "Otomatisasi kustom"], excluded: [], cta: "Pilih Pro" },
-      { desc: "Untuk bisnis yang membutuhkan kekuatan maksimal", features: ["Semua fitur Pro", "Pesan tak terbatas", "Corong penjualan otomatis", "Integrasi lanjutan", "Dukungan prioritas", "Pengaturan berbantuan", "Otomatisasi premium"], excluded: [], cta: "Pilih Premium" },
+      { desc: "Mulai tanpa biaya", features: ["1 bot", "100 pesan/bulan", "Chat web", "Panel kontrol"], excluded: ["WhatsApp tidak termasuk"], cta: "Mulai gratis" },
+      { desc: "Untuk bisnis yang mulai berkembang", features: ["2 bot", "1.000 pesan/bulan", "Chat web", "WhatsApp Business", "Dukungan email"], excluded: [], cta: "Pilih Starter" },
+      { desc: "Untuk bisnis yang sedang berkembang pesat", features: ["5 bot", "5.000 pesan/bulan", "Chat web + WhatsApp Business", "Inventaris real-time", "Jadwal otomatis", "Dukungan prioritas"], excluded: [], cta: "Pilih Pro" },
+      { desc: "Untuk bisnis yang membutuhkan kekuatan maksimal", features: ["Bot tak terbatas", "Pesan tak terbatas", "Semua fitur Pro", "Agen AI khusus", "Dukungan khusus"], excluded: [], cta: "Pilih Business" },
     ],
   },
 };
