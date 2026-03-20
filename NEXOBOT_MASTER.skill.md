@@ -297,7 +297,8 @@ ALTER TABLE products ADD COLUMN cost_price NUMERIC(10,2);
   - Reutilizable desde `chat/route.ts`, `whatsapp/webhook/route.ts`, y futuras integraciones
   - Verifica límites de mensajes del plan
   - Inyecta contexto de inventario vía `getInventoryContext()`
-  - Llama a GPT con `callOpenAI()` (3 reintentos automáticos)
+  - Si `bot.agent_enabled` → usa `runAgentLoop()` con tool calling
+  - Si no → `callOpenAI()` directo (3 reintentos automáticos)
   - Extrae citas con `tryExtractAppointment()`
   - Envía emails de alertas de límite
   - Contador mensual con auto-reset
@@ -305,6 +306,37 @@ ALTER TABLE products ADD COLUMN cost_price NUMERIC(10,2);
 - `app/api/chat/route.ts` — Wrapper para dashboard/widget
   - Usa `getAuth()` + `processBotMessage()`
   - Guarda historial en conversación `dashboard-{userId}-{botId}`
+
+### Agente AI con Tool Calling (2026-03-20)
+**Archivo**: `lib/agentLoop.ts`
+
+**Activación**: toggle "Agente AI" en `/dashboard/bots/[id]` → pestaña Config
+- BD: `bots.agent_enabled BOOLEAN DEFAULT false`
+- API: `PUT /api/bots/[id]` acepta y persiste `agent_enabled`
+
+**Herramientas disponibles (BOT_TOOLS)**:
+| Tool | Descripción |
+|---|---|
+| `get_inventory` | Inventario completo: nombre, precio, stock |
+| `get_products` | Busca productos por nombre/categoría (ilike) |
+| `search_appointments` | Consulta citas por fecha o visitante |
+| `create_appointment` | Crea cita (previo check de duplicado por fecha+hora) |
+
+**Flujo del loop**:
+```
+messages → openai.chat.completions.create({ tools: BOT_TOOLS, tool_choice: "auto" })
+  → finish_reason === "stop"  → retorna reply final
+  → finish_reason === "tool_calls" → executeTool() → push tool result → re-llama OpenAI
+  → máx. 4 iteraciones (≈12s) para respetar timeout de 15s de Meta WhatsApp
+  → fallback si se agotan iteraciones sin respuesta final
+```
+
+**Datos requeridos para tools**:
+- `get_inventory` / `get_products` → filtra por `user_id`
+- `search_appointments` / `create_appointment` → filtra por `bot_id`
+
+**TypeScript note**: `ChatCompletionMessageToolCall` es union con `ChatCompletionMessageCustomToolCall`
+→ guard obligatorio: `if (toolCall.type !== "function") continue;` antes de acceder a `.function`
 
 ### WhatsApp Integration (2026-03-15, debuggeado 2026-03-17, pipeline verificado 2026-03-18)
 **Fase 2B — Bot responde en WhatsApp en tiempo real — ✅ 100% COMPLETADA**
