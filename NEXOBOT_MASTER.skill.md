@@ -1,6 +1,6 @@
 # NEXOBOT_MASTER.skill.md
 > Memoria permanente del proyecto — actualizar al final de cada sesión.
-> Última actualización: 2026-03-17
+> Última actualización: 2026-03-20
 
 ---
 
@@ -85,7 +85,8 @@ nexobot-frontend/
 │   │   │   └── notes/[id]/route.ts
 │   │   ├── whatsapp/
 │   │   │   ├── webhook/route.ts    ← GET (challenge Meta) + POST (mensajes entrantes)
-│   │   │   └── connections/route.ts ← GET/POST/DELETE conexiones WA por bot
+│   │   │   ├── connections/route.ts ← GET/POST/DELETE conexiones WA por bot
+│   │   │   └── verify/route.ts     ← POST: valida token+phoneNumberId contra Meta Graph API
 │   │   └── stripe/
 │   │       ├── create-checkout-session/route.ts
 │   │       ├── verify-session/route.ts
@@ -122,7 +123,7 @@ nexobot-frontend/
 │   └── i18n/
 │       └── landing.ts              ← LandingT interface + 13 traducciones
 │
-├── middleware.ts                   ← Protección de rutas + detección de idioma
+├── middleware.ts                   ← Protección de rutas + detección de idioma + rate limiting auth
 ├── next.config.ts                  ← Security headers, imágenes remotas, ESLint
 ├── business-module-schema.sql      ← DDL del Business Module (ejecutar en Supabase)
 ├── NEXOBOT_MASTER.skill.md         ← Este archivo
@@ -315,13 +316,14 @@ Usuario escribe en WhatsApp
   → Guarda en conversations + messages
 ```
 
-**Variables de entorno** (todas necesarias en Vercel):
+**Variables de entorno** (Vercel — administrador de plataforma):
 ```
-WHATSAPP_TOKEN           — Token de acceso permanente de Meta (empieza con EAA...)
-WHATSAPP_PHONE_NUMBER_ID — ID del número de teléfono (ej: 875188135685843)
-WHATSAPP_VERIFY_TOKEN    — nexobot-verify-2024
+WHATSAPP_VERIFY_TOKEN    — string secreto para el challenge de Meta (ej: nexobot-verify-2024)
 WHATSAPP_APP_SECRET      — App Secret de Meta (para verificar firma HMAC-SHA256)
+WHATSAPP_TOKEN           — OPCIONAL: token global de fallback si el cliente no configura el suyo
+                           (desde 2026-03-20 cada cliente guarda su propio token en la BD)
 ```
+> `WHATSAPP_PHONE_NUMBER_ID` ya no es necesaria como env var — se guarda por cliente en la BD.
 
 **Requisito crítico — tabla whatsapp_connections**:
 Para que el webhook procese mensajes, DEBE existir una fila activa con `wa_token` seteado:
@@ -435,6 +437,24 @@ export async function getInventoryContext(userId, supabase): Promise<string>
 
 **Schema**: `business-module-schema.sql` en raíz del proyecto.
 
+### UX — Modal de confirmación de borrado (2026-03-20)
+`app/dashboard/bots/page.tsx`
+- Reemplaza el `confirm()` nativo del browser por un modal propio centrado en pantalla
+- Estado: `confirmDeleteId` + `confirmDeleteName`
+- Función `handleDelete(bot)` → setea el estado del modal; `executeDelete()` → llama a la API
+- Muestra el nombre del bot en negrita, botones Cancelar / Eliminar (rojo)
+
+### Seguridad — Rate limiting en middleware (2026-03-20)
+`middleware.ts` — sliding window in-memory por instancia Edge:
+| Ruta | Límite |
+|---|---|
+| `POST /api/auth/signup` | 5 req / 15 min |
+| `POST /api/auth/login` | 10 req / 15 min |
+| `POST /api/auth/reset` | 3 req / 15 min |
+- Devuelve `429` con `{ error }` JSON + `Retry-After: 900`
+- Protege contra credential stuffing y abuso de endpoints de auth
+- Escala actual: in-memory suficiente. Para multi-instancia → Upstash Redis
+
 ### Landing i18n — 13 idiomas (2026-03-13)
 **Arquitectura**:
 - `components/landing/LandingPage.tsx` — componente único parametrizable
@@ -495,8 +515,14 @@ Si `RESEND_API_KEY` no está configurado, retornan silenciosamente (no rompen el
 - **Debugging más fácil**: Se pueden probar con curl/Postman sin montar la UI.
 - **Consistencia**: Todo el equipo sigue el mismo patrón sin excepciones.
 
-### Cómo funciona el middleware de i18n
+### Cómo funciona el middleware
 ```
+Request POST a /api/auth/signup|login|reset
+  → Rate limiting sliding-window in-memory (por instancia Edge):
+     signup: 5 req / 15 min  |  login: 10 req / 15 min  |  reset: 3 req / 15 min
+  → Si excede → 429 JSON { error } + Retry-After: 900
+  → Si ok → continúa al siguiente check
+
 Request a "/"
   → middleware.ts detecta Accept-Language header
   → Si idioma soportado (en/pt/fr/it/de/nl/ar/zh/ja/ru/ko/tr/id) → redirect a /[locale]
@@ -510,6 +536,7 @@ Request a "/dashboard" sin cookie de auth
 
 No se usa el i18n nativo de Next.js — es detección manual via header HTTP.
 **Ventaja**: control total, sin routing phantom de Next.js.
+**Nota rate limiting**: es per-Edge-instance. Suficiente para escala actual; para multi-instancia usar Upstash Redis.
 
 ### Cómo funciona getInventoryContext()
 ```
@@ -552,10 +579,10 @@ OPENAI_API_KEY=
 RESEND_API_KEY=
 
 # WhatsApp Cloud API (Meta)
-WHATSAPP_TOKEN=
-WHATSAPP_PHONE_NUMBER_ID=875188135685843
-WHATSAPP_VERIFY_TOKEN=          # string secreto que tú defines
-WHATSAPP_APP_SECRET=            # App Secret de la app Meta (para verificar firma)
+WHATSAPP_VERIFY_TOKEN=          # string secreto que tú defines (ej: nexobot-verify-2024)
+WHATSAPP_APP_SECRET=            # App Secret de la app Meta (para verificar firma HMAC-SHA256)
+WHATSAPP_TOKEN=                 # OPCIONAL — fallback global si cliente no configura su propio token
+# WHATSAPP_PHONE_NUMBER_ID ya no es necesaria — se guarda por cliente en whatsapp_connections
 
 # App
 NEXT_PUBLIC_APP_URL=https://nexobot.net
@@ -674,6 +701,7 @@ SIG="sha256=$(printf '%s' "$PAYLOAD" | openssl dgst -sha256 -hmac "$SECRET" | aw
 | Tarea | Descripción | Notas |
 |---|---|---|
 | ✅ Fase 2B — WhatsApp Business API | Completada 2026-03-15 | Ver sección "WhatsApp Integration" |
+| ✅ WhatsApp self-service multi-tenant | Completado 2026-03-20 | Token por cliente, verify endpoint, has_token seguro |
 | Reportes mensuales PDF | Pro/Premium — resumen de gastos, ventas, margen | Usar lib/pdf o Puppeteer |
 | Export CSV | Gastos y ventas exportables | Pro/Premium |
 
