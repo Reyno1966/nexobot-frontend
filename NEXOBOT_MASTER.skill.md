@@ -492,6 +492,45 @@ export async function getInventoryContext(userId, supabase): Promise<string>
 - Si falla o no hay productos → devuelve `""` (bot funciona igual)
 - Se llama en `app/api/chat/route.ts` antes de cada llamada a GPT
 
+### Calendario Visual de Agendamiento (2026-03-20)
+**Archivos**:
+- `components/chat/AppointmentCalendar.tsx` — Componente React (extraído de widget/page.tsx)
+- `app/api/widget/[botId]/availability/route.ts` — API pública de disponibilidad
+
+**API de disponibilidad**:
+```
+GET /api/widget/[botId]/availability?year=2026&month=3
+→ { occupied: { "2026-03-20": ["09:00", "14:00"] } }
+```
+- Pública (no requiere auth), valida que el bot exista y esté activo
+- Filtra appointments por bot_id + mes, excluye status=cancelled
+- Normaliza appointment_time "09:00:00" → "09:00"
+
+**Componente AppointmentCalendar — 3 pasos**:
+1. **Calendario mensual**: días disponibles (● verde) / sin horarios (● rojo) / pasados (gris)
+   - Carga disponibilidad al montar y al cambiar de mes
+   - Tooltip: "X horarios disponibles" en cada día
+2. **Slots de hora**: grid 3×3 — disponibles (hover verde) / ocupados (tachado, disabled)
+   - Contador de horarios disponibles para la fecha seleccionada
+3. **Formulario**: Nombre*, Teléfono*, Email(opt) — resumen visual de la cita
+
+**Props**:
+| Prop | Tipo | Descripción |
+|---|---|---|
+| `botId` | string | ID del bot (para API calls) |
+| `widgetColor` | string | Color principal del widget |
+| `prefillName` | string | Nombre extraído de conversación |
+| `prefillPhone` | string | Teléfono extraído de conversación |
+| `prefillEmail` | string | Email extraído de conversación |
+| `onConfirm` | (summary: string) => void | Callback al confirmar cita |
+| `onClose` | () => void | Callback al cerrar |
+
+**Integración en widget** (`app/widget/[botId]/page.tsx`):
+- Keyword detection (`hasAppointmentTrigger`) → muestra calendario automáticamente
+- `extractVisitorPhone()` — detecta teléfono en mensajes del usuario (regex)
+- Botón "Agendar" en header → muestra/oculta calendario manualmente
+- El calendario postea a `POST /api/widget/[botId]/appointment` (existente)
+
 ### Business Module (2026-03-12)
 **Rutas dashboard**:
 - `/dashboard/business` — Overview con KPIs (ingresos, gastos, margen)
