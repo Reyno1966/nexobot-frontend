@@ -1,6 +1,6 @@
 # NEXOBOT_MASTER.skill.md
 > Memoria permanente del proyecto — actualizar al final de cada sesión.
-> Última actualización: 2026-03-21 (productos con imágenes + escáner de código de barras)
+> Última actualización: 2026-03-21 (productos con imágenes + escáner de código de barras + fix checkout Stripe v3)
 
 ---
 
@@ -883,6 +883,27 @@ SIG="sha256=$(echo "$PAYLOAD" | openssl dgst -sha256 -hmac "$SECRET" | awk '{pri
 # ✅ Firma correcta
 SIG="sha256=$(printf '%s' "$PAYLOAD" | openssl dgst -sha256 -hmac "$SECRET" | awk '{print $2}')"
 ```
+
+### Error 10: Checkout Stripe v3 devuelve "Plan no válido" (2026-03-21)
+**Síntoma**: Al intentar suscribirse con los nuevos planes, la API devuelve 400 `{ error: "Plan no válido" }`.
+**Causa**: `create-checkout-session/route.ts` tenía dos arrays hardcodeados (`SUBSCRIPTION_PRICE_IDS`, `ONE_TIME_PRICE_IDS`) con solo los IDs v2 legacy. Al llegar un price ID v3, ninguna condición lo reconocía y devolvía el error. Mismo problema en `verify-session/route.ts` donde `PLAN_NAMES` solo tenía IDs v2.
+**Solución**: Añadir todos los IDs v3 al inicio de ambos arrays/maps, manteniendo los v2 para compatibilidad con suscripciones existentes.
+```typescript
+// create-checkout-session/route.ts
+const SUBSCRIPTION_PRICE_IDS = [
+  // v3 (activos) — añadir PRIMERO
+  "price_1TCyOpRap0JkQNsmITpDzS3K", // Starter $19/mes
+  "price_1TCyZtRap0JkQNsmgI7TTCsN", // Pro $39/mes
+  "price_1TCyjDRap0JkQNsmsD2sNoh7", // Premium $79/mes
+  // ... anuales v3 ...
+  // v2 (legacy) — mantener para clientes existentes
+  "price_1T8eHgRap0JkQNsmxXKjK3IH", ...
+];
+```
+**Regla**: Al crear nuevos price IDs en Stripe, añadirlos SIEMPRE en:
+1. `lib/plans.ts` → `PRICE_TO_PLAN` y `PLAN_PRICES`
+2. `app/api/stripe/create-checkout-session/route.ts` → `SUBSCRIPTION_PRICE_IDS` o `ONE_TIME_PRICE_IDS`
+3. `app/api/stripe/verify-session/route.ts` → `PLAN_NAMES`
 
 ### Error 6: Merge olvidado antes de cerrar sesión
 **Síntoma**: Los cambios están en la rama de Claude pero no en producción (Vercel no despliega).
