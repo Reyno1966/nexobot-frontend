@@ -172,7 +172,7 @@ export async function executeTool(
     case "get_inventory": {
       const { data } = await supabase
         .from("products")
-        .select("name, price, currency, stock, unit")
+        .select("name, price, currency, stock, unit, image_url")
         .eq("user_id", userId)
         .neq("status", "inactive")
         .gt("stock", 0)
@@ -189,7 +189,7 @@ export async function executeTool(
       const query = typeof args.query === "string" ? args.query : "";
       let q = supabase
         .from("products")
-        .select("name, description, price, currency, stock, unit")
+        .select("name, description, price, currency, stock, unit, image_url")
         .eq("user_id", userId)
         .neq("status", "inactive")
         .gt("stock", 0)

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Image from "next/image";
 import AppointmentCalendar from "@/components/chat/AppointmentCalendar";
@@ -66,6 +66,30 @@ function extractVisitorPhone(messages: Message[]): string {
     }
   }
   return "";
+}
+
+// Renderiza el contenido del mensaje, detectando URLs de imágenes e insertando <img>
+function renderMessageContent(content: string): React.ReactNode {
+  const imageRegex = /(https?:\/\/[^\s]+\.(?:jpg|jpeg|png|gif|webp)(?:\?[^\s]*)?)/gi;
+  const parts = content.split(imageRegex);
+  if (parts.length === 1) return content;
+
+  return (
+    <>
+      {parts.map((part, idx) =>
+        /^https?:\/\/[^\s]+\.(?:jpg|jpeg|png|gif|webp)/i.test(part) ? (
+          <img
+            key={idx}
+            src={part}
+            alt="Producto"
+            className="mt-2 rounded-lg max-w-full max-h-48 object-contain block"
+          />
+        ) : part ? (
+          <span key={idx}>{part}</span>
+        ) : null
+      )}
+    </>
+  );
 }
 
 export default function WidgetPage() {
@@ -219,7 +243,7 @@ export default function WidgetPage() {
               }`}
               style={msg.role === "user" ? { backgroundColor: widgetColor } : undefined}
             >
-              {msg.content}
+              {renderMessageContent(msg.content)}
             </div>
           </div>
         ))}

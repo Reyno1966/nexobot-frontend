@@ -44,7 +44,7 @@ export async function GET(
     // Buscar productos del usuario (solo activos)
     let query = supabase
       .from("products")
-      .select("name, description, category, price, currency, stock, unit, status")
+      .select("name, description, category, price, currency, stock, unit, status, image_url")
       .eq("user_id", bot.user_id)
       .neq("status", "inactive")
       .order("name")

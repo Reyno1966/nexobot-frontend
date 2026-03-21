@@ -1,28 +1,34 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
+import BarcodeScanner from "@/components/BarcodeScanner";
+
+// ── Tipos ─────────────────────────────────────────────────────────────────────
 
 interface Product {
-  id: string;
-  name: string;
+  id:          string;
+  name:        string;
   description: string | null;
-  category: string;
-  sku: string | null;
-  price: number;
-  currency: string;
-  stock: number;
-  stock_min: number;
-  unit: string;
-  image_url: string | null;
-  status: "active" | "inactive" | "out_of_stock";
-  created_at: string;
-  updated_at: string | null;
+  category:    string;
+  sku:         string | null;
+  barcode:     string | null;
+  price:       number;
+  currency:    string;
+  stock:       number;
+  stock_min:   number;
+  unit:        string;
+  image_url:   string | null;
+  status:      "active" | "inactive" | "out_of_stock";
+  created_at:  string;
+  updated_at:  string | null;
 }
 
+// ── Constantes ────────────────────────────────────────────────────────────────
+
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
-  active:       { label: "Activo",     color: "bg-green-100 text-green-700" },
-  inactive:     { label: "Inactivo",   color: "bg-gray-100 text-gray-500" },
-  out_of_stock: { label: "Sin stock",  color: "bg-red-100 text-red-700" },
+  active:       { label: "Activo",    color: "bg-green-100 text-green-700" },
+  inactive:     { label: "Inactivo",  color: "bg-gray-100 text-gray-500" },
+  out_of_stock: { label: "Sin stock", color: "bg-red-100 text-red-700" },
 };
 
 const CURRENCIES = ["USD", "EUR", "MXN", "COP", "ARS", "CLP", "PEN", "CHF"];
@@ -33,22 +39,33 @@ function formatMoney(amount: number, currency: string) {
 }
 
 const emptyForm = {
-  name: "", description: "", category: "", sku: "",
+  name: "", description: "", category: "", sku: "", barcode: "",
   price: "", currency: "USD", stock: "", stock_min: "5",
   unit: "unidades", image_url: "",
 };
 
+// ── Componente ────────────────────────────────────────────────────────────────
+
 export default function ProductsPage() {
-  const [products, setProducts]   = useState<Product[]>([]);
-  const [loading, setLoading]     = useState(true);
-  const [search, setSearch]       = useState("");
-  const [filter, setFilter]       = useState("all");
-  const [showForm, setShowForm]   = useState(false);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [saving, setSaving]       = useState(false);
-  const [saveError, setSaveError] = useState("");
-  const [deleting, setDeleting]   = useState<string | null>(null);
-  const [form, setForm]           = useState({ ...emptyForm });
+  const [products,    setProducts]   = useState<Product[]>([]);
+  const [loading,     setLoading]    = useState(true);
+  const [search,      setSearch]     = useState("");
+  const [filter,      setFilter]     = useState("all");
+  const [showForm,    setShowForm]   = useState(false);
+  const [editingId,   setEditingId]  = useState<string | null>(null);
+  const [saving,      setSaving]     = useState(false);
+  const [saveError,   setSaveError]  = useState("");
+  const [deleting,    setDeleting]   = useState<string | null>(null);
+  const [form,        setForm]       = useState({ ...emptyForm });
+
+  // Scanner
+  const [showScanner,  setShowScanner] = useState(false);
+  const [scanMode,     setScanMode]    = useState<"lookup" | "fill">("lookup");
+
+  // Image upload
+  const [uploadingImg, setUploadingImg] = useState(false);
+  const [uploadImgErr, setUploadImgErr] = useState("");
+  const imageInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => { fetchProducts(); }, []);
 
@@ -59,14 +76,14 @@ export default function ProductsPage() {
     setLoading(false);
   }
 
+  // ── Acciones de stock y estado ───────────────────────────────────────────
+
   async function handleStockChange(id: string, delta: number) {
     const product = products.find((p) => p.id === id);
     if (!product) return;
     const newStock = Math.max(0, product.stock + delta);
     const res = await fetch(`/api/products/${id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
+      method: "PUT", headers: { "Content-Type": "application/json" }, credentials: "include",
       body: JSON.stringify({ stock: newStock }),
     });
     if (res.ok) {
@@ -78,9 +95,7 @@ export default function ProductsPage() {
   async function handleStatusToggle(id: string, currentStatus: string) {
     const newStatus = currentStatus === "active" ? "inactive" : "active";
     const res = await fetch(`/api/products/${id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
+      method: "PUT", headers: { "Content-Type": "application/json" }, credentials: "include",
       body: JSON.stringify({ status: newStatus }),
     });
     if (res.ok) {
@@ -97,10 +112,13 @@ export default function ProductsPage() {
     setDeleting(null);
   }
 
+  // ── Formulario CRUD ──────────────────────────────────────────────────────
+
   function openCreate() {
     setEditingId(null);
     setForm({ ...emptyForm });
     setSaveError("");
+    setUploadImgErr("");
     setShowForm(true);
   }
 
@@ -108,11 +126,13 @@ export default function ProductsPage() {
     setEditingId(p.id);
     setForm({
       name: p.name, description: p.description ?? "", category: p.category,
-      sku: p.sku ?? "", price: String(p.price), currency: p.currency,
-      stock: String(p.stock), stock_min: String(p.stock_min),
+      sku: p.sku ?? "", barcode: p.barcode ?? "",
+      price: String(p.price), currency: p.currency,
+      stock: String(p.stock), stock_min: String(p.stock_min ?? 5),
       unit: p.unit, image_url: p.image_url ?? "",
     });
     setSaveError("");
+    setUploadImgErr("");
     setShowForm(true);
   }
 
@@ -122,16 +142,14 @@ export default function ProductsPage() {
     try {
       const payload = {
         ...form,
-        price:     Number(form.price) || 0,
-        stock:     Number(form.stock) || 0,
+        price:     Number(form.price)     || 0,
+        stock:     Number(form.stock)     || 0,
         stock_min: Number(form.stock_min) || 0,
       };
       const url    = editingId ? `/api/products/${editingId}` : "/api/products";
       const method = editingId ? "PUT" : "POST";
       const res = await fetch(url, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
+        method, headers: { "Content-Type": "application/json" }, credentials: "include",
         body: JSON.stringify(payload),
       });
       const data = await res.json();
@@ -142,23 +160,89 @@ export default function ProductsPage() {
         setSaveError(data.error ?? "Error al guardar. Intenta de nuevo.");
       }
     } catch { setSaveError("Error de conexión."); }
-    finally { setSaving(false); }
+    finally   { setSaving(false); }
   }
+
+  // ── Upload de imagen ─────────────────────────────────────────────────────
+
+  async function handleImageFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingImg(true);
+    setUploadImgErr("");
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const res = await fetch("/api/products/upload-image", {
+        method: "POST", credentials: "include", body: fd,
+      });
+      const data = await res.json() as { url?: string; error?: string };
+      if (res.ok && data.url) {
+        setForm((f) => ({ ...f, image_url: data.url! }));
+      } else {
+        setUploadImgErr(data.error ?? "Error al subir la imagen.");
+      }
+    } catch {
+      setUploadImgErr("Error de conexión al subir la imagen.");
+    } finally {
+      setUploadingImg(false);
+      // Limpiar input para permitir re-selección del mismo archivo
+      if (imageInputRef.current) imageInputRef.current.value = "";
+    }
+  }
+
+  // ── Lector de código de barras ───────────────────────────────────────────
+
+  function openScanner(mode: "lookup" | "fill") {
+    setScanMode(mode);
+    setShowScanner(true);
+  }
+
+  const handleBarcodeScanned = useCallback(async (code: string) => {
+    setShowScanner(false);
+    if (scanMode === "fill") {
+      setForm((f) => ({ ...f, barcode: code }));
+      return;
+    }
+    // Modo lookup: buscar producto y abrir formulario
+    try {
+      const res = await fetch(`/api/products/barcode/${encodeURIComponent(code)}`, {
+        credentials: "include",
+      });
+      if (res.ok) {
+        const { product } = await res.json() as { product: Product };
+        openEdit(product);
+      } else {
+        // Producto no encontrado → abrir formulario nuevo con barcode pre-relleno
+        openCreate();
+        setForm((f) => ({ ...f, barcode: code }));
+      }
+    } catch {
+      // Si falla la búsqueda, abrir formulario nuevo de todas formas
+      openCreate();
+      setForm((f) => ({ ...f, barcode: code }));
+    }
+  }, [scanMode]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── Filtros y stats ──────────────────────────────────────────────────────
 
   const filtered = products.filter((p) => {
     const matchFilter = filter === "all" || p.status === filter;
     const matchSearch = !search || p.name.toLowerCase().includes(search.toLowerCase()) ||
-                        (p.category?.toLowerCase().includes(search.toLowerCase()));
+                        p.category?.toLowerCase().includes(search.toLowerCase()) ||
+                        p.barcode?.toLowerCase().includes(search.toLowerCase());
     return matchFilter && matchSearch;
   });
 
-  const lowStock = products.filter((p) => p.stock > 0 && p.stock <= p.stock_min).length;
+  const lowStock = products.filter((p) => p.stock > 0 && p.stock <= (p.stock_min ?? 0)).length;
   const outStock = products.filter((p) => p.status === "out_of_stock").length;
   const totalVal = products.filter((p) => p.status === "active").reduce((s, p) => s + p.price * p.stock, 0);
   const counts   = { all: products.length, active: 0, inactive: 0, out_of_stock: 0 };
   products.forEach((p) => { counts[p.status] = (counts[p.status] ?? 0) + 1; });
 
   const categories = [...new Set(products.map((p) => p.category).filter(Boolean))];
+
+  // ── Render ───────────────────────────────────────────────────────────────
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
@@ -169,13 +253,32 @@ export default function ProductsPage() {
           <h1 className="text-2xl font-bold text-gray-900">Inventario de Productos</h1>
           <p className="text-gray-500 mt-1">Catálogo privado — tu bot lo consulta en tiempo real</p>
         </div>
-        <button onClick={openCreate}
-          className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-blue-700 transition">
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
-          Nuevo producto
-        </button>
+        <div className="flex items-center gap-2">
+          {/* Escanear código */}
+          <button
+            onClick={() => openScanner("lookup")}
+            className="flex items-center gap-2 border border-gray-200 text-gray-600 px-3 py-2 rounded-xl text-sm font-medium hover:bg-gray-50 transition"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                d="M3 7V5a2 2 0 012-2h2M17 3h2a2 2 0 012 2v2M21 17v2a2 2 0 01-2 2h-2M7 21H5a2 2 0 01-2-2v-2" />
+              <line x1="7" y1="9" x2="7" y2="15" strokeWidth={2} />
+              <line x1="11" y1="9" x2="11" y2="15" strokeWidth={2} />
+              <line x1="15" y1="9" x2="15" y2="15" strokeWidth={2} />
+            </svg>
+            Escanear
+          </button>
+          {/* Nuevo producto */}
+          <button
+            onClick={openCreate}
+            className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-blue-700 transition"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+            Nuevo producto
+          </button>
+        </div>
       </div>
 
       {/* Stats */}
@@ -215,7 +318,7 @@ export default function ProductsPage() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
           <input type="text" value={search} onChange={(e) => setSearch(e.target.value)}
-            placeholder="Buscar producto o categoría..."
+            placeholder="Buscar por nombre, categoría o código de barras..."
             className="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
@@ -229,7 +332,7 @@ export default function ProductsPage() {
         </div>
       </div>
 
-      {/* Modal crear/editar */}
+      {/* ── Modal crear/editar ──────────────────────────────────────────── */}
       {showForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto">
@@ -238,6 +341,50 @@ export default function ProductsPage() {
             </h2>
             <div className="space-y-4">
 
+              {/* Imagen */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Imagen del producto</label>
+                <div className="flex items-start gap-3">
+                  {/* Preview */}
+                  <div className="w-16 h-16 rounded-xl border-2 border-dashed border-gray-200 overflow-hidden flex-shrink-0 bg-gray-50 flex items-center justify-center">
+                    {form.image_url ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={form.image_url} alt="Preview" className="w-full h-full object-cover" />
+                    ) : (
+                      <span className="text-2xl">📷</span>
+                    )}
+                  </div>
+                  {/* Controles */}
+                  <div className="flex-1">
+                    <input
+                      ref={imageInputRef}
+                      type="file"
+                      accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+                      className="hidden"
+                      onChange={handleImageFileChange}
+                    />
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <button type="button"
+                        onClick={() => imageInputRef.current?.click()}
+                        disabled={uploadingImg}
+                        className="text-xs text-blue-600 border border-blue-200 px-3 py-1.5 rounded-lg hover:bg-blue-50 transition disabled:opacity-50">
+                        {uploadingImg ? "Subiendo…" : "Subir imagen"}
+                      </button>
+                      {form.image_url && (
+                        <button type="button"
+                          onClick={() => setForm((f) => ({ ...f, image_url: "" }))}
+                          className="text-xs text-red-500 border border-red-200 px-3 py-1.5 rounded-lg hover:bg-red-50 transition">
+                          Quitar
+                        </button>
+                      )}
+                    </div>
+                    {uploadImgErr && <p className="text-xs text-red-600 mt-1">{uploadImgErr}</p>}
+                    <p className="text-xs text-gray-400 mt-1">JPG, PNG, WebP · Máx. 5 MB</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Nombre */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Nombre *</label>
                 <input type="text" value={form.name}
@@ -247,6 +394,7 @@ export default function ProductsPage() {
                 />
               </div>
 
+              {/* Descripción */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
                 <textarea value={form.description}
@@ -257,6 +405,7 @@ export default function ProductsPage() {
                 />
               </div>
 
+              {/* Categoría + SKU */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Categoría</label>
@@ -271,7 +420,7 @@ export default function ProductsPage() {
                   </datalist>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">SKU / Código</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">SKU / Código interno</label>
                   <input type="text" value={form.sku}
                     onChange={(e) => setForm((f) => ({ ...f, sku: e.target.value }))}
                     placeholder="Ej: CAM-NEG-001"
@@ -280,6 +429,32 @@ export default function ProductsPage() {
                 </div>
               </div>
 
+              {/* Código de barras */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Código de barras</label>
+                <div className="flex gap-2">
+                  <input type="text" value={form.barcode}
+                    onChange={(e) => setForm((f) => ({ ...f, barcode: e.target.value }))}
+                    placeholder="Escanea o escribe el código"
+                    className="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
+                  />
+                  <button type="button"
+                    onClick={() => openScanner("fill")}
+                    title="Escanear código"
+                    className="px-3 py-2.5 border border-gray-200 rounded-xl text-gray-500 hover:bg-gray-50 hover:text-gray-700 transition"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                        d="M3 7V5a2 2 0 012-2h2M17 3h2a2 2 0 012 2v2M21 17v2a2 2 0 01-2 2h-2M7 21H5a2 2 0 01-2-2v-2" />
+                      <line x1="7" y1="9" x2="7" y2="15" strokeWidth={2} />
+                      <line x1="11" y1="9" x2="11" y2="15" strokeWidth={2} />
+                      <line x1="15" y1="9" x2="15" y2="15" strokeWidth={2} />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              {/* Precio + Moneda + Unidad */}
               <div className="grid grid-cols-3 gap-3">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Precio</label>
@@ -307,6 +482,7 @@ export default function ProductsPage() {
                 </div>
               </div>
 
+              {/* Stock + Mínimo */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Stock actual</label>
@@ -338,14 +514,22 @@ export default function ProductsPage() {
               </button>
               <button onClick={handleSave} disabled={saving}
                 className="flex-1 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-blue-700 transition disabled:opacity-50">
-                {saving ? "Guardando..." : editingId ? "Guardar cambios" : "Crear producto"}
+                {saving ? "Guardando…" : editingId ? "Guardar cambios" : "Crear producto"}
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Lista de productos */}
+      {/* ── Lector de código de barras ──────────────────────────────────── */}
+      {showScanner && (
+        <BarcodeScanner
+          onScan={handleBarcodeScanned}
+          onClose={() => setShowScanner(false)}
+        />
+      )}
+
+      {/* ── Lista de productos ───────────────────────────────────────────── */}
       {loading ? (
         <div className="flex items-center justify-center py-20">
           <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
@@ -381,15 +565,25 @@ export default function ProductsPage() {
 
           <div className="divide-y divide-gray-50">
             {filtered.map((product) => {
-              const isLow = product.stock > 0 && product.stock <= product.stock_min;
+              const isLow = product.stock > 0 && product.stock <= (product.stock_min ?? 0);
               return (
                 <div key={product.id}
                   className={`grid grid-cols-1 sm:grid-cols-12 gap-3 sm:gap-4 px-5 py-4 hover:bg-gray-50 transition items-center ${isLow ? "bg-orange-50/50 hover:bg-orange-50" : ""}`}>
 
-                  {/* Nombre + estado */}
+                  {/* Imagen + nombre + estado */}
                   <div className="sm:col-span-4 flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gradient-to-br from-blue-50 to-violet-50 rounded-xl flex items-center justify-center flex-shrink-0 text-lg">
-                      📦
+                    <div className="w-10 h-10 rounded-xl overflow-hidden flex-shrink-0 bg-gradient-to-br from-blue-50 to-violet-50 flex items-center justify-center">
+                      {product.image_url ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={product.image_url}
+                          alt={product.name}
+                          className="w-full h-full object-cover"
+                          onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
+                        />
+                      ) : (
+                        <span className="text-lg">📦</span>
+                      )}
                     </div>
                     <div className="min-w-0">
                       <p className="font-semibold text-gray-900 text-sm truncate">{product.name}</p>
@@ -399,6 +593,9 @@ export default function ProductsPage() {
                         </span>
                         {isLow && <span className="text-xs text-orange-600 font-medium">⚠️ Stock bajo</span>}
                         {product.sku && <span className="text-xs text-gray-400">{product.sku}</span>}
+                        {product.barcode && (
+                          <span className="text-xs text-gray-400 font-mono">#{product.barcode}</span>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -437,9 +634,7 @@ export default function ProductsPage() {
                     <button onClick={() => handleStatusToggle(product.id, product.status)}
                       disabled={product.status === "out_of_stock"}
                       className={`px-2.5 py-1.5 text-xs font-medium rounded-lg transition disabled:opacity-40 ${
-                        product.status === "active"
-                          ? "text-gray-500 hover:bg-gray-100"
-                          : "text-green-700 hover:bg-green-50"
+                        product.status === "active" ? "text-gray-500 hover:bg-gray-100" : "text-green-700 hover:bg-green-50"
                       }`}>
                       {product.status === "active" ? "Pausar" : "Activar"}
                     </button>
@@ -449,7 +644,7 @@ export default function ProductsPage() {
                     </button>
                     <button onClick={() => handleDelete(product.id)} disabled={deleting === product.id}
                       className="px-2.5 py-1.5 text-xs text-gray-400 rounded-lg hover:bg-red-50 hover:text-red-600 transition disabled:opacity-50">
-                      {deleting === product.id ? "..." : "🗑️"}
+                      {deleting === product.id ? "…" : "🗑️"}
                     </button>
                   </div>
                 </div>
@@ -466,11 +661,8 @@ export default function ProductsPage() {
           <div>
             <p className="font-semibold text-blue-900 text-sm">Tu bot ya puede consultar este catálogo</p>
             <p className="text-blue-700 text-xs mt-1 leading-relaxed">
-              Agrega esta instrucción al <strong>System Prompt</strong> de tu bot para que responda sobre productos y stock en tiempo real:
+              Activa el <strong>Agente AI</strong> en la configuración del bot para que muestre imágenes y precios en tiempo real. Sin el agente, el bot recibe el catálogo como contexto de texto.
             </p>
-            <code className="block mt-2 bg-white border border-blue-100 rounded-xl px-4 py-3 text-xs text-gray-700 leading-relaxed">
-              {`Cuando el usuario pregunte sobre productos, precios o disponibilidad, consulta el catálogo actualizado. Los productos disponibles son los que tienen estado "activo". Informa el precio y stock exacto de cada producto.`}
-            </code>
           </div>
         </div>
       )}

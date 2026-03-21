@@ -12,7 +12,7 @@ export async function PUT(
   const { id } = await params;
   const body = await req.json();
 
-  const allowed = ["name", "description", "category", "sku", "price", "currency",
+  const allowed = ["name", "description", "category", "sku", "barcode", "price", "currency",
                    "stock", "stock_min", "unit", "image_url", "status"];
   const updates: Record<string, unknown> = {};
   for (const key of allowed) {

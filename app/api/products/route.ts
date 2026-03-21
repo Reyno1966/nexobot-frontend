@@ -13,7 +13,7 @@ export async function GET(req: Request) {
 
   let query = supabase
     .from("products")
-    .select("id, name, description, price, cost_price, currency, stock, unit, category, sku, status, image_url, created_at")
+    .select("id, name, description, price, cost_price, currency, stock, stock_min, unit, category, sku, barcode, status, image_url, created_at, updated_at")
     .eq("user_id", userId)
     .order("created_at", { ascending: false })
     .limit(500);
@@ -34,7 +34,7 @@ export async function POST(req: Request) {
 
   const { supabase, userId } = auth;
   const body = await req.json();
-  const { name, description, category, sku, price, currency, stock, stock_min, unit, image_url } = body;
+  const { name, description, category, sku, barcode, price, currency, stock, stock_min, unit, image_url } = body;
 
   if (!name?.trim()) {
     return NextResponse.json({ error: "El nombre del producto es obligatorio" }, { status: 400 });
@@ -53,6 +53,7 @@ export async function POST(req: Request) {
       description: description || null,
       category:    category || "General",
       sku:         sku || null,
+      barcode:     barcode || null,
       price:       Number(price ?? 0),
       currency:    currency || "USD",
       stock:       stockVal,
