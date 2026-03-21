@@ -1,6 +1,6 @@
 # NEXOBOT_MASTER.skill.md
 > Memoria permanente del proyecto — actualizar al final de cada sesión.
-> Última actualización: 2026-03-20 (pricing v3 — Stripe IDs actualizados, plan Premium $79)
+> Última actualización: 2026-03-21 (productos con imágenes + escáner de código de barras)
 
 ---
 
@@ -73,6 +73,10 @@ nexobot-frontend/
 │   │   ├── appointments/           ← Citas agendadas por bots
 │   │   ├── conversations/          ← Historial de conversaciones
 │   │   ├── products/               ← Catálogo / inventario
+│   │   │   ├── route.ts                ← GET (list+filter), POST (crear)
+│   │   │   ├── [id]/route.ts           ← PUT, DELETE
+│   │   │   ├── barcode/[code]/route.ts ← GET por código de barras (404 = nuevo)
+│   │   │   └── upload-image/route.ts   ← POST imagen → Supabase Storage → URL pública
 │   │   ├── invoices/               ← Facturas
 │   │   ├── profile/                ← Perfil de empresa
 │   │   ├── notifications/          ← Centro de notificaciones
@@ -101,6 +105,9 @@ nexobot-frontend/
 │   │   ├── LandingPage.tsx         ← Componente único parametrizable (t: LandingT)
 │   │   ├── DemoChat.tsx            ← Demo interactivo (en español, hardcoded)
 │   │   └── PricingSection.tsx      ← Sección precios (en español, hardcoded)
+│   ├── chat/
+│   │   └── AppointmentCalendar.tsx ← Calendario visual inline para el widget
+│   ├── BarcodeScanner.tsx          ← Escáner de cámara (@zxing/library) para productos
 │   └── dashboard/
 │       ├── Sidebar.tsx
 │       ├── AlertsPanel.tsx
@@ -261,9 +268,22 @@ ALTER TABLE appointments ADD COLUMN customer_id UUID REFERENCES customers(id);
 ```sql
 -- products: margen de ganancia
 ALTER TABLE products ADD COLUMN cost_price NUMERIC(10,2);
+-- products: código de barras (EAN, QR, etc.)
+ALTER TABLE products ADD COLUMN barcode TEXT;
+CREATE INDEX IF NOT EXISTS idx_products_barcode ON products(user_id, barcode) WHERE barcode IS NOT NULL;
 -- appointments: enlace al cliente (Agente AI)
 ALTER TABLE appointments ADD COLUMN customer_id UUID REFERENCES customers(id);
 ```
+
+### Supabase Storage
+| Bucket | Acceso | Uso |
+|---|---|---|
+| `product-images` | Público | Imágenes de productos — path: `{userId}/{timestamp}.{ext}` |
+
+- Creación: `INSERT INTO storage.buckets (id, name, public) VALUES ('product-images', 'product-images', true) ON CONFLICT (id) DO NOTHING`
+- Upload requiere **service role key** (bypasses RLS)
+- `getPublicUrl()` devuelve URL permanente (sin expiración)
+- Tamaño máximo: 5 MB. Tipos permitidos: jpg, jpeg, png, gif, webp
 
 ---
 
@@ -530,6 +550,69 @@ GET /api/widget/[botId]/availability?year=2026&month=3
 - `extractVisitorPhone()` — detecta teléfono en mensajes del usuario (regex)
 - Botón "Agendar" en header → muestra/oculta calendario manualmente
 - El calendario postea a `POST /api/widget/[botId]/appointment` (existente)
+
+### Productos con imágenes y código de barras (2026-03-21)
+**Dependencia nueva**: `@zxing/library` (v0.21.3) — escáner de códigos de barras en el browser.
+
+**Archivos**:
+- `components/BarcodeScanner.tsx` — escáner de cámara
+- `app/api/products/upload-image/route.ts` — upload de imagen → Supabase Storage
+- `app/api/products/barcode/[code]/route.ts` — búsqueda por código de barras
+
+**Componente BarcodeScanner**:
+```typescript
+// Props
+interface BarcodeScannerProps {
+  onScan: (code: string) => void;  // callback cuando se detecta un código
+  onClose: () => void;
+}
+// Importa @zxing/library dinámicamente en useEffect (evita SSR issues)
+// Usa BrowserMultiFormatReader con { facingMode: "environment" } (cámara trasera)
+// NotFoundException es normal (no hay código en frame) — se ignora silenciosamente
+// Cleanup: reader.reset() al desmontar + cancelled flag para evitar state updates huérfanos
+// scannedRef.current = true → evita callbacks duplicados
+// NotAllowedError → muestra mensaje de permisos de cámara
+```
+
+**Dos modos del escáner (en /dashboard/products)**:
+| Modo | Activación | Comportamiento |
+|---|---|---|
+| `"lookup"` | Botón "Escanear" en header | Escanea → busca barcode en BD → si existe: abre edición; si 404: abre nuevo con barcode pre-relleno |
+| `"fill"` | Botón 📷 en campo barcode del formulario | Escanea → rellena el campo `form.barcode` y cierra el escáner |
+
+**Upload de imagen**:
+```typescript
+// POST /api/products/upload-image
+// FormData con campo "file"
+// Valida: tipo (jpg/png/gif/webp), tamaño (max 5MB)
+// Path en Storage: {userId}/{Date.now()}.{ext}
+// Usa SUPABASE_SERVICE_ROLE_KEY para bypass de RLS
+// Retorna: { url: string } — URL pública permanente
+```
+
+**Búsqueda por barcode**:
+```typescript
+// GET /api/products/barcode/[code]
+// Requiere getAuth() — ruta privada
+// Retorna 200 + { product } si existe
+// Retorna 404 + { error } si no existe
+// Frontend usa el 404 para abrir formulario de creación con barcode pre-relleno
+```
+
+**Renderizado de imágenes en widget de chat** (`app/widget/[botId]/page.tsx`):
+```typescript
+function renderMessageContent(content: string): React.ReactNode {
+  // Detecta URLs de imagen en el texto con regex
+  // Renderiza <img> inline dentro de la burbuja del mensaje
+  // Soporta: .jpg, .jpeg, .png, .gif, .webp (con query params opcionales)
+  // Si no hay URLs → retorna el texto sin cambios (performance: evita render extra)
+}
+// Supabase Storage URLs tienen formato:
+// https://xxx.supabase.co/storage/v1/object/public/product-images/{userId}/{ts}.jpg
+```
+
+**Campo `barcode` en products**: tipo TEXT, índice en `(user_id, barcode) WHERE barcode IS NOT NULL`
+**Campo `image_url` en products**: ya existía — ahora tiene upload desde dashboard y se incluye en respuestas del agente AI.
 
 ### Business Module (2026-03-12)
 **Rutas dashboard**:
@@ -815,8 +898,12 @@ SIG="sha256=$(printf '%s' "$PAYLOAD" | openssl dgst -sha256 -hmac "$SECRET" | aw
 | ✅ Fase 2B — WhatsApp Business API | Completada 2026-03-15 | Ver sección "WhatsApp Integration" |
 | ✅ WhatsApp self-service multi-tenant | Completado 2026-03-20 | Token por cliente, verify endpoint, has_token seguro |
 | ✅ Pricing v3 — 4 planes + Stripe IDs | Completado 2026-03-20 | Free/$0, Starter/$19, Pro/$39, Premium/$79. IDs `price_1TCy*` |
+| ✅ Agente AI — protocolo citas + customers | Completado 2026-03-20 | upsert_customer + AGENT_SYSTEM_INSTRUCTIONS |
+| ✅ Calendario visual de agendamiento en widget | Completado 2026-03-20 | AppointmentCalendar.tsx + /api/widget/[botId]/availability |
+| ✅ Productos con imágenes + escáner barcode | Completado 2026-03-21 | BarcodeScanner.tsx, upload-image API, barcode lookup |
 | Reportes mensuales PDF | Pro/Premium — resumen de gastos, ventas, margen | Usar lib/pdf o Puppeteer |
 | Export CSV | Gastos y ventas exportables | Pro/Premium |
+| Business sales + notes | `/dashboard/business/sales` y `/dashboard/business/notes` full CRUD | Actualmente son placeholders |
 
 ### Media prioridad
 | Tarea | Descripción | Notas |
