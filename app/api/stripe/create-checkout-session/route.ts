@@ -20,6 +20,14 @@ export async function POST(req: Request) {
 
     // Suscripciones (modo: subscription) — mensuales y anuales
     const SUBSCRIPTION_PRICE_IDS = [
+      // v3 (activos)
+      "price_1TCyOpRap0JkQNsmITpDzS3K", // Starter $19/mes
+      "price_1TCyZtRap0JkQNsmgI7TTCsN", // Pro $39/mes
+      "price_1TCyjDRap0JkQNsmsD2sNoh7", // Premium $79/mes
+      "price_1TCyWDRap0JkQNsmF2TqoFIh", // Starter $182/año
+      "price_1TCyd3Rap0JkQNsmkNvp1VvQ", // Pro $374/año
+      "price_1TCylLRap0JkQNsm2rjF94Ny", // Premium $778/año
+      // v2 (legacy)
       "price_1T8eHgRap0JkQNsmxXKjK3IH", // Starter $14/mes
       "price_1T8eNZRap0JkQNsmeObpDc8j", // Pro $29/mes
       "price_1T8eRdRap0JkQNsmllSsPbVs", // Premium $49/mes
@@ -30,9 +38,14 @@ export async function POST(req: Request) {
 
     // Pagos únicos (modo: payment)
     const ONE_TIME_PRICE_IDS = [
-      "price_1T8ehkRap0JkQNsmtky7j7ZL", // Personalización avanzada $49
-      "price_1T8f2CRap0JkQNsmyzuyUvU4", // Automatizaciones avanzadas $79
-      "price_1T8eyARap0JkQNsmWVnTTioZ", // Integración sistemas externos $99
+      // v3 (activos)
+      "price_1TCzXvRap0JkQNsmZu8qpWIX", // Personalización Avanzada $69
+      "price_1TCzaERap0JkQNsmDF5hgJ75", // Automatizaciones Avanzadas $99
+      "price_1TCzdPRap0JkQNsmkZRPlJPC", // Integración Sistemas Externos $149
+      // v2 (legacy)
+      "price_1T8ehkRap0JkQNsmtky7j7ZL", // Personalización avanzada
+      "price_1T8f2CRap0JkQNsmyzuyUvU4", // Automatizaciones avanzadas
+      "price_1T8eyARap0JkQNsmWVnTTioZ", // Integración sistemas externos
     ];
 
     const isSubscription = SUBSCRIPTION_PRICE_IDS.includes(priceId);
