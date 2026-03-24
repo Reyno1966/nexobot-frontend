@@ -1,6 +1,6 @@
 # NEXOBOT_MASTER.skill.md
 > Memoria permanente del proyecto — actualizar al final de cada sesión.
-> Última actualización: 2026-03-21 (productos con imágenes + escáner de código de barras + fix checkout Stripe v3)
+> Última actualización: 2026-03-23 (Stripe Connect — clientes conectan su propia cuenta Stripe)
 
 ---
 
@@ -246,6 +246,41 @@ if (limits.bots !== -1 && botCount >= limits.bots) {
 | Tabla | Descripción | RLS |
 |---|---|---|
 | `whatsapp_connections` | Vincula bot ↔ phone_number_id de Meta | ✅ |
+
+### Stripe Connect (implementado 2026-03-23)
+
+**Feature**: Los clientes de NexoBot pueden conectar su propia cuenta Stripe para cobrar a sus clientes finales. El dinero va directo a ellos, NexoBot no toca esos fondos.
+
+**Tipo de cuenta**: Express Account. **Modelo**: Plataforma (no marketplace). **Sin** `application_fee`.
+
+**Archivos creados**:
+- `app/api/stripe/connect/authorize/route.ts` → genera URL OAuth + CSRF state, redirige a Stripe
+- `app/api/stripe/connect/callback/route.ts` → recibe `code`, verifica state, guarda `acct_xxx` en BD
+- `app/api/stripe/connect/status/route.ts` → estado de conexión en tiempo real (refresca `charges_enabled` desde Stripe; no expone `acct_id` raw)
+- `app/api/stripe/connect/disconnect/route.ts` → revoca en Stripe + limpia BD
+- `app/dashboard/settings/page.tsx` → sección "Métodos de cobro" añadida (antes de Soporte)
+
+**Base de datos** (columnas añadidas a `profiles`):
+| Columna | Tipo | Descripción |
+|---|---|---|
+| `stripe_connect_account_id` | TEXT | `acct_xxx` del Express Account conectado |
+| `stripe_connect_charges_enabled` | BOOLEAN | Si la cuenta puede procesar cobros |
+| `stripe_connect_connected_at` | TIMESTAMPTZ | Cuándo conectó |
+
+Índice: `idx_profiles_stripe_connect` en `(stripe_connect_account_id) WHERE NOT NULL`
+
+**Seguridad CSRF**: `state` = HMAC-SHA256(userId, STRIPE_WEBHOOK_SECRET) — verificado con `timingSafeEqual` en el callback.
+
+**ENV var pendiente**:
+```
+STRIPE_CLIENT_ID=ca_xxx   ← pendiente verificación de identidad en Stripe
+```
+
+**Pendiente para activar en producción**:
+1. Verificar identidad en Stripe → obtener `ca_xxx`
+2. Añadir `STRIPE_CLIENT_ID` en Vercel
+3. Añadir Redirect URI en Stripe Dashboard: `https://nexobot.net/api/stripe/connect/callback`
+4. Push a `main`
 
 **Schema**: `whatsapp-schema.sql` en raíz del proyecto.
 
@@ -922,6 +957,7 @@ const SUBSCRIPTION_PRICE_IDS = [
 | ✅ Agente AI — protocolo citas + customers | Completado 2026-03-20 | upsert_customer + AGENT_SYSTEM_INSTRUCTIONS |
 | ✅ Calendario visual de agendamiento en widget | Completado 2026-03-20 | AppointmentCalendar.tsx + /api/widget/[botId]/availability |
 | ✅ Productos con imágenes + escáner barcode | Completado 2026-03-21 | BarcodeScanner.tsx, upload-image API, barcode lookup |
+| ✅ Stripe Connect — pagos directos a clientes | Completado 2026-03-23 | OAuth Express Account, sin application_fee |
 | Reportes mensuales PDF | Pro/Premium — resumen de gastos, ventas, margen | Usar lib/pdf o Puppeteer |
 | Export CSV | Gastos y ventas exportables | Pro/Premium |
 | Business sales + notes | `/dashboard/business/sales` y `/dashboard/business/notes` full CRUD | Actualmente son placeholders |

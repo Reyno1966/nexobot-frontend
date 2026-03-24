@@ -13,6 +13,13 @@ interface Profile {
   company_website:  string | null;
 }
 
+interface ConnectStatus {
+  connected:       boolean;
+  charges_enabled?: boolean;
+  connected_at?:   string;
+  account_preview?: string;
+}
+
 export default function SettingsPage() {
   const [user, setUser]       = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -34,11 +41,18 @@ export default function SettingsPage() {
   const [logoError, setLogoError]       = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Stripe Connect
+  const [connectStatus, setConnectStatus]     = useState<ConnectStatus | null>(null);
+  const [connectLoading, setConnectLoading]   = useState(true);
+  const [disconnecting, setDisconnecting]     = useState(false);
+  const [connectMessage, setConnectMessage]   = useState<{ type: "success" | "error" | "info"; text: string } | null>(null);
+
   useEffect(() => {
     async function load() {
-      const [meRes, profileRes] = await Promise.all([
-        fetch("/api/auth/me",  { credentials: "include" }),
-        fetch("/api/profile",  { credentials: "include" }),
+      const [meRes, profileRes, connectRes] = await Promise.all([
+        fetch("/api/auth/me",               { credentials: "include" }),
+        fetch("/api/profile",               { credentials: "include" }),
+        fetch("/api/stripe/connect/status", { credentials: "include" }),
       ]);
       if (meRes.ok)      setUser((await meRes.json()).user);
       if (profileRes.ok) {
@@ -55,9 +69,25 @@ export default function SettingsPage() {
           if (p.company_logo_url) setLogoPreview(p.company_logo_url);
         }
       }
+      if (connectRes.ok) setConnectStatus(await connectRes.json());
+      setConnectLoading(false);
       setLoading(false);
     }
     load();
+
+    // Handle redirect back from Stripe OAuth
+    const params = new URLSearchParams(window.location.search);
+    const connectParam = params.get("connect");
+    if (connectParam === "success") {
+      setConnectMessage({ type: "success", text: "✅ ¡Cuenta Stripe conectada correctamente!" });
+      window.history.replaceState({}, "", "/dashboard/settings");
+    } else if (connectParam === "error") {
+      setConnectMessage({ type: "error", text: "No se pudo conectar la cuenta Stripe. Inténtalo de nuevo." });
+      window.history.replaceState({}, "", "/dashboard/settings");
+    } else if (connectParam === "cancelled") {
+      setConnectMessage({ type: "info", text: "Conexión cancelada." });
+      window.history.replaceState({}, "", "/dashboard/settings");
+    }
   }, []);
 
   // ── Subida directa de logo ──
@@ -143,6 +173,29 @@ export default function SettingsPage() {
     } catch {
       setBrandMessage({ type: "error", text: "Error de conexión." });
     } finally { setBrandSaving(false); }
+  }
+
+  async function handleDisconnect() {
+    if (!confirm("¿Seguro que quieres desconectar tu cuenta Stripe? Tus bots dejarán de poder procesar pagos.")) return;
+    setDisconnecting(true);
+    setConnectMessage(null);
+    try {
+      const res = await fetch("/api/stripe/connect/disconnect", {
+        method: "DELETE",
+        credentials: "include",
+      });
+      if (res.ok) {
+        setConnectStatus({ connected: false });
+        setConnectMessage({ type: "success", text: "Cuenta Stripe desconectada." });
+      } else {
+        const data = await res.json();
+        setConnectMessage({ type: "error", text: data.error ?? "Error al desconectar." });
+      }
+    } catch {
+      setConnectMessage({ type: "error", text: "Error de conexión." });
+    } finally {
+      setDisconnecting(false);
+    }
   }
 
   if (loading) {
@@ -411,6 +464,104 @@ export default function SettingsPage() {
             {pwLoading ? "Actualizando..." : "Actualizar contraseña"}
           </button>
         </form>
+      </div>
+
+      {/* ── MÉTODOS DE COBRO ── */}
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-6">
+        <div className="flex items-center gap-3 mb-5">
+          <div className="w-9 h-9 bg-gradient-to-br from-[#2CC5C5] to-[#F5A623] rounded-xl flex items-center justify-center">
+            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+            </svg>
+          </div>
+          <div>
+            <h2 className="text-base font-semibold text-gray-900">Métodos de cobro</h2>
+            <p className="text-xs text-gray-400">Conecta tu cuenta Stripe para cobrar a tus clientes desde tus bots</p>
+          </div>
+        </div>
+
+        {connectMessage && (
+          <div className={`rounded-xl px-4 py-3 text-sm mb-4 ${
+            connectMessage.type === "success"
+              ? "bg-green-50 text-green-700 border border-green-200"
+              : connectMessage.type === "error"
+              ? "bg-red-50 text-red-600 border border-red-200"
+              : "bg-gray-50 text-gray-600 border border-gray-200"
+          }`}>
+            {connectMessage.text}
+          </div>
+        )}
+
+        {connectLoading ? (
+          <div className="flex items-center justify-center py-6">
+            <div className="w-7 h-7 border-2 border-[#2CC5C5] border-t-transparent rounded-full animate-spin" />
+          </div>
+        ) : connectStatus?.connected ? (
+          /* ── CONECTADO ── */
+          <div>
+            <div className="flex items-start gap-4 p-4 bg-green-50 border border-green-200 rounded-xl mb-4">
+              {/* Stripe logo */}
+              <div className="w-10 h-10 bg-[#635BFF] rounded-xl flex items-center justify-center flex-shrink-0">
+                <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M13.976 9.15c-2.172-.806-3.356-1.426-3.356-2.409 0-.831.683-1.305 1.901-1.305 2.227 0 4.515.858 6.09 1.631l.89-5.494C18.252.975 15.697 0 12.165 0 9.667 0 7.589.654 6.104 1.872 4.56 3.147 3.757 4.992 3.757 7.218c0 4.039 2.467 5.76 6.476 7.219 2.585.92 3.445 1.574 3.445 2.583 0 .98-.84 1.545-2.354 1.545-1.875 0-4.965-.921-6.99-2.109l-.9 5.555C5.175 22.99 8.385 24 11.714 24c2.641 0 4.843-.624 6.328-1.813 1.664-1.305 2.525-3.236 2.525-5.732 0-4.128-2.524-5.851-6.591-7.305z"/>
+                </svg>
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="font-semibold text-green-800 text-sm">Stripe conectado</p>
+                <p className="text-xs text-green-600 mt-0.5">{connectStatus.account_preview}</p>
+                {connectStatus.connected_at && (
+                  <p className="text-xs text-gray-400 mt-1">
+                    Conectado el {new Date(connectStatus.connected_at).toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric" })}
+                  </p>
+                )}
+              </div>
+              <div className="flex-shrink-0">
+                {connectStatus.charges_enabled ? (
+                  <span className="inline-flex items-center gap-1 bg-green-100 text-green-700 text-xs font-medium px-2.5 py-1 rounded-full">
+                    <span className="w-1.5 h-1.5 bg-green-500 rounded-full" />
+                    Activo
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 bg-yellow-100 text-yellow-700 text-xs font-medium px-2.5 py-1 rounded-full">
+                    <span className="w-1.5 h-1.5 bg-yellow-500 rounded-full" />
+                    Pendiente
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {!connectStatus.charges_enabled && (
+              <p className="text-xs text-yellow-700 bg-yellow-50 border border-yellow-200 rounded-xl px-4 py-3 mb-4">
+                Tu cuenta Stripe aún no puede procesar cobros. Completa la verificación de identidad en el panel de Stripe para activarla.
+              </p>
+            )}
+
+            <button
+              onClick={handleDisconnect}
+              disabled={disconnecting}
+              className="text-sm text-red-500 hover:text-red-600 font-medium transition disabled:opacity-50"
+            >
+              {disconnecting ? "Desconectando..." : "Desconectar cuenta Stripe"}
+            </button>
+          </div>
+        ) : (
+          /* ── NO CONECTADO ── */
+          <div>
+            <p className="text-sm text-gray-500 mb-5">
+              Conecta tu cuenta Stripe para que tus bots puedan enviar links de pago y cobrar a tus clientes finales. El dinero va directo a tu cuenta — NexoBot no interviene en los cobros.
+            </p>
+            <a
+              href="/api/stripe/connect/authorize"
+              className="inline-flex items-center gap-2.5 px-5 py-2.5 bg-[#635BFF] hover:bg-[#4F46E5] text-white text-sm font-semibold rounded-xl transition"
+            >
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M13.976 9.15c-2.172-.806-3.356-1.426-3.356-2.409 0-.831.683-1.305 1.901-1.305 2.227 0 4.515.858 6.09 1.631l.89-5.494C18.252.975 15.697 0 12.165 0 9.667 0 7.589.654 6.104 1.872 4.56 3.147 3.757 4.992 3.757 7.218c0 4.039 2.467 5.76 6.476 7.219 2.585.92 3.445 1.574 3.445 2.583 0 .98-.84 1.545-2.354 1.545-1.875 0-4.965-.921-6.99-2.109l-.9 5.555C5.175 22.99 8.385 24 11.714 24c2.641 0 4.843-.624 6.328-1.813 1.664-1.305 2.525-3.236 2.525-5.732 0-4.128-2.524-5.851-6.591-7.305z"/>
+              </svg>
+              Conectar mi Stripe
+            </a>
+          </div>
+        )}
       </div>
 
       {/* ── SOPORTE ── */}
