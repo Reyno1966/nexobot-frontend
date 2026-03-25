@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import Link from "next/link";
+import { exportToXLSX, exportToPDF } from "@/lib/export-business";
 
 interface Product {
   id: string;
@@ -47,6 +48,9 @@ export default function InventoryPage() {
   const [loading, setLoading]     = useState(true);
   const [search, setSearch]       = useState("");
   const [filterActive, setFilter] = useState<"todos" | "activos" | "inactivos">("activos");
+  const [showExport, setShowExport] = useState(false);
+  const [exporting, setExporting]   = useState<"xlsx" | "pdf" | null>(null);
+  const exportRef                   = useRef<HTMLDivElement>(null);
 
   const fetchProducts = useCallback(async () => {
     setLoading(true);
@@ -78,6 +82,61 @@ export default function InventoryPage() {
   const lowStock        = products.filter((p) => p.stock !== null && p.stock <= 5);
   const outOfStock      = products.filter((p) => p.stock === 0);
   const totalStockValue = activeProducts.reduce((sum, p) => sum + (p.price * (p.stock ?? 0)), 0);
+
+  // ── Export helpers ───────────────────────────────────────────────────────────
+  useEffect(() => {
+    if (!showExport) return;
+    function handleClickOutside(e: MouseEvent) {
+      if (exportRef.current && !exportRef.current.contains(e.target as Node)) {
+        setShowExport(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [showExport]);
+
+  function buildExportData() {
+    const columns = [
+      { header: "Producto",       key: "nombre",    width: 28, align: "left"   as const },
+      { header: "Categoría",      key: "categoria", width: 16, align: "left"   as const },
+      { header: "Precio venta",   key: "precio",    width: 14, align: "right"  as const },
+      { header: "Costo",          key: "costo",     width: 14, align: "right"  as const },
+      { header: "Margen %",       key: "margen",    width: 12, align: "right"  as const },
+      { header: "Stock",          key: "stock",     width: 10, align: "center" as const },
+      { header: "Estado",         key: "estado",    width: 12, align: "center" as const },
+    ];
+    const rows = filtered.map((p) => {
+      const hasCost = p.cost_price > 0;
+      const margin  = hasCost ? ((p.price - p.cost_price) / p.price) * 100 : null;
+      return {
+        nombre:    p.name,
+        categoria: p.category ?? "",
+        precio:    p.price.toFixed(2),
+        costo:     hasCost ? p.cost_price.toFixed(2) : "",
+        margen:    margin !== null ? `${margin.toFixed(1)}%` : "",
+        stock:     p.stock !== null ? String(p.stock) : "",
+        estado:    STATUS_MAP[p.status]?.label ?? p.status,
+      };
+    });
+    const filterLabel = filterActive === "activos" ? "Activos" : filterActive === "inactivos" ? "Inactivos" : "Todos";
+    const searchLabel = search.trim() ? ` · Búsqueda: "${search.trim()}"` : "";
+    const subtitle = `Filtro: ${filterLabel}${searchLabel} · Generado: ${new Date().toLocaleDateString("es", { day: "2-digit", month: "long", year: "numeric" })}`;
+    const filename = `inventario_${new Date().toISOString().split("T")[0]}`;
+    return { columns, rows, subtitle, filename };
+  }
+
+  async function handleExport(type: "xlsx" | "pdf") {
+    setShowExport(false);
+    setExporting(type);
+    const { columns, rows, subtitle, filename } = buildExportData();
+    const opts = { filename, title: "Reporte de Inventario", subtitle, columns, rows };
+    try {
+      if (type === "xlsx") await exportToXLSX(opts);
+      else                  await exportToPDF(opts);
+    } finally {
+      setExporting(null);
+    }
+  }
 
   // ── Render ───────────────────────────────────────────────────────────────────
   return (
@@ -137,16 +196,61 @@ export default function InventoryPage() {
           ))}
         </div>
 
-        {/* Botón gestionar (va a /dashboard/products) */}
-        <Link
-          href="/dashboard/products"
-          className="flex-shrink-0 flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#2CC5C5] to-[#F5A623] text-white rounded-xl text-sm font-semibold hover:opacity-90 transition shadow-sm"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
-          Gestionar productos
-        </Link>
+        {/* Botones: Exportar + Gestionar productos */}
+        <div className="flex items-center gap-2 flex-shrink-0">
+          {/* Exportar dropdown */}
+          <div className="relative" ref={exportRef}>
+            <button
+              onClick={() => setShowExport((v) => !v)}
+              disabled={!!exporting || filtered.length === 0}
+              className="flex items-center gap-1.5 px-4 py-2 border border-[#2CC5C5] text-[#2CC5C5] rounded-xl text-sm font-semibold hover:bg-[#EEF9F9] transition disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              {exporting ? (
+                <div className="w-4 h-4 border-2 border-[#2CC5C5] border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+              )}
+              Exportar
+              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            {showExport && (
+              <div className="absolute right-0 top-full mt-1 z-20 bg-white border border-gray-100 rounded-xl shadow-lg py-1 min-w-[160px]">
+                <button
+                  onClick={() => handleExport("xlsx")}
+                  className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 hover:bg-[#EEF9F9] hover:text-[#2CC5C5] transition"
+                >
+                  <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  Excel (.xlsx)
+                </button>
+                <button
+                  onClick={() => handleExport("pdf")}
+                  className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 hover:bg-[#EEF9F9] hover:text-[#2CC5C5] transition"
+                >
+                  <svg className="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                  </svg>
+                  PDF
+                </button>
+              </div>
+            )}
+          </div>
+
+          <Link
+            href="/dashboard/products"
+            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#2CC5C5] to-[#F5A623] text-white rounded-xl text-sm font-semibold hover:opacity-90 transition shadow-sm"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+            Gestionar productos
+          </Link>
+        </div>
       </div>
 
       {/* ── Tabla de productos ── */}

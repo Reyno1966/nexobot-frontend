@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
+import { exportToXLSX, exportToPDF } from "@/lib/export-business";
 
 interface Sale {
   id: string;
@@ -82,6 +83,9 @@ export default function SalesPage() {
   const [deleting, setDeleting]       = useState<string | null>(null);
   const [saveError, setSaveError]     = useState("");
   const [form, setForm]               = useState({ ...emptyForm });
+  const [showExport, setShowExport]   = useState(false);
+  const [exporting, setExporting]     = useState<"xlsx" | "pdf" | null>(null);
+  const exportRef                     = useRef<HTMLDivElement>(null);
 
   const period = getMonthPeriod(monthOffset);
 
@@ -187,6 +191,60 @@ export default function SalesPage() {
     setSales((prev) => prev.filter((s) => s.id !== id));
   }
 
+  // ── Export helpers ───────────────────────────────────────────────────────────
+  useEffect(() => {
+    if (!showExport) return;
+    function handleClickOutside(e: MouseEvent) {
+      if (exportRef.current && !exportRef.current.contains(e.target as Node)) {
+        setShowExport(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [showExport]);
+
+  function buildExportData() {
+    const columns = [
+      { header: "Fecha",            key: "fecha",          width: 14, align: "left"  as const },
+      { header: "Descripción",      key: "descripcion",    width: 30, align: "left"  as const },
+      { header: "Categoría",        key: "categoria",      width: 16, align: "left"  as const },
+      { header: "Método de pago",   key: "metodo",         width: 16, align: "center" as const },
+      { header: "Monto (USD)",      key: "monto",          width: 14, align: "right" as const },
+    ];
+    const rows = filtered.map((s) => ({
+      fecha:       formatDate(s.date),
+      descripcion: s.description,
+      categoria:   s.category ?? "",
+      metodo:      PM_LABELS[s.payment_method as PaymentMethod] ?? s.payment_method,
+      monto:       Number(s.amount).toFixed(2),
+    }));
+    const totalAmt = filtered.reduce((sum, s) => sum + Number(s.amount), 0);
+    const totals = {
+      fecha:       "",
+      descripcion: "TOTAL",
+      categoria:   "",
+      metodo:      `${filtered.length} venta${filtered.length !== 1 ? "s" : ""}`,
+      monto:       totalAmt.toFixed(2),
+    };
+    const pmLabel = filterPM === "Todas" ? "Todos los métodos" : PM_LABELS[filterPM as PaymentMethod];
+    const subtitle = `Período: ${period.label} · Filtro: ${pmLabel} · Generado: ${new Date().toLocaleDateString("es", { day: "2-digit", month: "long", year: "numeric" })}`;
+    const filename = `ventas_${period.year}-${period.month}`;
+    return { columns, rows, totals, subtitle, filename };
+  }
+
+  async function handleExport(type: "xlsx" | "pdf") {
+    setShowExport(false);
+    setExporting(type);
+    const { columns, rows, totals, subtitle, filename } = buildExportData();
+    const opts = { filename, title: "Reporte de Ventas", subtitle, columns, rows, totals };
+    try {
+      if (type === "xlsx") await exportToXLSX(opts);
+      else                  await exportToPDF(opts);
+    } finally {
+      setExporting(null);
+    }
+  }
+
   // ── Render ──────────────────────────────────────────────────────────────────
   return (
     <div>
@@ -281,16 +339,61 @@ export default function SalesPage() {
           ))}
         </div>
 
-        {/* Botón agregar */}
-        <button
-          onClick={openNew}
-          className="flex-shrink-0 flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#2CC5C5] to-[#F5A623] text-white rounded-xl text-sm font-semibold hover:opacity-90 transition shadow-sm"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
-          Registrar venta
-        </button>
+        {/* Botones: Exportar + Agregar */}
+        <div className="flex items-center gap-2 flex-shrink-0">
+          {/* Exportar dropdown */}
+          <div className="relative" ref={exportRef}>
+            <button
+              onClick={() => setShowExport((v) => !v)}
+              disabled={!!exporting || filtered.length === 0}
+              className="flex items-center gap-1.5 px-4 py-2 border border-[#2CC5C5] text-[#2CC5C5] rounded-xl text-sm font-semibold hover:bg-[#EEF9F9] transition disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              {exporting ? (
+                <div className="w-4 h-4 border-2 border-[#2CC5C5] border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+              )}
+              Exportar
+              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            {showExport && (
+              <div className="absolute right-0 top-full mt-1 z-20 bg-white border border-gray-100 rounded-xl shadow-lg py-1 min-w-[160px]">
+                <button
+                  onClick={() => handleExport("xlsx")}
+                  className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 hover:bg-[#EEF9F9] hover:text-[#2CC5C5] transition"
+                >
+                  <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  Excel (.xlsx)
+                </button>
+                <button
+                  onClick={() => handleExport("pdf")}
+                  className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 hover:bg-[#EEF9F9] hover:text-[#2CC5C5] transition"
+                >
+                  <svg className="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                  </svg>
+                  PDF
+                </button>
+              </div>
+            )}
+          </div>
+
+          <button
+            onClick={openNew}
+            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#2CC5C5] to-[#F5A623] text-white rounded-xl text-sm font-semibold hover:opacity-90 transition shadow-sm"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+            Registrar venta
+          </button>
+        </div>
       </div>
 
       {/* ── Lista de ventas ── */}
