@@ -100,6 +100,40 @@ export async function POST(req: Request) {
   return NextResponse.json({ ok: true });
 }
 
+// ─── Reenvío a BolsaAI (fire & forget) ───────────────────────────────────────
+
+async function forwardToBolsaAI(
+  entry: WAEntry,
+  change: WAEntry["changes"][number]
+) {
+  const webhookUrl    = process.env.BOLSAAI_WEBHOOK_URL;
+  const webhookSecret = process.env.BOLSAAI_WEBHOOK_SECRET;
+
+  if (!webhookUrl || !webhookSecret) {
+    console.warn("[BolsaAI forward] BOLSAAI_WEBHOOK_URL o BOLSAAI_WEBHOOK_SECRET no configurados");
+    return;
+  }
+
+  const payload = {
+    object: "whatsapp_business_account",
+    entry: [{ ...entry, changes: [change] }],
+  };
+
+  const res = await fetch(webhookUrl, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-nexobot-webhook-secret": webhookSecret,
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`BolsaAI webhook respondió ${res.status}: ${text}`);
+  }
+}
+
 // ─── Procesamiento interno (async, fuera del ciclo request/response) ──────────
 
 async function processEntries(entries: WAEntry[]) {
@@ -147,7 +181,15 @@ async function processEntries(entries: WAEntry[]) {
         // Marcar como leído (fire & forget)
         markWhatsAppMessageRead(messageId, phoneNumberId, waToken).catch(() => {});
 
-        // ── 4b. Cargar o crear conversación para este número de WhatsApp ────
+        // ── 4b. Reenviar a BolsaAI si el mensaje es un comando de stops ─────
+        const upperText = messageText.trim().toUpperCase();
+        if (["CONFIRMAR", "CANCELAR", "VERIFICAR"].includes(upperText)) {
+          forwardToBolsaAI(entry, change).catch((err) => {
+            console.error("[WhatsApp] Error reenviando a BolsaAI:", err);
+          });
+        }
+
+        // ── 4d. Cargar o crear conversación para este número de WhatsApp ────
         const sessionId = `whatsapp-${senderPhone}`;
         let conversationId: string | null = null;
 
@@ -174,7 +216,7 @@ async function processEntries(entries: WAEntry[]) {
           conversationId = newConv?.id ?? null;
         }
 
-        // ── 4c. Cargar historial de la conversación (últimos mensajes) ────
+        // ── 4e. Cargar historial de la conversación (últimos mensajes) ────
         interface DBMessage { role: string; content: string }
         let history: Array<{ role: "user" | "assistant"; content: string }> = [];
         if (conversationId) {
@@ -194,7 +236,7 @@ async function processEntries(entries: WAEntry[]) {
           }
         }
 
-        // ── 4d. Procesar con el motor del bot ──────────────────────────────
+        // ── 4f. Procesar con el motor del bot ──────────────────────────────
         const result = await processBotMessage({
           userId,
           botId,
@@ -209,7 +251,7 @@ async function processEntries(entries: WAEntry[]) {
           continue;
         }
 
-        // ── 4e. Enviar respuesta por WhatsApp ──────────────────────────────
+        // ── 4g. Enviar respuesta por WhatsApp ──────────────────────────────
         if (!result.limitReached) {
           await sendWhatsAppMessage(senderPhone, result.reply, phoneNumberId, waToken);
         } else {
@@ -222,7 +264,7 @@ async function processEntries(entries: WAEntry[]) {
           ).catch(() => {});
         }
 
-        // ── 4f. Guardar intercambio en la BD ──────────────────────────────
+        // ── 4h. Guardar intercambio en la BD ──────────────────────────────
         if (conversationId) {
           const msgCount = (existingConv?.message_count ?? 0) + 2;
           await supabase
